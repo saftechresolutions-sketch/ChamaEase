@@ -30,13 +30,11 @@
             --sidebar-width: 280px;
         }
 
-        /* Layout with Sidebar */
         .app-wrapper {
             display: flex;
             min-height: 100vh;
         }
 
-        /* Sidebar Styles */
         .sidebar {
             width: var(--sidebar-width);
             background: white;
@@ -142,7 +140,6 @@
             margin: 0.6rem 1rem;
         }
 
-        /* Main Content */
         .main-content {
             flex: 1;
             margin-left: var(--sidebar-width);
@@ -150,7 +147,6 @@
             width: calc(100% - var(--sidebar-width));
         }
 
-        /* Top Bar */
         .top-bar {
             background: white;
             padding: 0.7rem 1rem;
@@ -173,10 +169,6 @@
             padding: 6px;
             border-radius: 50%;
             transition: all 0.2s;
-        }
-
-        .menu-toggle:hover {
-            background: var(--primary-light);
         }
 
         .page-title {
@@ -281,13 +273,53 @@
             width: 100%;
             border-collapse: collapse;
             font-size: 0.7rem;
-            min-width: 500px;
         }
         
-        @media (min-width: 640px) {
+        @media (max-width: 768px) {
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+            thead {
+                display: none;
+            }
+            tr {
+                margin-bottom: 1rem;
+                border: 1px solid var(--gray-border);
+                border-radius: 12px;
+                background: white;
+                padding: 0.5rem;
+            }
+            td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.6rem 0.4rem;
+                border-bottom: 1px solid var(--gray-border);
+                font-size: 0.75rem;
+            }
+            td:last-child {
+                border-bottom: none;
+            }
+            td::before {
+                content: attr(data-label);
+                font-weight: 600;
+                width: 40%;
+                color: #5b6e8c;
+            }
+        }
+        
+        @media (min-width: 769px) {
             table {
-                font-size: 0.8rem;
-                min-width: auto;
+                min-width: 500px;
+            }
+            th, td {
+                padding: 0.6rem 0.4rem;
+            }
+            th {
+                font-size: 0.7rem;
+            }
+            td {
+                font-size: 0.7rem;
             }
         }
 
@@ -300,16 +332,6 @@
         th {
             background: #f8fafc;
             font-weight: 600;
-            font-size: 0.7rem;
-        }
-
-        @media (min-width: 640px) {
-            th {
-                font-size: 0.8rem;
-            }
-            td {
-                font-size: 0.8rem;
-            }
         }
 
         .badge-paid {
@@ -425,7 +447,6 @@
             font-size: 1.2rem;
         }
 
-        /* Form row for new contribution */
         .form-row {
             display: flex;
             flex-wrap: wrap;
@@ -454,7 +475,6 @@
             }
         }
 
-        /* Sidebar Overlay */
         .sidebar-overlay {
             display: none;
             position: fixed;
@@ -470,7 +490,6 @@
             display: block;
         }
 
-        /* Mobile Sidebar */
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -502,59 +521,23 @@
             <button class="sidebar-close" id="sidebarClose">✕</button>
         </div>
         <nav class="sidebar-nav">
-            <a href="dashboard.html" class="nav-item">
-                <span class="icon">📊</span>
-                <span class="label">Dashboard</span>
-            </a>
-            <a href="members.html" class="nav-item">
-                <span class="icon">👥</span>
-                <span class="label">Members</span>
-            </a>
-            <a href="contributions.html" class="nav-item active">
-                <span class="icon">💰</span>
-                <span class="label">Contributions</span>
-            </a>
-            
+            <a href="dashboard.html" class="nav-item"><span class="icon">📊</span><span class="label">Dashboard</span></a>
+            <a href="members.html" class="nav-item"><span class="icon">👥</span><span class="label">Members</span></a>
+            <a href="contributions.html" class="nav-item active"><span class="icon">💰</span><span class="label">Contributions</span></a>
             <div class="nav-divider"></div>
-            
-            <div class="nav-item" style="cursor: default; opacity: 0.7;">
-                <span class="icon">📜</span>
-                <span class="label">History</span>
-            </div>
+            <div class="nav-item" style="cursor: default; opacity: 0.7;"><span class="icon">📜</span><span class="label">History</span></div>
             <div class="nav-submenu">
-                <a href="contribution-history.html" class="nav-item">
-                    <span class="icon">📋</span>
-                    <span class="label">Contributions History</span>
-                </a>
-                <a href="member-history.html" class="nav-item">
-                    <span class="icon">👤</span>
-                    <span class="label">Members History</span>
-                </a>
+                <a href="contribution-history.html" class="nav-item"><span class="icon">📋</span><span class="label">Contributions History</span></a>
+                <a href="member-history.html" class="nav-item"><span class="icon">👤</span><span class="label">Members History</span></a>
             </div>
-            
             <div class="nav-divider"></div>
-            
-            <div class="nav-item" style="cursor: default; opacity: 0.7;">
-                <span class="icon">📈</span>
-                <span class="label">Analytics</span>
-            </div>
+            <div class="nav-item" style="cursor: default; opacity: 0.7;"><span class="icon">📈</span><span class="label">Analytics</span></div>
             <div class="nav-submenu">
-                <a href="statistics.html" class="nav-item">
-                    <span class="icon">📊</span>
-                    <span class="label">Monthly Statistics</span>
-                </a>
-                <a href="reports.html" class="nav-item">
-                    <span class="icon">📋</span>
-                    <span class="label">Reports</span>
-                </a>
+                <a href="statistics.html" class="nav-item"><span class="icon">📊</span><span class="label">Monthly Statistics</span></a>
+                <a href="reports.html" class="nav-item"><span class="icon">📋</span><span class="label">Reports</span></a>
             </div>
-            
             <div class="nav-divider"></div>
-            
-            <a href="settings.html" class="nav-item">
-                <span class="icon">⚙️</span>
-                <span class="label">Settings</span>
-            </a>
+            <a href="settings.html" class="nav-item"><span class="icon">⚙️</span><span class="label">Settings</span></a>
         </nav>
     </aside>
 
@@ -583,78 +566,43 @@
     let allContributions = [];
     let currentMonthFilter = 'all';
 
-    // Sidebar functionality
     const menuToggle = document.getElementById('menuToggle');
     const sidebar = document.getElementById('sidebar');
     const sidebarClose = document.getElementById('sidebarClose');
     const sidebarOverlay = document.getElementById('sidebarOverlay');
     
-    function openSidebar() {
-        sidebar.classList.add('open');
-        sidebarOverlay.classList.add('active');
-    }
-    
-    function closeSidebar() {
-        sidebar.classList.remove('open');
-        sidebarOverlay.classList.remove('active');
-    }
+    function openSidebar() { sidebar.classList.add('open'); sidebarOverlay.classList.add('active'); }
+    function closeSidebar() { sidebar.classList.remove('open'); sidebarOverlay.classList.remove('active'); }
     
     if (menuToggle) menuToggle.addEventListener('click', openSidebar);
     if (sidebarClose) sidebarClose.addEventListener('click', closeSidebar);
     if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebar);
-    
-    window.addEventListener('resize', () => {
-        if (window.innerWidth > 768) closeSidebar();
-    });
+    window.addEventListener('resize', () => { if (window.innerWidth > 768) closeSidebar(); });
 
     (async function() {
         const isAuth = await protectPage();
         if (!isAuth) return;
-        
         const user = await getCurrentUser();
         if (user) document.getElementById('userEmail').textContent = user.email || 'Admin';
-        
         await loadData();
     })();
 
-    document.getElementById('logoutBtn').addEventListener('click', async () => {
-        await logoutUser();
-        window.location.href = 'index.html';
-    });
+    document.getElementById('logoutBtn').addEventListener('click', async () => { await logoutUser(); window.location.href = 'index.html'; });
 
-    function formatNumber(num) {
-        return (num || 0).toLocaleString('en-KE');
-    }
+    function formatNumber(num) { return (num || 0).toLocaleString('en-KE'); }
 
     async function loadData() {
         try {
-            const { data: members, error: membersError } = await supabaseClient
-                .from('members')
-                .select('*')
-                .order('name');
-            
+            const { data: members, error: membersError } = await supabaseClient.from('members').select('*').order('name');
             if (membersError) throw membersError;
             allMembers = members || [];
-            
-            const { data: contributions, error: contribError } = await supabaseClient
-                .from('contributions')
-                .select(`*, members:member_id (name)`)
-                .order('date', { ascending: false });
-            
+            const { data: contributions, error: contribError } = await supabaseClient.from('contributions').select(`*, members:member_id (name)`).order('date', { ascending: false });
             if (contribError) throw contribError;
             allContributions = contributions || [];
-            
             renderContributionsPage();
-            
         } catch (error) {
             console.error("Error loading data:", error);
-            document.getElementById('app-root').innerHTML = `
-                <div class="card">
-                    <h3>⚠️ Error Loading Data</h3>
-                    <p style="font-size:0.8rem;">${error.message}</p>
-                    <button class="btn" onclick="location.reload()" style="margin-top:0.5rem;">Retry</button>
-                </div>
-            `;
+            document.getElementById('app-root').innerHTML = `<div class="card"><h3>⚠️ Error Loading Data</h3><p style="font-size:0.8rem;">${error.message}</p><button class="btn" onclick="location.reload()" style="margin-top:0.5rem;">Retry</button></div>`;
         }
     }
 
@@ -677,86 +625,22 @@
         const unpaidMembers = allMembers.filter(m => (m.balance || 0) > 0);
         
         const html = `
-            <div class="history-header">
-                <h2>💰 Contributions</h2>
-                <button class="btn-sm btn-outline" id="refreshBtn">🔄 Refresh</button>
-            </div>
-            
-            <div class="card">
-                <h3>➕ Record New Contribution</h3>
-                <div class="form-row">
-                    <select id="memberSelect">
-                        <option value="">-- Select Member --</option>
-                        ${allMembers.map(m => `<option value="${m.id}">${escapeHtml(m.name)}</option>`).join('')}
-                    </select>
-                    <input type="number" id="contributionAmount" placeholder="Amount (KES)">
-                    <input type="month" id="contributionMonth" value="${new Date().toISOString().slice(0,7)}">
-                    <input type="date" id="contributionDate" value="${new Date().toISOString().slice(0,10)}">
-                    <select id="paymentMethod">
-                        <option value="M-Pesa">M-Pesa</option>
-                        <option value="Cash">Cash</option>
-                        <option value="Bank Transfer">Bank Transfer</option>
-                    </select>
-                    <button id="saveContributionBtn" class="btn">💾 Save</button>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="flex-between">
-                    <h3>🔍 Filter</h3>
-                    <select id="monthFilterSelect" class="filter-select">
-                        <option value="all" ${currentMonthFilter === 'all' ? 'selected' : ''}>All Records</option>
-                        ${months.map(m => `<option value="${m}" ${currentMonthFilter === m ? 'selected' : ''}>${m}</option>`).join('')}
-                    </select>
-                </div>
-            </div>
-            
-            <div class="card">
-                <h3>✅ Paid Members</h3>
-                <div class="table-wrapper">
-                    <table>
-                        <thead><tr><th>Name</th><th>Total Paid</th><th>Status</th></tr></thead>
-                        <tbody>
-                            ${paidMembers.map(m => `<tr><td><strong>${escapeHtml(m.name)}</strong></td><td>KES ${formatNumber(m.total_contributed)}</td><td><span class="badge-paid">Paid</span></td></tr>`).join('')}
-                            ${paidMembers.length === 0 ? '<tr><td colspan="3">No paid members yet</td></tr>' : ''}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            
-            <div class="card">
-                <h3>⚠️ Unpaid Members</h3>
-                <div class="table-wrapper">
-                    <table>
-                        <thead><tr><th>Name</th><th>Balance</th><th>Action</th></tr></thead>
-                        <tbody>
-                            ${unpaidMembers.map(m => `<tr><td><strong>${escapeHtml(m.name)}</strong></td><td>KES ${formatNumber(m.balance)}</td><td><button class="btn-sm btn-outline settle-balance" data-id="${m.id}" data-balance="${m.balance || 0}">Settle</button></td></tr>`).join('')}
-                            ${unpaidMembers.length === 0 ? '<tr><td colspan="3">🎉 Everyone is up to date!</td></tr>' : ''}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            
-            <div class="card">
-                <h3>📜 Contribution History ${currentMonthFilter !== 'all' ? `- ${currentMonthFilter}` : ''}</h3>
-                <p><strong>Total: KES ${formatNumber(totalCollected)}</strong></p>
-                <div class="table-wrapper">
-                    <table>
-                        <thead><tr><th>Member</th><th>Amount</th><th>Date</th><th>Month</th><th>Method</th><th>Action</th></tr></thead>
-                        <tbody>
-                            ${filteredContribs.map(c => `<tr><td>${escapeHtml(c.members?.name || 'Unknown')}</td><td>KES ${formatNumber(c.amount)}</td><td>${c.date || '-'}</td><td>${c.month || '-'}</td><td>${c.method || '-'}</td><td><button class="btn-sm btn-danger-outline delete-contribution" data-id="${c.id}" data-member="${escapeHtml(c.members?.name || 'Unknown')}" data-amount="${c.amount}">Del</button></td></tr>`).join('')}
-                            ${filteredContribs.length === 0 ? '<tr><td colspan="6">No contributions found</td></tr>' : ''}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            <div class="history-header"><h2>💰 Contributions</h2><button class="btn-sm btn-outline" id="refreshBtn">🔄 Refresh</button></div>
+            <div class="card"><h3>➕ Record New Contribution</h3><div class="form-row">
+                <select id="memberSelect"><option value="">-- Select Member --</option>${allMembers.map(m => `<option value="${m.id}">${escapeHtml(m.name)}</option>`).join('')}</select>
+                <input type="number" id="contributionAmount" placeholder="Amount (KES)">
+                <input type="month" id="contributionMonth" value="${new Date().toISOString().slice(0,7)}">
+                <input type="date" id="contributionDate" value="${new Date().toISOString().slice(0,10)}">
+                <select id="paymentMethod"><option value="M-Pesa">M-Pesa</option><option value="Cash">Cash</option><option value="Bank Transfer">Bank Transfer</option></select>
+                <button id="saveContributionBtn" class="btn">💾 Save</button>
+            </div></div>
+            <div class="card"><div class="flex-between"><h3>🔍 Filter</h3><select id="monthFilterSelect" class="filter-select"><option value="all" ${currentMonthFilter === 'all' ? 'selected' : ''}>All Records</option>${months.map(m => `<option value="${m}" ${currentMonthFilter === m ? 'selected' : ''}>${m}</option>`).join('')}</select></div></div>
+            <div class="card"><h3>✅ Paid Members</h3><div class="table-wrapper"><table><thead><tr><th>Name</th><th>Total Paid</th><th>Status</th></tr></thead><tbody>${paidMembers.map(m => `<tr><td data-label="Name"><strong>${escapeHtml(m.name)}</strong></td><td data-label="Total Paid">KES ${formatNumber(m.total_contributed)}</td><td data-label="Status"><span class="badge-paid">Paid</span></td></tr>`).join('')}${paidMembers.length === 0 ? '<tr><td colspan="3">No paid members yet</td></tr>' : ''}</tbody></table></div></div>
+            <div class="card"><h3>⚠️ Unpaid Members</h3><div class="table-wrapper"><table><thead><tr><th>Name</th><th>Balance</th><th>Action</th></tr></thead><tbody>${unpaidMembers.map(m => `<tr><td data-label="Name"><strong>${escapeHtml(m.name)}</strong></td><td data-label="Balance">KES ${formatNumber(m.balance)}</td><td data-label="Action"><button class="btn-sm btn-outline settle-balance" data-id="${m.id}" data-balance="${m.balance || 0}">Settle</button></td></tr>`).join('')}${unpaidMembers.length === 0 ? '<tr><td colspan="3">🎉 Everyone is up to date!</td></tr>' : ''}</tbody></table></div></div>
+            <div class="card"><h3>📜 Contribution History ${currentMonthFilter !== 'all' ? `- ${currentMonthFilter}` : ''}</h3><p><strong>Total: KES ${formatNumber(totalCollected)}</strong></p><div class="table-wrapper"><table><thead><tr><th>Member</th><th>Amount</th><th>Date</th><th>Month</th><th>Method</th><th>Action</th></tr></thead><tbody>${filteredContribs.map(c => `<tr><td data-label="Member">${escapeHtml(c.members?.name || 'Unknown')}</td><td data-label="Amount">KES ${formatNumber(c.amount)}</td><td data-label="Date">${c.date || '-'}</td><td data-label="Month">${c.month || '-'}</td><td data-label="Method">${c.method || '-'}</td><td data-label="Action"><button class="btn-sm btn-danger-outline delete-contribution" data-id="${c.id}" data-member="${escapeHtml(c.members?.name || 'Unknown')}" data-amount="${c.amount}">Del</button></td></tr>`).join('')}${filteredContribs.length === 0 ? '<tr><td colspan="6">No contributions found</td></tr>' : ''}</tbody></table></div></div>
         `;
-        
         container.innerHTML = html;
-        attachEvents();
-    }
-    
-    function attachEvents() {
+        
         document.getElementById('saveContributionBtn')?.addEventListener('click', saveContribution);
         document.getElementById('monthFilterSelect')?.addEventListener('change', (e) => { currentMonthFilter = e.target.value; renderContributionsPage(); });
         document.getElementById('refreshBtn')?.addEventListener('click', () => loadData());
@@ -770,18 +654,12 @@
         const month = document.getElementById('contributionMonth').value;
         const date = document.getElementById('contributionDate').value;
         const method = document.getElementById('paymentMethod').value;
-        
         if (!memberId) { showToast('Please select a member', 'error'); return; }
         if (isNaN(amount) || amount <= 0) { showToast('Please enter a valid amount', 'error'); return; }
         if (!date) { showToast('Please select a date', 'error'); return; }
-        
         const user = await getCurrentUser();
-        const { error } = await supabaseClient.from('contributions').insert([{
-            member_id: memberId, amount, month, date, method, type: 'Monthly', recorded_by: user?.id
-        }]);
-        
+        const { error } = await supabaseClient.from('contributions').insert([{ member_id: memberId, amount, month, date, method, type: 'Monthly', recorded_by: user?.id }]);
         if (error) { showToast('Error: ' + error.message, 'error'); return; }
-        
         showToast('✅ Contribution saved!', 'success');
         document.getElementById('memberSelect').value = '';
         document.getElementById('contributionAmount').value = '';
@@ -790,29 +668,16 @@
     
     function showSettleModal(memberId, currentBalance) {
         if (currentBalance <= 0) { showToast('Balance is zero', 'error'); return; }
-        
         const member = allMembers.find(m => m.id === memberId);
         const modal = document.createElement('div');
         modal.className = 'modal';
-        modal.innerHTML = `
-            <div class="modal-content">
-                <h3>Settle Balance</h3>
-                <p><strong>${escapeHtml(member?.name || 'Unknown')}</strong></p>
-                <p>Amount: KES ${formatNumber(currentBalance)}</p>
-                <div class="form-group"><label>Payment Method:</label><select id="settleMethodSelect"><option value="M-Pesa">M-Pesa</option><option value="Cash">Cash</option><option value="Bank Transfer">Bank Transfer</option></select></div>
-                <div class="form-group"><label>Date:</label><input type="date" id="settleDate" value="${new Date().toISOString().slice(0,10)}"></div>
-                <div style="display:flex; gap:10px; margin-top:1rem;"><button id="confirmSettleBtn" class="btn" style="flex:1;">Confirm</button><button id="cancelSettleBtn" class="btn-outline btn" style="flex:1;">Cancel</button></div>
-            </div>
-        `;
+        modal.innerHTML = `<div class="modal-content"><h3>Settle Balance</h3><p><strong>${escapeHtml(member?.name || 'Unknown')}</strong></p><p>Amount: KES ${formatNumber(currentBalance)}</p><div class="form-group"><label>Payment Method:</label><select id="settleMethodSelect"><option value="M-Pesa">M-Pesa</option><option value="Cash">Cash</option><option value="Bank Transfer">Bank Transfer</option></select></div><div class="form-group"><label>Date:</label><input type="date" id="settleDate" value="${new Date().toISOString().slice(0,10)}"></div><div style="display:flex; gap:10px; margin-top:1rem;"><button id="confirmSettleBtn" class="btn" style="flex:1;">Confirm</button><button id="cancelSettleBtn" class="btn-outline btn" style="flex:1;">Cancel</button></div></div>`;
         document.body.appendChild(modal);
-        
         document.getElementById('confirmSettleBtn').onclick = async () => {
             const method = document.getElementById('settleMethodSelect').value;
             const date = document.getElementById('settleDate').value;
             const user = await getCurrentUser();
-            const { error } = await supabaseClient.from('contributions').insert([{
-                member_id: memberId, amount: currentBalance, month: date.slice(0,7), date, method, type: 'Settlement', recorded_by: user?.id
-            }]);
+            const { error } = await supabaseClient.from('contributions').insert([{ member_id: memberId, amount: currentBalance, month: date.slice(0,7), date, method, type: 'Settlement', recorded_by: user?.id }]);
             if (error) { showToast('Error: ' + error.message, 'error'); modal.remove(); return; }
             modal.remove();
             showToast(`✅ Settled KES ${formatNumber(currentBalance)} via ${method}`, 'success');
@@ -824,15 +689,8 @@
     async function confirmDeleteContribution(id, memberName, amount) {
         const modal = document.createElement('div');
         modal.className = 'modal';
-        modal.innerHTML = `
-            <div class="modal-content">
-                <h3>⚠️ Delete Contribution</h3>
-                <p>Delete ${memberName} - KES ${formatNumber(amount)}?</p>
-                <div style="display:flex; gap:10px; margin-top:1rem;"><button id="confirmDeleteBtn" class="btn btn-danger" style="flex:1;">Delete</button><button id="cancelModalBtn" class="btn-outline btn" style="flex:1;">Cancel</button></div>
-            </div>
-        `;
+        modal.innerHTML = `<div class="modal-content"><h3>⚠️ Delete Contribution</h3><p>Delete ${memberName} - KES ${formatNumber(amount)}?</p><div style="display:flex; gap:10px; margin-top:1rem;"><button id="confirmDeleteBtn" class="btn btn-danger" style="flex:1;">Delete</button><button id="cancelModalBtn" class="btn-outline btn" style="flex:1;">Cancel</button></div></div>`;
         document.body.appendChild(modal);
-        
         document.getElementById('confirmDeleteBtn').onclick = async () => {
             const { error } = await supabaseClient.from('contributions').delete().eq('id', id);
             if (error) { showToast('Error: ' + error.message, 'error'); modal.remove(); return; }
