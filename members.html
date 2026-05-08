@@ -281,13 +281,73 @@
             width: 100%;
             border-collapse: collapse;
             font-size: 0.7rem;
-            min-width: 600px;
         }
         
-        @media (min-width: 640px) {
+        /* Mobile: Make each row display as block with 2 rows */
+        @media (max-width: 768px) {
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+            
+            thead {
+                display: none;
+            }
+            
+            tr {
+                margin-bottom: 1rem;
+                border: 1px solid var(--gray-border);
+                border-radius: 12px;
+                background: white;
+                padding: 0.5rem;
+            }
+            
+            td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.6rem 0.4rem;
+                border-bottom: 1px solid var(--gray-border);
+                font-size: 0.75rem;
+            }
+            
+            td:last-child {
+                border-bottom: none;
+            }
+            
+            td::before {
+                content: attr(data-label);
+                font-weight: 600;
+                width: 40%;
+                color: #5b6e8c;
+            }
+            
+            .action-group {
+                justify-content: flex-end;
+                gap: 8px;
+            }
+        }
+        
+        @media (min-width: 769px) {
             table {
+                min-width: 600px;
+            }
+            th, td {
+                padding: 0.6rem 0.4rem;
+            }
+            th {
+                font-size: 0.7rem;
+            }
+            td {
+                font-size: 0.7rem;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            th {
                 font-size: 0.8rem;
-                min-width: auto;
+            }
+            td {
+                font-size: 0.8rem;
             }
         }
 
@@ -300,16 +360,6 @@
         th {
             background: #f8fafc;
             font-weight: 600;
-            font-size: 0.7rem;
-        }
-
-        @media (min-width: 640px) {
-            th {
-                font-size: 0.8rem;
-            }
-            td {
-                font-size: 0.8rem;
-            }
         }
 
         .badge-paid {
@@ -418,6 +468,26 @@
             margin-bottom: 0.2rem;
             font-weight: 600;
             font-size: 0.75rem;
+        }
+
+        .error-message {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 0.4rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.7rem;
+            text-align: center;
+        }
+
+        .success-message {
+            background: #dff0e4;
+            color: #2c7a4d;
+            padding: 0.4rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.7rem;
+            text-align: center;
         }
 
         /* Sidebar Overlay */
@@ -540,7 +610,7 @@
     <main class="main-content">
         <div class="top-bar">
             <button class="menu-toggle" id="menuToggle">☰</button>
-            <div class="page-title">👥 Members Management</div>
+            <div class="page-title">👥 Members</div>
             <div class="user-info">
                 <span class="user-email" id="userEmail"></span>
                 <button id="logoutBtn" class="logout-btn">Logout</button>
@@ -661,7 +731,7 @@
                 <button class="btn" id="addMemberBtn">+ Add Member</button>
             </div>
             <div class="flex-between">
-                <input type="text" id="searchMemberInput" class="search-bar" placeholder="🔍 Search by name or phone..." value="${searchTerm}">
+                <input type="text" id="searchMemberInput" class="search-bar" placeholder="🔍 Search by name or phone..." value="${escapeHtml(searchTerm)}">
             </div>
             <div class="card">
                 <div class="table-wrapper">
@@ -680,11 +750,13 @@
                         <tbody>
                             ${filtered.map(m => `
                                 <tr>
-                                    <td><strong>${escapeHtml(m.name)}</strong></td>
-                                    <td>${escapeHtml(m.phone) || '-'}</span></td>
-                                    <td>KES ${formatNumber(m.expected_contribution)}</span></td>
-                                    <td>KES ${formatNumber(m.total_contributed)}</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span>
-                                    <td class="action-group">
+                                    <td data-label="Name"><strong>${escapeHtml(m.name)}</strong></td>
+                                    <td data-label="Phone">${escapeHtml(m.phone) || '-'}</td>
+                                    <td data-label="Expected">KES ${formatNumber(m.expected_contribution)}</span></td>
+                                    <td data-label="Paid">KES ${formatNumber(m.total_contributed)}</span></td>
+                                    <td data-label="Balance"><span style="color:${(m.balance || 0) > 0 ? '#dc2626' : '#2c7a4d'}; font-weight:600;">KES ${formatNumber(m.balance)}</span></td>
+                                    <td data-label="Status"><span class="${(m.balance || 0) === 0 ? 'badge-paid' : 'badge-unpaid'}">${(m.balance || 0) === 0 ? 'Paid' : 'Unpaid'}</span></td>
+                                    <td data-label="Actions" class="action-group">
                                         <button class="btn-sm btn-outline view-detail" data-id="${m.id}">View</button>
                                         <button class="btn-sm btn-outline edit-member" data-id="${m.id}" data-name="${escapeHtml(m.name)}" data-phone="${escapeHtml(m.phone)}" data-expected="${m.expected_contribution || 0}">Edit</button>
                                         <button class="btn-sm btn-danger-outline delete-member" data-id="${m.id}" data-name="${escapeHtml(m.name)}">Del</button>
@@ -911,14 +983,22 @@
                 <h4 style="margin-top:1rem;">📅 Contribution History</h4>
                 <div class="table-wrapper">
                     <table style="min-width: 250px;">
-                        <thead><tr><th>Date</th><th>Amount</th><th>Method</th><th>Month</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th>Method</th>
+                                <th>Month</th>
+                            </tr>
+                        </thead>
                         <tbody>
                             ${contributions?.map(c => `
                                 <tr>
                                     <td>${c.date || '-'}</td>
                                     <td>KES ${formatNumber(c.amount)}</span></td>
-                                    <td>${c.method || '-'}</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span>
-                                    <td>
+                                    <td>${c.method || '-'}</td>
+                                    <td>${c.month || '-'}</td>
+                                </tr>
                             `).join('') || '<tr><td colspan="4">No contributions yet</td></tr>'}
                         </tbody>
                     </table>
@@ -934,7 +1014,7 @@
     function showModalMessage(message, type) {
         const msgDiv = document.getElementById('modalMessage');
         if (msgDiv) {
-            msgDiv.innerHTML = `<div class="${type === 'error' ? 'error-message' : 'success-message'}" style="padding:0.5rem; margin-bottom:0.8rem;">${message}</div>`;
+            msgDiv.innerHTML = `<div class="${type === 'error' ? 'error-message' : 'success-message'}">${message}</div>`;
             setTimeout(() => {
                 if (msgDiv.innerHTML) msgDiv.innerHTML = '';
             }, 3000);
