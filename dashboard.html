@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
     <title>ChamaEase | Dashboard</title>
     <style>
         * {
@@ -24,10 +24,9 @@
             --danger: #dc4c4c;
             --gray-border: #e2e8f0;
             --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.04);
-            --radius-card: 20px;
+            --radius-card: 16px;
             --radius-btn: 32px;
-            --sidebar-width: 260px;
-            --sidebar-collapsed-width: 70px;
+            --sidebar-width: 280px;
         }
 
         /* Layout with Sidebar */
@@ -46,15 +45,18 @@
             top: 0;
             bottom: 0;
             overflow-y: auto;
-            transition: all 0.3s ease;
-            z-index: 100;
+            transition: transform 0.3s ease;
+            z-index: 1000;
             box-shadow: var(--shadow-sm);
+            transform: translateX(0);
         }
 
         .sidebar-header {
             padding: 1.2rem;
             border-bottom: 1px solid var(--gray-border);
-            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .sidebar-logo {
@@ -66,6 +68,26 @@
             color: transparent;
         }
 
+        .sidebar-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #94a3b8;
+            transition: all 0.2s;
+            display: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar-close:hover {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+
         .sidebar-nav {
             padding: 1rem 0;
         }
@@ -74,7 +96,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 0.8rem 1.2rem;
+            padding: 0.8rem 1rem;
             margin: 0.2rem 0.8rem;
             border-radius: 12px;
             text-decoration: none;
@@ -95,7 +117,7 @@
 
         .nav-item .icon {
             font-size: 1.2rem;
-            width: 24px;
+            width: 28px;
             text-align: center;
         }
 
@@ -124,13 +146,14 @@
         .main-content {
             flex: 1;
             margin-left: var(--sidebar-width);
-            transition: all 0.3s ease;
+            transition: margin-left 0.3s ease;
+            width: calc(100% - var(--sidebar-width));
         }
 
         /* Top Bar */
         .top-bar {
             background: white;
-            padding: 0.8rem 2rem;
+            padding: 0.8rem 1rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -142,16 +165,65 @@
         }
 
         .menu-toggle {
-            display: none;
             background: none;
             border: none;
             font-size: 1.5rem;
             cursor: pointer;
             color: var(--primary);
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .menu-toggle:hover {
+            background: var(--primary-light);
+        }
+
+        /* Animated hand pointing to menu */
+        .hand-pointer {
+            position: fixed;
+            top: 70px;
+            left: 15px;
+            background: var(--primary);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            z-index: 98;
+            animation: bounce 1s ease-in-out infinite;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            pointer-events: none;
+        }
+
+        .hand-pointer span {
+            font-size: 1rem;
+            animation: point 0.8s ease-in-out infinite;
+            display: inline-block;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); opacity: 1; }
+            50% { transform: translateY(-5px); opacity: 0.9; }
+        }
+
+        @keyframes point {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(5px); }
+        }
+
+        @media (min-width: 769px) {
+            .hand-pointer {
+                display: none;
+            }
         }
 
         .page-title {
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             font-weight: 600;
             color: #1e2a3e;
         }
@@ -159,22 +231,30 @@
         .user-info {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.8rem;
         }
 
         .user-email {
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             color: #5b6e8c;
+            display: none;
+        }
+
+        @media (min-width: 480px) {
+            .user-email {
+                display: inline;
+            }
         }
 
         .logout-btn {
             background: transparent;
             border: 1px solid #dc2626;
             color: #dc2626;
-            padding: 0.4rem 1rem;
+            padding: 0.4rem 0.8rem;
             border-radius: 2rem;
             cursor: pointer;
             transition: all 0.2s;
+            font-size: 0.75rem;
         }
 
         .logout-btn:hover {
@@ -184,47 +264,54 @@
 
         /* Container */
         .container {
-            max-width: 1300px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 1.5rem;
+            padding: 1rem;
             width: 100%;
             min-height: 70vh;
         }
 
-        /* Stats Grid */
+        /* Stats Grid - Mobile First */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1rem;
-            margin-bottom: 2rem;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        @media (min-width: 640px) {
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 1rem;
+            }
         }
 
         .stat-card {
             background: white;
-            border-radius: 1.25rem;
-            padding: 1rem 0.8rem;
+            border-radius: 1rem;
+            padding: 0.8rem;
             text-align: center;
             box-shadow: var(--shadow-sm);
             border: 1px solid var(--gray-border);
         }
 
         .stat-card h4 {
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             color: #5b6e8c;
-            margin-bottom: 0.4rem;
+            margin-bottom: 0.3rem;
         }
 
         .stat-number {
-            font-size: 1.8rem;
+            font-size: 1.3rem;
             font-weight: 800;
             color: var(--primary);
             line-height: 1.2;
         }
 
         .stat-full {
-            font-size: 0.85rem;
+            font-size: 0.7rem;
             color: #6c757d;
             margin-top: 0.2rem;
         }
@@ -233,8 +320,8 @@
             background: white;
             border-radius: var(--radius-card);
             box-shadow: var(--shadow-sm);
-            padding: 1.2rem;
-            margin-bottom: 1.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
             border: 1px solid var(--gray-border);
         }
 
@@ -242,11 +329,11 @@
             border: none;
             background: var(--primary);
             color: white;
-            padding: 0.6rem 1.2rem;
+            padding: 0.5rem 1rem;
             border-radius: var(--radius-btn);
             font-weight: 600;
             cursor: pointer;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             transition: 0.2s;
             text-decoration: none;
             display: inline-block;
@@ -259,8 +346,8 @@
         }
 
         .btn-sm {
-            padding: 0.3rem 0.8rem;
-            font-size: 0.75rem;
+            padding: 0.25rem 0.6rem;
+            font-size: 0.7rem;
         }
 
         .table-wrapper {
@@ -272,34 +359,19 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
+            min-width: 400px;
         }
         
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-            .sidebar.open {
-                transform: translateX(0);
-            }
-            .main-content {
-                margin-left: 0;
-            }
-            .menu-toggle {
-                display: block;
-            }
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 0.8rem;
-            }
-            .stat-number {
-                font-size: 1.4rem;
+        @media (min-width: 640px) {
+            table {
+                font-size: 0.85rem;
             }
         }
 
         th, td {
             text-align: left;
-            padding: 0.7rem 0.5rem;
+            padding: 0.6rem 0.4rem;
             border-bottom: 1px solid var(--gray-border);
         }
 
@@ -313,14 +385,14 @@
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 0.8rem;
-            margin-bottom: 1.2rem;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
         }
 
         footer {
             text-align: center;
-            padding: 1rem;
-            font-size: 0.8rem;
+            padding: 0.8rem;
+            font-size: 0.7rem;
             color: #6c757d;
             border-top: 1px solid var(--gray-border);
             margin-top: 1rem;
@@ -329,18 +401,23 @@
         .welcome-card {
             background: linear-gradient(135deg, var(--primary), #3b9b62);
             color: white;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
         }
         
         .welcome-card h1 {
-            font-size: 1.8rem;
-            margin-bottom: 0.5rem;
+            font-size: 1.3rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .welcome-card p {
+            font-size: 0.8rem;
+            opacity: 0.95;
         }
 
         .loading-spinner {
             display: inline-block;
-            width: 40px;
-            height: 40px;
+            width: 30px;
+            height: 30px;
             border: 3px solid #e2e8f0;
             border-radius: 50%;
             border-top-color: var(--primary);
@@ -350,35 +427,62 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
-        
-        .badge-paid {
-            background: #dff0e4;
-            color: #1f5a3a;
-            padding: 0.2rem 0.6rem;
-            border-radius: 30px;
-            font-weight: 600;
-            font-size: 0.7rem;
-            display: inline-block;
+
+        /* Sidebar Overlay */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
         }
-        
-        .badge-unpaid {
-            background: #ffe6e5;
-            color: #b91c1c;
-            padding: 0.2rem 0.6rem;
-            border-radius: 30px;
-            font-weight: 600;
-            font-size: 0.7rem;
-            display: inline-block;
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        /* Mobile Sidebar */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+            .sidebar-close {
+                display: flex;
+            }
+        }
+
+        /* Hide hand pointer after user interacts with menu */
+        .hand-pointer.hide {
+            display: none;
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 <div class="app-wrapper">
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
+    <!-- Animated Hand Pointer -->
+    <div class="hand-pointer" id="handPointer">
+        <span>👉</span> Click here for menu
+    </div>
+    
     <!-- Sidebar Navigation -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">🌿 ChamaEase</div>
+            <button class="sidebar-close" id="sidebarClose">✕</button>
         </div>
         <nav class="sidebar-nav">
             <a href="dashboard.html" class="nav-item active">
@@ -450,33 +554,67 @@
             </div>
         </div>
         <div id="app-root" class="container">
-            <div style="text-align: center; padding: 2rem;">
+            <div style="text-align: center; padding: 1.5rem;">
                 <div class="loading-spinner"></div>
-                <p>Loading dashboard...</p>
+                <p style="margin-top: 0.5rem; font-size: 0.8rem;">Loading dashboard...</p>
             </div>
         </div>
-        <footer>✨ Smart Chama Management · sidebar navigation · Enhanced analytics</footer>
+        <footer>✨ Smart Chama Management · Tap ☰ for menu</footer>
     </main>
 </div>
 
 <script src="supabase-config.js"></script>
 <script>
-    // Sidebar toggle functionality
+    // Sidebar functionality
     const menuToggle = document.getElementById('menuToggle');
     const sidebar = document.getElementById('sidebar');
+    const sidebarClose = document.getElementById('sidebarClose');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    const handPointer = document.getElementById('handPointer');
     
-    if (menuToggle) {
-        menuToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('open');
-        });
+    function openSidebar() {
+        sidebar.classList.add('open');
+        sidebarOverlay.classList.add('active');
+        // Hide hand pointer after first interaction
+        if (handPointer) {
+            handPointer.classList.add('hide');
+            localStorage.setItem('handPointerSeen', 'true');
+        }
     }
     
-    // Close sidebar when clicking outside on mobile
-    document.addEventListener('click', (e) => {
-        if (window.innerWidth <= 768) {
-            if (!sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
-                sidebar.classList.remove('open');
-            }
+    function closeSidebar() {
+        sidebar.classList.remove('open');
+        sidebarOverlay.classList.remove('active');
+    }
+    
+    if (menuToggle) {
+        menuToggle.addEventListener('click', openSidebar);
+    }
+    
+    if (sidebarClose) {
+        sidebarClose.addEventListener('click', closeSidebar);
+    }
+    
+    if (sidebarOverlay) {
+        sidebarOverlay.addEventListener('click', closeSidebar);
+    }
+    
+    // Hide hand pointer if already seen
+    if (localStorage.getItem('handPointerSeen') === 'true') {
+        if (handPointer) handPointer.style.display = 'none';
+    }
+    
+    // Auto-hide hand pointer after 10 seconds
+    setTimeout(() => {
+        if (handPointer && !localStorage.getItem('handPointerSeen')) {
+            handPointer.classList.add('hide');
+        }
+    }, 10000);
+    
+    // Close sidebar on window resize if screen becomes larger
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) {
+            closeSidebar();
         }
     });
 
@@ -540,17 +678,17 @@
                         <div class="stat-number">${totalMembers}</div>
                     </div>
                     <div class="stat-card">
-                        <h4>💰 TOTAL COLLECTED</h4>
+                        <h4>💰 COLLECTED</h4>
                         <div class="stat-number">KES ${(totalCollected/1000).toFixed(0)}k</div>
                         <div class="stat-full">${formatNumber(totalCollected)}</div>
                     </div>
                     <div class="stat-card">
-                        <h4>✅ PAID MEMBERS</h4>
+                        <h4>✅ PAID</h4>
                         <div class="stat-number">${paidMembers}</div>
-                        <div class="stat-full">out of ${totalMembers}</div>
+                        <div class="stat-full">of ${totalMembers}</div>
                     </div>
                     <div class="stat-card">
-                        <h4>⏳ OUTSTANDING BALANCE</h4>
+                        <h4>⏳ BALANCE</h4>
                         <div class="stat-number">KES ${(totalBalance/1000).toFixed(0)}k</div>
                         <div class="stat-full">${formatNumber(totalBalance)}</div>
                     </div>
@@ -577,11 +715,11 @@
                                 ${contributions?.map(c => `
                                     <tr>
                                         <td>${c.members?.name || 'Unknown'}</td>
-                                        <td>KES ${formatNumber(c.amount || 0)}</td>
-                                        <td>${c.date || '-'}</td>
-                                        <td>${c.method || '-'}</td>
+                                        <td>KES ${formatNumber(c.amount || 0)}</span></td>
+                                        <td>${c.date || '-'}</span></td>
+                                        <td>${c.method || '-'}</span></td>
                                     </tr>
-                                `).join('') || '<tr><td colspan="4">No contributions yet</td></tr>'}
+                                `).join('') || '<tr><td colspan="4">No contributions yet</td><tr'}
                             </tbody>
                         </table>
                     </div>
@@ -589,17 +727,17 @@
             `;
             
             const buttonsHtml = `
-                <div class="flex-between" style="margin-top:0.5rem;">
-                    <a href="members.html" class="btn" style="text-decoration:none;">📇 Manage Members</a>
-                    <a href="contributions.html" class="btn-outline btn" style="text-decoration:none;">➕ Add Contribution</a>
-                    <a href="statistics.html" class="btn-outline btn" style="text-decoration:none;">📊 View Statistics</a>
+                <div class="flex-between">
+                    <a href="members.html" class="btn" style="text-decoration:none; flex:1; text-align:center;">📇 Members</a>
+                    <a href="contributions.html" class="btn-outline btn" style="text-decoration:none; flex:1; text-align:center;">💰 Add</a>
+                    <a href="statistics.html" class="btn-outline btn" style="text-decoration:none; flex:1; text-align:center;">📊 Stats</a>
                 </div>
             `;
             
             container.innerHTML = `
                 <div class="welcome-card card">
-                    <h1>📊 Welcome to ChamaEase</h1>
-                    <p>Your digital Chama management system - replace spreadsheets with smart tracking</p>
+                    <h1>📊 ChamaEase</h1>
+                    <p>Your digital Chama management system</p>
                 </div>
                 ${statsHtml}
                 ${recentHtml}
@@ -611,8 +749,8 @@
             container.innerHTML = `
                 <div class="card">
                     <h3>⚠️ Error Loading Data</h3>
-                    <p>${error.message}</p>
-                    <button class="btn" onclick="location.reload()">Retry</button>
+                    <p style="font-size:0.8rem;">${error.message}</p>
+                    <button class="btn" onclick="location.reload()" style="margin-top:0.5rem;">Retry</button>
                 </div>
             `;
         }
