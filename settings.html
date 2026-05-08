@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
     <title>ChamaEase | Settings</title>
     <style>
         * {
@@ -25,9 +25,9 @@
             --warning: #e6a017;
             --gray-border: #e2e8f0;
             --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.04);
-            --radius-card: 20px;
+            --radius-card: 16px;
             --radius-btn: 32px;
-            --sidebar-width: 260px;
+            --sidebar-width: 280px;
         }
 
         .app-wrapper {
@@ -44,35 +44,58 @@
             top: 0;
             bottom: 0;
             overflow-y: auto;
-            transition: all 0.3s ease;
-            z-index: 100;
+            transition: transform 0.3s ease;
+            z-index: 1000;
             box-shadow: var(--shadow-sm);
+            transform: translateX(0);
         }
 
         .sidebar-header {
-            padding: 1.2rem;
+            padding: 1rem;
             border-bottom: 1px solid var(--gray-border);
-            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .sidebar-logo {
             font-weight: 800;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             background: linear-gradient(135deg, var(--primary), #3b9b62);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
         }
 
+        .sidebar-close {
+            background: none;
+            border: none;
+            font-size: 1.3rem;
+            cursor: pointer;
+            color: #94a3b8;
+            transition: all 0.2s;
+            display: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar-close:hover {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+
         .sidebar-nav {
-            padding: 1rem 0;
+            padding: 0.8rem 0;
         }
 
         .nav-item {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 0.8rem 1.2rem;
+            gap: 10px;
+            padding: 0.7rem 1rem;
             margin: 0.2rem 0.8rem;
             border-radius: 12px;
             text-decoration: none;
@@ -92,40 +115,41 @@
         }
 
         .nav-item .icon {
-            font-size: 1.2rem;
-            width: 24px;
+            font-size: 1.1rem;
+            width: 26px;
             text-align: center;
         }
 
         .nav-item .label {
             font-weight: 500;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
         .nav-submenu {
-            padding-left: 3rem;
+            padding-left: 2.8rem;
         }
 
         .nav-submenu .nav-item {
-            padding: 0.6rem 1rem;
-            font-size: 0.85rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
         }
 
         .nav-divider {
             height: 1px;
             background: var(--gray-border);
-            margin: 0.8rem 1.2rem;
+            margin: 0.6rem 1rem;
         }
 
         .main-content {
             flex: 1;
             margin-left: var(--sidebar-width);
-            transition: all 0.3s ease;
+            transition: margin-left 0.3s ease;
+            width: calc(100% - var(--sidebar-width));
         }
 
         .top-bar {
             background: white;
-            padding: 0.8rem 2rem;
+            padding: 0.7rem 1rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -137,16 +161,18 @@
         }
 
         .menu-toggle {
-            display: none;
             background: none;
             border: none;
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             cursor: pointer;
             color: var(--primary);
+            padding: 6px;
+            border-radius: 50%;
+            transition: all 0.2s;
         }
 
         .page-title {
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             font-weight: 600;
             color: #1e2a3e;
         }
@@ -154,22 +180,30 @@
         .user-info {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.6rem;
         }
 
         .user-email {
-            font-size: 0.85rem;
+            font-size: 0.7rem;
             color: #5b6e8c;
+            display: none;
+        }
+
+        @media (min-width: 480px) {
+            .user-email {
+                display: inline;
+            }
         }
 
         .logout-btn {
             background: transparent;
             border: 1px solid #dc2626;
             color: #dc2626;
-            padding: 0.4rem 1rem;
+            padding: 0.35rem 0.7rem;
             border-radius: 2rem;
             cursor: pointer;
             transition: all 0.2s;
+            font-size: 0.7rem;
         }
 
         .logout-btn:hover {
@@ -180,7 +214,7 @@
         .container {
             max-width: 1000px;
             margin: 0 auto;
-            padding: 1.5rem;
+            padding: 1rem;
             width: 100%;
             min-height: 70vh;
         }
@@ -189,8 +223,8 @@
             background: white;
             border-radius: var(--radius-card);
             box-shadow: var(--shadow-sm);
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
             border: 1px solid var(--gray-border);
         }
 
@@ -198,11 +232,11 @@
             border: none;
             background: var(--primary);
             color: white;
-            padding: 0.6rem 1.2rem;
+            padding: 0.5rem 1rem;
             border-radius: var(--radius-btn);
             font-weight: 600;
             cursor: pointer;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             transition: 0.2s;
             text-decoration: none;
             display: inline-block;
@@ -214,6 +248,11 @@
             color: var(--primary);
         }
 
+        .btn-sm {
+            padding: 0.25rem 0.6rem;
+            font-size: 0.65rem;
+        }
+
         .btn-danger {
             background: var(--danger);
         }
@@ -223,28 +262,28 @@
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 0.8rem;
-            margin-bottom: 1.2rem;
+            gap: 0.6rem;
+            margin-bottom: 1rem;
         }
 
         .form-group {
-            margin-bottom: 1.2rem;
+            margin-bottom: 1rem;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.3rem;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.75rem;
             color: #1e2a3e;
         }
 
         input, select {
             width: 100%;
-            padding: 0.7rem 1rem;
+            padding: 0.5rem 0.8rem;
             border-radius: 1rem;
             border: 1px solid var(--gray-border);
-            font-size: 0.9rem;
+            font-size: 0.75rem;
             transition: all 0.2s;
         }
 
@@ -258,7 +297,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1rem 0;
+            padding: 0.8rem 0;
             border-bottom: 1px solid var(--gray-border);
         }
 
@@ -267,18 +306,18 @@
         }
 
         .setting-info h4 {
-            font-size: 1rem;
+            font-size: 0.85rem;
             margin-bottom: 0.2rem;
         }
 
         .setting-info p {
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             color: #6c757d;
         }
 
         .toggle-switch {
-            width: 50px;
-            height: 26px;
+            width: 45px;
+            height: 24px;
             background: #cbd5e1;
             border-radius: 30px;
             position: relative;
@@ -292,8 +331,8 @@
 
         .toggle-switch::after {
             content: '';
-            width: 22px;
-            height: 22px;
+            width: 20px;
+            height: 20px;
             background: white;
             border-radius: 50%;
             position: absolute;
@@ -303,31 +342,31 @@
         }
 
         .toggle-switch.active::after {
-            left: 25px;
+            left: 22px;
         }
 
         .success-message {
             background: #dff0e4;
             color: #2c7a4d;
-            padding: 0.8rem;
+            padding: 0.6rem;
             border-radius: 1rem;
-            margin-bottom: 1rem;
-            font-size: 0.85rem;
+            margin-bottom: 0.8rem;
+            font-size: 0.7rem;
         }
 
         .error-message {
             background: #fee2e2;
             color: #dc2626;
-            padding: 0.8rem;
+            padding: 0.6rem;
             border-radius: 1rem;
-            margin-bottom: 1rem;
-            font-size: 0.85rem;
+            margin-bottom: 0.8rem;
+            font-size: 0.7rem;
         }
 
         footer {
             text-align: center;
-            padding: 1rem;
-            font-size: 0.8rem;
+            padding: 0.8rem;
+            font-size: 0.65rem;
             color: #6c757d;
             border-top: 1px solid var(--gray-border);
             margin-top: 1rem;
@@ -335,8 +374,8 @@
 
         .loading-spinner {
             display: inline-block;
-            width: 40px;
-            height: 40px;
+            width: 30px;
+            height: 30px;
             border: 3px solid #e2e8f0;
             border-radius: 50%;
             border-top-color: var(--primary);
@@ -345,6 +384,21 @@
 
         @keyframes spin {
             to { transform: rotate(360deg); }
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
         }
 
         @media (max-width: 768px) {
@@ -356,9 +410,18 @@
             }
             .main-content {
                 margin-left: 0;
+                width: 100%;
             }
-            .menu-toggle {
-                display: block;
+            .sidebar-close {
+                display: flex;
+            }
+            .container {
+                padding: 0.8rem;
+            }
+            .setting-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
             }
         }
     </style>
@@ -366,9 +429,12 @@
 </head>
 <body>
 <div class="app-wrapper">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">🌿 ChamaEase</div>
+            <button class="sidebar-close" id="sidebarClose">✕</button>
         </div>
         <nav class="sidebar-nav">
             <a href="dashboard.html" class="nav-item">
@@ -437,9 +503,9 @@
             </div>
         </div>
         <div id="app-root" class="container">
-            <div style="text-align: center; padding: 2rem;">
+            <div style="text-align: center; padding: 1.5rem;">
                 <div class="loading-spinner"></div>
-                <p>Loading settings...</p>
+                <p style="margin-top: 0.5rem; font-size: 0.8rem;">Loading settings...</p>
             </div>
         </div>
         <footer>✨ Smart Chama Management · System settings and preferences</footer>
@@ -452,21 +518,28 @@
     let emailNotifications = true;
     let darkMode = false;
 
+    // Sidebar functionality
     const menuToggle = document.getElementById('menuToggle');
     const sidebar = document.getElementById('sidebar');
+    const sidebarClose = document.getElementById('sidebarClose');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
     
-    if (menuToggle) {
-        menuToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('open');
-        });
+    function openSidebar() {
+        sidebar.classList.add('open');
+        sidebarOverlay.classList.add('active');
     }
     
-    document.addEventListener('click', (e) => {
-        if (window.innerWidth <= 768) {
-            if (!sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
-                sidebar.classList.remove('open');
-            }
-        }
+    function closeSidebar() {
+        sidebar.classList.remove('open');
+        sidebarOverlay.classList.remove('active');
+    }
+    
+    if (menuToggle) menuToggle.addEventListener('click', openSidebar);
+    if (sidebarClose) sidebarClose.addEventListener('click', closeSidebar);
+    if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebar);
+    
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) closeSidebar();
     });
 
     (async function() {
@@ -495,17 +568,7 @@
             }, 4000);
         } else {
             const toast = document.createElement('div');
-            toast.style.cssText = `
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                background: ${type === 'error' ? '#dc2626' : '#2c7a4d'};
-                color: white;
-                padding: 12px 20px;
-                border-radius: 40px;
-                font-size: 0.85rem;
-                z-index: 1001;
-            `;
+            toast.style.cssText = `position:fixed; bottom:20px; right:20px; background:${type === 'error' ? '#dc2626' : '#2c7a4d'}; color:white; padding:10px 16px; border-radius:40px; font-size:0.75rem; z-index:1002;`;
             toast.textContent = message;
             document.body.appendChild(toast);
             setTimeout(() => toast.remove(), 3000);
@@ -533,10 +596,7 @@
         }
         
         try {
-            const { error } = await supabaseClient.auth.updateUser({
-                password: newPassword
-            });
-            
+            const { error } = await supabaseClient.auth.updateUser({ password: newPassword });
             if (error) throw error;
             
             showMessage('✅ Password updated successfully!', 'success');
@@ -563,11 +623,8 @@
             const { error } = await supabaseClient.auth.updateUser({
                 data: { full_name: fullName, phone: phone }
             });
-            
             if (error) throw error;
-            
             showMessage('✅ Profile updated successfully!', 'success');
-            
         } catch (error) {
             console.error("Profile update error:", error);
             showMessage(error.message || 'Error updating profile', 'error');
@@ -594,9 +651,7 @@
             link.download = `chamaease_backup_${new Date().toISOString().slice(0,10)}.json`;
             link.click();
             URL.revokeObjectURL(link.href);
-            
             showMessage('✅ Data exported successfully!', 'success');
-            
         } catch (error) {
             console.error("Export error:", error);
             showMessage('Error exporting data: ' + error.message, 'error');
@@ -607,11 +662,8 @@
         emailNotifications = !emailNotifications;
         const toggle = document.getElementById('notificationToggle');
         if (toggle) {
-            if (emailNotifications) {
-                toggle.classList.add('active');
-            } else {
-                toggle.classList.remove('active');
-            }
+            if (emailNotifications) toggle.classList.add('active');
+            else toggle.classList.remove('active');
         }
         localStorage.setItem('emailNotifications', emailNotifications);
         showMessage(`Email notifications ${emailNotifications ? 'enabled' : 'disabled'}`, 'success');
@@ -621,17 +673,17 @@
         darkMode = !darkMode;
         const toggle = document.getElementById('themeToggle');
         if (toggle) {
-            if (darkMode) {
-                toggle.classList.add('active');
-                document.body.style.background = '#1a1a2e';
-                document.body.style.color = '#e2e8f0';
-            } else {
-                toggle.classList.remove('active');
-                document.body.style.background = '#f4f7fb';
-                document.body.style.color = '#1e2a3e';
-            }
+            if (darkMode) toggle.classList.add('active');
+            else toggle.classList.remove('active');
         }
         localStorage.setItem('darkMode', darkMode);
+        if (darkMode) {
+            document.body.style.background = '#1a1a2e';
+            document.body.style.color = '#e2e8f0';
+        } else {
+            document.body.style.background = '#f4f7fb';
+            document.body.style.color = '#1e2a3e';
+        }
     }
 
     function renderSettings() {
@@ -640,13 +692,12 @@
         const html = `
             <div id="messageArea"></div>
             
-            <!-- Profile Settings -->
             <div class="card">
-                <h3>👤 Profile Settings</h3>
+                <h3 style="font-size:1rem;">👤 Profile Settings</h3>
                 <div class="form-group">
                     <label>Email Address</label>
                     <input type="email" value="${currentUser?.email || ''}" disabled style="background:#f8fafc;">
-                    <small style="color:#6c757d;">Email cannot be changed</small>
+                    <small style="color:#6c757d; font-size:0.65rem;">Email cannot be changed</small>
                 </div>
                 <div class="form-group">
                     <label>Full Name</label>
@@ -659,9 +710,8 @@
                 <button class="btn" onclick="updateProfile()">💾 Update Profile</button>
             </div>
             
-            <!-- Security Settings -->
             <div class="card">
-                <h3>🔒 Security & Password</h3>
+                <h3 style="font-size:1rem;">🔒 Security & Password</h3>
                 <div class="form-group">
                     <label>Current Password</label>
                     <input type="password" id="currentPassword" placeholder="Enter current password">
@@ -677,13 +727,12 @@
                 <button class="btn" onclick="updatePassword()">🔑 Change Password</button>
             </div>
             
-            <!-- Preferences -->
             <div class="card">
-                <h3>⚙️ Preferences</h3>
+                <h3 style="font-size:1rem;">⚙️ Preferences</h3>
                 <div class="setting-item">
                     <div class="setting-info">
                         <h4>Email Notifications</h4>
-                        <p>Receive email alerts for new contributions and payment reminders</p>
+                        <p>Receive email alerts for contributions</p>
                     </div>
                     <div class="toggle-switch ${emailNotifications ? 'active' : ''}" id="notificationToggle" onclick="toggleNotification()"></div>
                 </div>
@@ -696,46 +745,43 @@
                 </div>
             </div>
             
-            <!-- Data Management -->
             <div class="card">
-                <h3>💾 Data Management</h3>
+                <h3 style="font-size:1rem;">💾 Data Management</h3>
                 <div class="setting-item">
                     <div class="setting-info">
                         <h4>Export All Data</h4>
-                        <p>Download a complete backup of all members and contributions in JSON format</p>
+                        <p>Download backup of members and contributions in JSON format</p>
                     </div>
                     <button class="btn-outline btn-sm" onclick="exportAllData()">📎 Export</button>
                 </div>
                 <div class="setting-item">
                     <div class="setting-info">
                         <h4>System Information</h4>
-                        <p>Version: 2.0.0 | Built with Supabase | Last updated: ${new Date().toLocaleDateString()}</p>
+                        <p>Version: 2.0.0 | Built with Supabase | ${new Date().toLocaleDateString()}</p>
                     </div>
                 </div>
             </div>
             
-            <!-- Support -->
             <div class="card">
-                <h3>🆘 Support & Help</h3>
+                <h3 style="font-size:1rem;">🆘 Support & Help</h3>
                 <div class="setting-item">
                     <div class="setting-info">
                         <h4>Need Help?</h4>
-                        <p>Contact support: support@chamaease.com | +254 700 000 000</p>
+                        <p>Email: support@chamaease.com | Phone: +254 700 000 000</p>
                     </div>
                 </div>
                 <div class="setting-item">
                     <div class="setting-info">
                         <h4>Documentation</h4>
-                        <p>View user guide and video tutorials</p>
+                        <p>View user guide and tutorials</p>
                     </div>
-                    <button class="btn-outline btn-sm" onclick="window.open('#', '_blank')">📖 View Docs</button>
+                    <button class="btn-outline btn-sm" onclick="alert('Documentation coming soon!')">📖 View Docs</button>
                 </div>
             </div>
         `;
         
         container.innerHTML = html;
         
-        // Load saved preferences
         const savedNotifications = localStorage.getItem('emailNotifications');
         const savedTheme = localStorage.getItem('darkMode');
         if (savedNotifications !== null) emailNotifications = savedNotifications === 'true';
