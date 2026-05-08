@@ -30,13 +30,11 @@
             --sidebar-width: 280px;
         }
 
-        /* Layout with Sidebar */
         .app-wrapper {
             display: flex;
             min-height: 100vh;
         }
 
-        /* Sidebar Styles */
         .sidebar {
             width: var(--sidebar-width);
             background: white;
@@ -142,7 +140,6 @@
             margin: 0.6rem 1rem;
         }
 
-        /* Main Content */
         .main-content {
             flex: 1;
             margin-left: var(--sidebar-width);
@@ -150,7 +147,6 @@
             width: calc(100% - var(--sidebar-width));
         }
 
-        /* Top Bar */
         .top-bar {
             background: white;
             padding: 0.7rem 1rem;
@@ -283,7 +279,6 @@
             font-size: 0.7rem;
         }
         
-        /* Mobile: Make each row display as block with 2 rows */
         @media (max-width: 768px) {
             table, thead, tbody, th, td, tr {
                 display: block;
@@ -490,7 +485,6 @@
             text-align: center;
         }
 
-        /* Sidebar Overlay */
         .sidebar-overlay {
             display: none;
             position: fixed;
@@ -506,7 +500,6 @@
             display: block;
         }
 
-        /* Mobile Sidebar */
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -540,10 +533,8 @@
 </head>
 <body>
 <div class="app-wrapper">
-    <!-- Sidebar Overlay -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
     
-    <!-- Sidebar Navigation -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">🌿 ChamaEase</div>
@@ -606,7 +597,6 @@
         </nav>
     </aside>
 
-    <!-- Main Content -->
     <main class="main-content">
         <div class="top-bar">
             <button class="menu-toggle" id="menuToggle">☰</button>
@@ -631,7 +621,6 @@
     let allMembers = [];
     let searchTerm = '';
 
-    // Sidebar functionality
     const menuToggle = document.getElementById('menuToggle');
     const sidebar = document.getElementById('sidebar');
     const sidebarClose = document.getElementById('sidebarClose');
@@ -647,38 +636,24 @@
         sidebarOverlay.classList.remove('active');
     }
     
-    if (menuToggle) {
-        menuToggle.addEventListener('click', openSidebar);
-    }
-    
-    if (sidebarClose) {
-        sidebarClose.addEventListener('click', closeSidebar);
-    }
-    
-    if (sidebarOverlay) {
-        sidebarOverlay.addEventListener('click', closeSidebar);
-    }
+    if (menuToggle) menuToggle.addEventListener('click', openSidebar);
+    if (sidebarClose) sidebarClose.addEventListener('click', closeSidebar);
+    if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebar);
     
     window.addEventListener('resize', () => {
-        if (window.innerWidth > 768) {
-            closeSidebar();
-        }
+        if (window.innerWidth > 768) closeSidebar();
     });
 
-    // Check authentication and protect page
     (async function() {
         const isAuth = await protectPage();
         if (!isAuth) return;
         
         const user = await getCurrentUser();
-        if (user) {
-            document.getElementById('userEmail').textContent = user.email || 'Admin';
-        }
+        if (user) document.getElementById('userEmail').textContent = user.email || 'Admin';
         
         await loadMembers();
     })();
 
-    // Logout functionality
     document.getElementById('logoutBtn').addEventListener('click', async () => {
         await logoutUser();
         window.location.href = 'index.html';
@@ -698,32 +673,17 @@
                 .order('name');
             
             if (error) throw error;
-            
             allMembers = members || [];
             renderMembersList();
-            
         } catch (error) {
             console.error("Error loading members:", error);
-            container.innerHTML = `
-                <div class="card">
-                    <h3>⚠️ Error Loading Members</h3>
-                    <p style="font-size:0.8rem;">${error.message}</p>
-                    <button class="btn" onclick="location.reload()" style="margin-top:0.5rem;">Retry</button>
-                </div>
-            `;
+            container.innerHTML = `<div class="card"><h3>⚠️ Error Loading Members</h3><p style="font-size:0.8rem;">${error.message}</p><button class="btn" onclick="location.reload()" style="margin-top:0.5rem;">Retry</button></div>`;
         }
     }
 
     function renderMembersList() {
         const container = document.getElementById('app-root');
-        
-        let filtered = allMembers;
-        if (searchTerm) {
-            filtered = allMembers.filter(m => 
-                m.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                m.phone.includes(searchTerm)
-            );
-        }
+        let filtered = searchTerm ? allMembers.filter(m => m.name.toLowerCase().includes(searchTerm.toLowerCase()) || m.phone.includes(searchTerm)) : allMembers;
         
         const html = `
             <div class="flex-between">
@@ -737,28 +697,21 @@
                 <div class="table-wrapper">
                     <table>
                         <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Phone</th>
-                                <th>Expected</th>
-                                <th>Paid</th>
-                                <th>Balance</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
+                            <tr><th>Name</th><th>Phone</th><th>Expected</th><th>Paid</th><th>Balance</th><th>Status</th><th>Actions</th></tr>
                         </thead>
                         <tbody>
                             ${filtered.map(m => `
                                 <tr>
                                     <td data-label="Name"><strong>${escapeHtml(m.name)}</strong></td>
                                     <td data-label="Phone">${escapeHtml(m.phone) || '-'}</td>
-                                    <td data-label="Expected">KES ${formatNumber(m.expected_contribution)}</span></td>
-                                    <td data-label="Paid">KES ${formatNumber(m.total_contributed)}</span></td>
+                                    <td data-label="Expected">KES ${formatNumber(m.expected_contribution)}</td>
+                                    <td data-label="Paid">KES ${formatNumber(m.total_contributed)}</td>
                                     <td data-label="Balance"><span style="color:${(m.balance || 0) > 0 ? '#dc2626' : '#2c7a4d'}; font-weight:600;">KES ${formatNumber(m.balance)}</span></td>
                                     <td data-label="Status"><span class="${(m.balance || 0) === 0 ? 'badge-paid' : 'badge-unpaid'}">${(m.balance || 0) === 0 ? 'Paid' : 'Unpaid'}</span></td>
                                     <td data-label="Actions" class="action-group">
                                         <button class="btn-sm btn-outline view-detail" data-id="${m.id}">View</button>
                                         <button class="btn-sm btn-outline edit-member" data-id="${m.id}" data-name="${escapeHtml(m.name)}" data-phone="${escapeHtml(m.phone)}" data-expected="${m.expected_contribution || 0}">Edit</button>
+                                        ${(m.balance || 0) > 0 ? `<button class="btn-sm btn-outline settle-balance" data-id="${m.id}" data-balance="${m.balance}">Settle</button>` : ''}
                                         <button class="btn-sm btn-danger-outline delete-member" data-id="${m.id}" data-name="${escapeHtml(m.name)}">Del</button>
                                     </td>
                                 </tr>
@@ -769,28 +722,14 @@
                 </div>
             </div>
         `;
-        
         container.innerHTML = html;
         
-        // Attach event listeners
-        document.getElementById('searchMemberInput')?.addEventListener('input', (e) => {
-            searchTerm = e.target.value;
-            renderMembersList();
-        });
-        
+        document.getElementById('searchMemberInput')?.addEventListener('input', (e) => { searchTerm = e.target.value; renderMembersList(); });
         document.getElementById('addMemberBtn')?.addEventListener('click', showAddMemberModal);
-        
-        document.querySelectorAll('.view-detail').forEach(btn => {
-            btn.addEventListener('click', () => showMemberDetails(btn.dataset.id));
-        });
-        
-        document.querySelectorAll('.edit-member').forEach(btn => {
-            btn.addEventListener('click', () => showEditMemberModal(btn.dataset.id, btn.dataset.name, btn.dataset.phone, btn.dataset.expected));
-        });
-        
-        document.querySelectorAll('.delete-member').forEach(btn => {
-            btn.addEventListener('click', () => confirmDeleteMember(btn.dataset.id, btn.dataset.name));
-        });
+        document.querySelectorAll('.view-detail').forEach(btn => btn.addEventListener('click', () => showMemberDetails(btn.dataset.id)));
+        document.querySelectorAll('.edit-member').forEach(btn => btn.addEventListener('click', () => showEditMemberModal(btn.dataset.id, btn.dataset.name, btn.dataset.phone, btn.dataset.expected)));
+        document.querySelectorAll('.settle-balance').forEach(btn => btn.addEventListener('click', () => showSettleModal(btn.dataset.id, parseFloat(btn.dataset.balance))));
+        document.querySelectorAll('.delete-member').forEach(btn => btn.addEventListener('click', () => confirmDeleteMember(btn.dataset.id, btn.dataset.name)));
     }
 
     function showAddMemberModal() {
@@ -800,22 +739,10 @@
             <div class="modal-content">
                 <h3 style="margin-bottom:1rem;">➕ Add New Member</h3>
                 <div id="modalMessage"></div>
-                <div class="form-group">
-                    <label>Full Name *</label>
-                    <input type="text" id="memberName" placeholder="Enter full name">
-                </div>
-                <div class="form-group">
-                    <label>Phone Number *</label>
-                    <input type="tel" id="memberPhone" placeholder="0712345678">
-                </div>
-                <div class="form-group">
-                    <label>Expected Monthly Contribution (KES)</label>
-                    <input type="number" id="memberExpected" placeholder="0" value="0">
-                </div>
-                <div style="display:flex; gap:10px; margin-top:1rem;">
-                    <button id="confirmAddBtn" class="btn" style="flex:1;">Add Member</button>
-                    <button id="cancelModalBtn" class="btn-outline btn" style="flex:1;">Cancel</button>
-                </div>
+                <div class="form-group"><label>Full Name *</label><input type="text" id="memberName" placeholder="Enter full name"></div>
+                <div class="form-group"><label>Phone Number *</label><input type="tel" id="memberPhone" placeholder="0712345678"></div>
+                <div class="form-group"><label>Expected Monthly Contribution (KES)</label><input type="number" id="memberExpected" placeholder="0" value="0"></div>
+                <div style="display:flex; gap:10px; margin-top:1rem;"><button id="confirmAddBtn" class="btn" style="flex:1;">Add Member</button><button id="cancelModalBtn" class="btn-outline btn" style="flex:1;">Cancel</button></div>
             </div>
         `;
         document.body.appendChild(modal);
@@ -824,33 +751,13 @@
             const name = document.getElementById('memberName').value.trim();
             const phone = document.getElementById('memberPhone').value.trim();
             const expected = parseFloat(document.getElementById('memberExpected').value) || 0;
-            
-            if (!name || !phone) {
-                showModalMessage('Please fill in name and phone number', 'error');
-                return;
-            }
-            
-            const { error } = await supabaseClient
-                .from('members')
-                .insert([{
-                    name: name,
-                    phone: phone,
-                    expected_contribution: expected,
-                    total_contributed: 0,
-                    balance: expected,
-                    status: expected > 0 ? 'unpaid' : 'paid'
-                }]);
-            
-            if (error) {
-                showModalMessage(error.message, 'error');
-                return;
-            }
-            
+            if (!name || !phone) { showModalMessage('Please fill in name and phone number', 'error'); return; }
+            const { error } = await supabaseClient.from('members').insert([{ name, phone, expected_contribution: expected, total_contributed: 0, balance: expected, status: expected > 0 ? 'unpaid' : 'paid' }]);
+            if (error) { showModalMessage(error.message, 'error'); return; }
             modal.remove();
             await loadMembers();
             showToast('✅ Member added successfully!', 'success');
         };
-        
         document.getElementById('cancelModalBtn').onclick = () => modal.remove();
     }
 
@@ -861,22 +768,10 @@
             <div class="modal-content">
                 <h3 style="margin-bottom:1rem;">✏️ Edit Member</h3>
                 <div id="modalMessage"></div>
-                <div class="form-group">
-                    <label>Full Name *</label>
-                    <input type="text" id="memberName" value="${escapeHtml(name)}">
-                </div>
-                <div class="form-group">
-                    <label>Phone Number *</label>
-                    <input type="tel" id="memberPhone" value="${escapeHtml(phone)}">
-                </div>
-                <div class="form-group">
-                    <label>Expected Monthly Contribution (KES)</label>
-                    <input type="number" id="memberExpected" value="${expected}">
-                </div>
-                <div style="display:flex; gap:10px; margin-top:1rem;">
-                    <button id="confirmEditBtn" class="btn" style="flex:1;">Save Changes</button>
-                    <button id="cancelModalBtn" class="btn-outline btn" style="flex:1;">Cancel</button>
-                </div>
+                <div class="form-group"><label>Full Name *</label><input type="text" id="memberName" value="${escapeHtml(name)}"></div>
+                <div class="form-group"><label>Phone Number *</label><input type="tel" id="memberPhone" value="${escapeHtml(phone)}"></div>
+                <div class="form-group"><label>Expected Monthly Contribution (KES)</label><input type="number" id="memberExpected" value="${expected}"></div>
+                <div style="display:flex; gap:10px; margin-top:1rem;"><button id="confirmEditBtn" class="btn" style="flex:1;">Save Changes</button><button id="cancelModalBtn" class="btn-outline btn" style="flex:1;">Cancel</button></div>
             </div>
         `;
         document.body.appendChild(modal);
@@ -885,32 +780,44 @@
             const newName = document.getElementById('memberName').value.trim();
             const newPhone = document.getElementById('memberPhone').value.trim();
             const newExpected = parseFloat(document.getElementById('memberExpected').value) || 0;
-            
-            if (!newName || !newPhone) {
-                showModalMessage('Please fill in name and phone number', 'error');
-                return;
-            }
-            
-            const { error } = await supabaseClient
-                .from('members')
-                .update({
-                    name: newName,
-                    phone: newPhone,
-                    expected_contribution: newExpected
-                })
-                .eq('id', id);
-            
-            if (error) {
-                showModalMessage(error.message, 'error');
-                return;
-            }
-            
+            if (!newName || !newPhone) { showModalMessage('Please fill in name and phone number', 'error'); return; }
+            const { error } = await supabaseClient.from('members').update({ name: newName, phone: newPhone, expected_contribution: newExpected }).eq('id', id);
+            if (error) { showModalMessage(error.message, 'error'); return; }
             modal.remove();
             await loadMembers();
             showToast('✅ Member updated successfully!', 'success');
         };
-        
         document.getElementById('cancelModalBtn').onclick = () => modal.remove();
+    }
+
+    function showSettleModal(memberId, currentBalance) {
+        if (currentBalance <= 0) { showToast('Balance is already zero', 'error'); return; }
+        const member = allMembers.find(m => m.id === memberId);
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <h3>Settle Balance</h3>
+                <p><strong>${escapeHtml(member?.name || 'Unknown')}</strong></p>
+                <p>Amount: KES ${formatNumber(currentBalance)}</p>
+                <div class="form-group"><label>Payment Method:</label><select id="settleMethodSelect"><option value="M-Pesa">M-Pesa</option><option value="Cash">Cash</option><option value="Bank Transfer">Bank Transfer</option></select></div>
+                <div class="form-group"><label>Date:</label><input type="date" id="settleDate" value="${new Date().toISOString().slice(0,10)}"></div>
+                <div style="display:flex; gap:10px; margin-top:1rem;"><button id="confirmSettleBtn" class="btn" style="flex:1;">Confirm</button><button id="cancelSettleBtn" class="btn-outline btn" style="flex:1;">Cancel</button></div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        
+        document.getElementById('confirmSettleBtn').onclick = async () => {
+            const method = document.getElementById('settleMethodSelect').value;
+            const date = document.getElementById('settleDate').value;
+            const user = await getCurrentUser();
+            const { error } = await supabaseClient.from('contributions').insert([{ member_id: memberId, amount: currentBalance, month: date.slice(0,7), date, method, type: 'Settlement', recorded_by: user?.id }]);
+            if (error) { showToast('Error: ' + error.message, 'error'); modal.remove(); return; }
+            modal.remove();
+            showToast(`✅ Settled KES ${formatNumber(currentBalance)} via ${method}`, 'success');
+            await loadMembers();
+        };
+        document.getElementById('cancelSettleBtn').onclick = () => modal.remove();
     }
 
     function confirmDeleteMember(id, name) {
@@ -921,120 +828,55 @@
                 <h3 style="margin-bottom:1rem;">⚠️ Delete Member</h3>
                 <p>Delete <strong>${escapeHtml(name)}</strong>?</p>
                 <p style="color:#dc2626; font-size:0.7rem; margin-top:0.5rem;">This also deletes all contribution records.</p>
-                <div style="display:flex; gap:10px; margin-top:1rem;">
-                    <button id="confirmDeleteBtn" class="btn btn-danger" style="flex:1;">Delete</button>
-                    <button id="cancelModalBtn" class="btn-outline btn" style="flex:1;">Cancel</button>
-                </div>
+                <div style="display:flex; gap:10px; margin-top:1rem;"><button id="confirmDeleteBtn" class="btn btn-danger" style="flex:1;">Delete</button><button id="cancelModalBtn" class="btn-outline btn" style="flex:1;">Cancel</button></div>
             </div>
         `;
         document.body.appendChild(modal);
         
         document.getElementById('confirmDeleteBtn').onclick = async () => {
-            const { error } = await supabaseClient
-                .from('members')
-                .delete()
-                .eq('id', id);
-            
-            if (error) {
-                showToast('Error: ' + error.message, 'error');
-                modal.remove();
-                return;
-            }
-            
+            const { error } = await supabaseClient.from('members').delete().eq('id', id);
+            if (error) { showToast('Error: ' + error.message, 'error'); modal.remove(); return; }
             modal.remove();
             await loadMembers();
             showToast('✅ Member deleted successfully!', 'success');
         };
-        
         document.getElementById('cancelModalBtn').onclick = () => modal.remove();
     }
 
     async function showMemberDetails(memberId) {
         const member = allMembers.find(m => m.id === memberId);
         if (!member) return;
-        
-        const { data: contributions, error } = await supabaseClient
-            .from('contributions')
-            .select('*')
-            .eq('member_id', memberId)
-            .order('date', { ascending: false });
-        
-        if (error) {
-            showToast('Error loading contributions: ' + error.message, 'error');
-            return;
-        }
-        
+        const { data: contributions, error } = await supabaseClient.from('contributions').select('*').eq('member_id', memberId).order('date', { ascending: false });
+        if (error) { showToast('Error loading contributions: ' + error.message, 'error'); return; }
         const totalPaid = contributions?.reduce((sum, c) => sum + c.amount, 0) || 0;
-        
         const modal = document.createElement('div');
         modal.className = 'modal';
         modal.innerHTML = `
             <div class="modal-content" style="max-width: 500px; max-height: 80vh; overflow-y: auto;">
-                <div class="flex-between" style="margin-bottom:1rem;">
-                    <h3>👤 ${escapeHtml(member.name)}</h3>
-                    <button id="closeModalBtn" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button>
-                </div>
+                <div class="flex-between" style="margin-bottom:1rem;"><h3>👤 ${escapeHtml(member.name)}</h3><button id="closeModalBtn" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button></div>
                 <p><strong>📞 Phone:</strong> ${escapeHtml(member.phone) || '-'}</p>
                 <p><strong>💰 Expected:</strong> KES ${formatNumber(member.expected_contribution)}</p>
                 <p><strong>💵 Total Paid:</strong> KES ${formatNumber(totalPaid)}</p>
                 <p><strong>⚖️ Balance:</strong> KES ${formatNumber(member.balance)}</p>
                 <p><strong>📊 Status:</strong> <span class="${(member.balance || 0) === 0 ? 'badge-paid' : 'badge-unpaid'}">${(member.balance || 0) === 0 ? 'Paid' : 'Unpaid'}</span></p>
-                
                 <h4 style="margin-top:1rem;">📅 Contribution History</h4>
-                <div class="table-wrapper">
-                    <table style="min-width: 250px;">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Amount</th>
-                                <th>Method</th>
-                                <th>Month</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${contributions?.map(c => `
-                                <tr>
-                                    <td>${c.date || '-'}</td>
-                                    <td>KES ${formatNumber(c.amount)}</span></td>
-                                    <td>${c.method || '-'}</td>
-                                    <td>${c.month || '-'}</td>
-                                </tr>
-                            `).join('') || '<tr><td colspan="4">No contributions yet</td></tr>'}
-                        </tbody>
-                    </table>
-                </div>
+                <div class="table-wrapper"><table style="min-width:250px;"><thead><tr><th>Date</th><th>Amount</th><th>Method</th><th>Month</th></tr></thead><tbody>${contributions?.map(c => `<tr><td>${c.date || '-'}</td><td>KES ${formatNumber(c.amount)}</td><td>${c.method || '-'}</td><td>${c.month || '-'}</td></tr>`).join('') || '<tr><td colspan="4">No contributions yet</td></tr>'}</tbody></table></div>
             </div>
         `;
         document.body.appendChild(modal);
-        
         modal.querySelector('#closeModalBtn').onclick = () => modal.remove();
         modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
     }
 
     function showModalMessage(message, type) {
         const msgDiv = document.getElementById('modalMessage');
-        if (msgDiv) {
-            msgDiv.innerHTML = `<div class="${type === 'error' ? 'error-message' : 'success-message'}">${message}</div>`;
-            setTimeout(() => {
-                if (msgDiv.innerHTML) msgDiv.innerHTML = '';
-            }, 3000);
-        }
+        if (msgDiv) msgDiv.innerHTML = `<div class="${type === 'error' ? 'error-message' : 'success-message'}">${message}</div>`;
+        setTimeout(() => { if (msgDiv) msgDiv.innerHTML = ''; }, 3000);
     }
 
     function showToast(message, type) {
         const toast = document.createElement('div');
-        toast.style.cssText = `
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: ${type === 'error' ? '#dc2626' : '#2c7a4d'};
-            color: white;
-            padding: 10px 16px;
-            border-radius: 40px;
-            font-size: 0.75rem;
-            z-index: 1002;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        `;
+        toast.style.cssText = `position:fixed; bottom:20px; right:20px; background:${type === 'error' ? '#dc2626' : '#2c7a4d'}; color:white; padding:10px 16px; border-radius:40px; font-size:0.75rem; z-index:1002; box-shadow:0 4px 12px rgba(0,0,0,0.15);`;
         toast.textContent = message;
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 3000);
@@ -1042,12 +884,7 @@
 
     function escapeHtml(str) {
         if (!str) return '';
-        return String(str).replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        });
+        return String(str).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m] || m));
     }
 </script>
 </body>
