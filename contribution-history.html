@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
     <title>ChamaEase | Contribution History</title>
     <style>
         * {
@@ -25,9 +25,9 @@
             --warning: #e6a017;
             --gray-border: #e2e8f0;
             --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.04);
-            --radius-card: 20px;
+            --radius-card: 16px;
             --radius-btn: 32px;
-            --sidebar-width: 260px;
+            --sidebar-width: 280px;
         }
 
         /* Layout with Sidebar */
@@ -46,35 +46,58 @@
             top: 0;
             bottom: 0;
             overflow-y: auto;
-            transition: all 0.3s ease;
-            z-index: 100;
+            transition: transform 0.3s ease;
+            z-index: 1000;
             box-shadow: var(--shadow-sm);
+            transform: translateX(0);
         }
 
         .sidebar-header {
-            padding: 1.2rem;
+            padding: 1rem;
             border-bottom: 1px solid var(--gray-border);
-            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .sidebar-logo {
             font-weight: 800;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             background: linear-gradient(135deg, var(--primary), #3b9b62);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
         }
 
+        .sidebar-close {
+            background: none;
+            border: none;
+            font-size: 1.3rem;
+            cursor: pointer;
+            color: #94a3b8;
+            transition: all 0.2s;
+            display: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar-close:hover {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+
         .sidebar-nav {
-            padding: 1rem 0;
+            padding: 0.8rem 0;
         }
 
         .nav-item {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 0.8rem 1.2rem;
+            gap: 10px;
+            padding: 0.7rem 1rem;
             margin: 0.2rem 0.8rem;
             border-radius: 12px;
             text-decoration: none;
@@ -94,42 +117,43 @@
         }
 
         .nav-item .icon {
-            font-size: 1.2rem;
-            width: 24px;
+            font-size: 1.1rem;
+            width: 26px;
             text-align: center;
         }
 
         .nav-item .label {
             font-weight: 500;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
         .nav-submenu {
-            padding-left: 3rem;
+            padding-left: 2.8rem;
         }
 
         .nav-submenu .nav-item {
-            padding: 0.6rem 1rem;
-            font-size: 0.85rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
         }
 
         .nav-divider {
             height: 1px;
             background: var(--gray-border);
-            margin: 0.8rem 1.2rem;
+            margin: 0.6rem 1rem;
         }
 
         /* Main Content */
         .main-content {
             flex: 1;
             margin-left: var(--sidebar-width);
-            transition: all 0.3s ease;
+            transition: margin-left 0.3s ease;
+            width: calc(100% - var(--sidebar-width));
         }
 
         /* Top Bar */
         .top-bar {
             background: white;
-            padding: 0.8rem 2rem;
+            padding: 0.7rem 1rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -141,16 +165,18 @@
         }
 
         .menu-toggle {
-            display: none;
             background: none;
             border: none;
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             cursor: pointer;
             color: var(--primary);
+            padding: 6px;
+            border-radius: 50%;
+            transition: all 0.2s;
         }
 
         .page-title {
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             font-weight: 600;
             color: #1e2a3e;
         }
@@ -158,22 +184,30 @@
         .user-info {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.6rem;
         }
 
         .user-email {
-            font-size: 0.85rem;
+            font-size: 0.7rem;
             color: #5b6e8c;
+            display: none;
+        }
+
+        @media (min-width: 480px) {
+            .user-email {
+                display: inline;
+            }
         }
 
         .logout-btn {
             background: transparent;
             border: 1px solid #dc2626;
             color: #dc2626;
-            padding: 0.4rem 1rem;
+            padding: 0.35rem 0.7rem;
             border-radius: 2rem;
             cursor: pointer;
             transition: all 0.2s;
+            font-size: 0.7rem;
         }
 
         .logout-btn:hover {
@@ -181,11 +215,10 @@
             color: white;
         }
 
-        /* Container */
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 1.5rem;
+            padding: 1rem;
             width: 100%;
             min-height: 70vh;
         }
@@ -194,8 +227,8 @@
             background: white;
             border-radius: var(--radius-card);
             box-shadow: var(--shadow-sm);
-            padding: 1.2rem;
-            margin-bottom: 1.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
             border: 1px solid var(--gray-border);
         }
 
@@ -203,11 +236,11 @@
             border: none;
             background: var(--primary);
             color: white;
-            padding: 0.6rem 1.2rem;
+            padding: 0.5rem 1rem;
             border-radius: var(--radius-btn);
             font-weight: 600;
             cursor: pointer;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             transition: 0.2s;
             text-decoration: none;
             display: inline-block;
@@ -220,8 +253,8 @@
         }
 
         .btn-sm {
-            padding: 0.3rem 0.8rem;
-            font-size: 0.75rem;
+            padding: 0.25rem 0.6rem;
+            font-size: 0.65rem;
         }
 
         .table-wrapper {
@@ -233,39 +266,36 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.85rem;
+            font-size: 0.7rem;
+            min-width: 600px;
         }
         
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-            .sidebar.open {
-                transform: translateX(0);
-            }
-            .main-content {
-                margin-left: 0;
-            }
-            .menu-toggle {
-                display: block;
-            }
+        @media (min-width: 640px) {
             table {
-                font-size: 0.75rem;
-            }
-            th, td {
-                padding: 0.5rem 0.3rem;
+                font-size: 0.8rem;
+                min-width: auto;
             }
         }
 
         th, td {
             text-align: left;
-            padding: 0.7rem 0.5rem;
+            padding: 0.6rem 0.4rem;
             border-bottom: 1px solid var(--gray-border);
         }
 
         th {
             background: #f8fafc;
             font-weight: 600;
+            font-size: 0.7rem;
+        }
+
+        @media (min-width: 640px) {
+            th {
+                font-size: 0.8rem;
+            }
+            td {
+                font-size: 0.8rem;
+            }
         }
 
         .flex-between {
@@ -273,55 +303,69 @@
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 0.8rem;
-            margin-bottom: 1.2rem;
+            gap: 0.6rem;
+            margin-bottom: 1rem;
         }
 
         .filter-bar {
             display: flex;
             flex-wrap: wrap;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
+            gap: 0.6rem;
+            margin-top: 0.8rem;
         }
 
-        .filter-select, .filter-input {
-            padding: 0.5rem 1rem;
+        .filter-select {
+            padding: 0.4rem 0.8rem;
             border-radius: 40px;
             border: 1px solid var(--gray-border);
             background: white;
-            min-width: 150px;
+            font-size: 0.75rem;
+            flex: 1;
+            min-width: 130px;
         }
 
         .stats-summary {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (min-width: 640px) {
+            .stats-summary {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 1rem;
+            }
         }
 
         .stat-box {
             background: #f8fafc;
-            border-radius: 1rem;
-            padding: 1rem;
+            border-radius: 12px;
+            padding: 0.8rem;
             text-align: center;
         }
 
         .stat-box h4 {
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             color: #5b6e8c;
-            margin-bottom: 0.3rem;
+            margin-bottom: 0.2rem;
         }
 
         .stat-box .value {
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             font-weight: 800;
             color: var(--primary);
         }
 
+        .stat-box small {
+            font-size: 0.6rem;
+            color: #6c757d;
+        }
+
         footer {
             text-align: center;
-            padding: 1rem;
-            font-size: 0.8rem;
+            padding: 0.8rem;
+            font-size: 0.65rem;
             color: #6c757d;
             border-top: 1px solid var(--gray-border);
             margin-top: 1rem;
@@ -329,8 +373,8 @@
 
         .loading-spinner {
             display: inline-block;
-            width: 40px;
-            height: 40px;
+            width: 30px;
+            height: 30px;
             border: 3px solid #e2e8f0;
             border-radius: 50%;
             border-top-color: var(--primary);
@@ -344,18 +388,68 @@
         .report-actions {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 1rem;
+            gap: 8px;
+        }
+
+        /* Sidebar Overlay */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        /* Mobile Sidebar */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+            .sidebar-close {
+                display: flex;
+            }
+            .container {
+                padding: 0.8rem;
+            }
+            .filter-bar {
+                flex-direction: column;
+            }
+            .filter-select {
+                width: 100%;
+            }
+            .flex-between {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .report-actions {
+                justify-content: center;
+            }
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 <div class="app-wrapper">
-    <!-- Sidebar Navigation -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">🌿 ChamaEase</div>
+            <button class="sidebar-close" id="sidebarClose">✕</button>
         </div>
         <nav class="sidebar-nav">
             <a href="dashboard.html" class="nav-item">
@@ -414,7 +508,6 @@
         </nav>
     </aside>
 
-    <!-- Main Content -->
     <main class="main-content">
         <div class="top-bar">
             <button class="menu-toggle" id="menuToggle">☰</button>
@@ -425,9 +518,9 @@
             </div>
         </div>
         <div id="app-root" class="container">
-            <div style="text-align: center; padding: 2rem;">
+            <div style="text-align: center; padding: 1.5rem;">
                 <div class="loading-spinner"></div>
-                <p>Loading contribution history...</p>
+                <p style="margin-top: 0.5rem; font-size: 0.8rem;">Loading contribution history...</p>
             </div>
         </div>
         <footer>✨ Smart Chama Management · Full contribution history with filters</footer>
@@ -445,22 +538,28 @@
         method: 'all'
     };
 
-    // Sidebar toggle
+    // Sidebar functionality
     const menuToggle = document.getElementById('menuToggle');
     const sidebar = document.getElementById('sidebar');
+    const sidebarClose = document.getElementById('sidebarClose');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
     
-    if (menuToggle) {
-        menuToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('open');
-        });
+    function openSidebar() {
+        sidebar.classList.add('open');
+        sidebarOverlay.classList.add('active');
     }
     
-    document.addEventListener('click', (e) => {
-        if (window.innerWidth <= 768) {
-            if (!sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
-                sidebar.classList.remove('open');
-            }
-        }
+    function closeSidebar() {
+        sidebar.classList.remove('open');
+        sidebarOverlay.classList.remove('active');
+    }
+    
+    if (menuToggle) menuToggle.addEventListener('click', openSidebar);
+    if (sidebarClose) sidebarClose.addEventListener('click', closeSidebar);
+    if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebar);
+    
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) closeSidebar();
     });
 
     (async function() {
@@ -503,8 +602,8 @@
             document.getElementById('app-root').innerHTML = `
                 <div class="card">
                     <h3>⚠️ Error Loading Data</h3>
-                    <p>${error.message}</p>
-                    <button class="btn" onclick="location.reload()">Retry</button>
+                    <p style="font-size:0.8rem;">${error.message}</p>
+                    <button class="btn" onclick="location.reload()" style="margin-top:0.5rem;">Retry</button>
                 </div>
             `;
         }
@@ -534,7 +633,7 @@
     }
 
     function formatNumber(num) {
-        return num?.toLocaleString('en-KE') || '0';
+        return (num || 0).toLocaleString('en-KE');
     }
 
     function exportToCSV() {
@@ -571,7 +670,7 @@
         link.download = `contribution_history_${new Date().toISOString().slice(0,10)}.csv`;
         link.click();
         URL.revokeObjectURL(link.href);
-        showToast('✅ CSV exported successfully!', 'success');
+        showToast('✅ CSV exported!', 'success');
     }
 
     async function copyToClipboard() {
@@ -591,7 +690,7 @@
         });
         
         await navigator.clipboard.writeText(text);
-        showToast('✅ Report copied to clipboard!', 'success');
+        showToast('✅ Report copied!', 'success');
     }
 
     function renderHistoryPage() {
@@ -604,14 +703,13 @@
         const html = `
             <div class="card">
                 <div class="flex-between">
-                    <h2>📜 Contribution History</h2>
+                    <h2 style="font-size:1.2rem;">📜 Contribution History</h2>
                     <div class="report-actions">
                         <button id="copyBtn" class="btn-sm btn-outline">📋 Copy</button>
-                        <button id="exportCSVBtn" class="btn-sm btn-outline">📎 Export CSV</button>
+                        <button id="exportCSVBtn" class="btn-sm btn-outline">📎 CSV</button>
                     </div>
                 </div>
                 
-                <!-- Filter Bar -->
                 <div class="filter-bar">
                     <select id="monthFilter" class="filter-select">
                         <option value="all" ${currentFilters.month === 'all' ? 'selected' : ''}>All Months</option>
@@ -625,7 +723,7 @@
                     
                     <select id="memberFilter" class="filter-select">
                         <option value="all" ${currentFilters.member === 'all' ? 'selected' : ''}>All Members</option>
-                        ${allMembers.map(m => `<option value="${m.id}" ${currentFilters.member === m.id ? 'selected' : ''}>${m.name}</option>`).join('')}
+                        ${allMembers.map(m => `<option value="${m.id}" ${currentFilters.member === m.id ? 'selected' : ''}>${escapeHtml(m.name)}</option>`).join('')}
                     </select>
                     
                     <select id="methodFilter" class="filter-select">
@@ -635,11 +733,10 @@
                         <option value="Bank Transfer" ${currentFilters.method === 'Bank Transfer' ? 'selected' : ''}>Bank Transfer</option>
                     </select>
                     
-                    <button id="resetFiltersBtn" class="btn-sm btn-outline">🔄 Reset Filters</button>
+                    <button id="resetFiltersBtn" class="btn-sm btn-outline">🔄 Reset</button>
                 </div>
             </div>
             
-            <!-- Statistics Summary -->
             <div class="stats-summary">
                 <div class="stat-box">
                     <h4>Total Records</h4>
@@ -660,37 +757,32 @@
                 </div>
             </div>
             
-            <!-- Contributions Table -->
             <div class="card">
-                <h3>📋 Contribution Records</h3>
+                <h3 style="font-size:1rem;">📋 Contribution Records</h3>
                 <div class="table-wrapper">
                     <table>
                         <thead>
                             <tr>
                                 <th>Date</th>
-                                <th>Member Name</th>
+                                <th>Member</th>
                                 <th>Phone</th>
-                                <th>Amount (KES)</th>
+                                <th>Amount</th>
                                 <th>Month</th>
-                                <th>Payment Method</th>
+                                <th>Method</th>
                                 <th>Type</th>
                             </tr>
                         </thead>
                         <tbody>
                             ${filtered.map(c => `
                                 <tr>
-                                    <td>${c.date || '-'}</td>
-                                    <td>${c.members?.name || 'Unknown'}</strong></td>
-                                    <td>${c.members?.phone || '-'}</td>
-                                    <td><span style="font-weight:600;color:var(--primary);">KES ${formatNumber(c.amount)}</span></td>
-                                    <td>${c.month || '-'}</td>
-                                    </td>${c.method || '-'}</td>
-                                    <td>${c.type || 'Monthly'}</td>
-                                </tr>
+                                    <td>${c.date || '-'}</span></td>
+                                    <td><strong>${escapeHtml(c.members?.name || 'Unknown')}</strong></span></td>
+                                    <td>${c.members?.phone || '-'}</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span>
+                                    <tr>
                             `).join('')}
-                            ${filtered.length === 0 ? '<tr><td colspan="7" style="text-align:center;">No contributions found for selected filters</td></tr>' : ''}
+                            ${filtered.length === 0 ? '<tr><td colspan="7" style="text-align:center;">No contributions found</td></tr>' : ''}
                         </tbody>
-                     </div>
+                    </div>
                 </div>
             </div>
         `;
@@ -731,22 +823,15 @@
     
     function showToast(message, type) {
         const toast = document.createElement('div');
-        toast.style.cssText = `
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: ${type === 'error' ? '#dc2626' : '#2c7a4d'};
-            color: white;
-            padding: 12px 20px;
-            border-radius: 40px;
-            font-size: 0.85rem;
-            z-index: 1001;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            animation: slideIn 0.3s ease;
-        `;
+        toast.style.cssText = `position:fixed; bottom:20px; right:20px; background:${type === 'error' ? '#dc2626' : '#2c7a4d'}; color:white; padding:10px 16px; border-radius:40px; font-size:0.75rem; z-index:1002; box-shadow:0 4px 12px rgba(0,0,0,0.15);`;
         toast.textContent = message;
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 3000);
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m] || m));
     }
 </script>
 </body>
