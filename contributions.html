@@ -667,11 +667,11 @@
                             ${paidMembers.map(m => `
                                 <tr>
                                     <td data-label="Name"><strong>${escapeHtml(m.name)}</strong></td>
-                                    <td data-label="Total Paid">KES ${formatNumber(m.total_contributed)}</span></td>
+                                    <td data-label="Total Paid">KES ${formatNumber(m.total_contributed)}</td>
                                     <td data-label="Status"><span class="badge-paid">Paid</span></td>
                                 </tr>
                             `).join('')}
-                            ${paidMembers.length === 0 ? '<tr><td colspan="3">No paid members yet</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></tr>'}
+                            ${paidMembers.length === 0 ? '<tr><td colspan="3">No paid members yet</td></tr>' : ''}
                         </tbody>
                     </table>
                 </div>
@@ -687,11 +687,11 @@
                             ${unpaidMembers.map(m => `
                                 <tr>
                                     <td data-label="Name"><strong>${escapeHtml(m.name)}</strong></td>
-                                    <td data-label="Balance">KES ${formatNumber(m.balance)}</span></td>
+                                    <td data-label="Balance">KES ${formatNumber(m.balance)}</td>
                                     <td data-label="Action"><button class="btn-sm btn-outline settle-balance" data-id="${m.id}" data-balance="${m.balance || 0}">Settle</button></td>
                                 </tr>
                             `).join('')}
-                            ${unpaidMembers.length === 0 ? '<tr><td colspan="3">🎉 Everyone is up to date!</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></td>'}
+                            ${unpaidMembers.length === 0 ? '<tr><td colspan="3">🎉 Everyone is up to date!</td></tr>' : ''}
                         </tbody>
                     </table>
                 </div>
@@ -707,15 +707,15 @@
                         <tbody>
                             ${filteredContribs.map(c => `
                                 <tr>
-                                    <td data-label="Member">${escapeHtml(c.members?.name || 'Unknown')}</span></td>
-                                    <td data-label="Amount">KES ${formatNumber(c.amount)}</span></td>
-                                    <td data-label="Date">${c.date || '-'}</span></td>
-                                    <td data-label="Month">${c.month || '-'}</span></td>
-                                    <td data-label="Method">${c.method || '-'}</span></td>
+                                    <td data-label="Member">${escapeHtml(c.members?.name || 'Unknown')}</td>
+                                    <td data-label="Amount">KES ${formatNumber(c.amount)}</td>
+                                    <td data-label="Date">${c.date || '-'}</td>
+                                    <td data-label="Month">${c.month || '-'}</td>
+                                    <td data-label="Method">${c.method || '-'}</td>
                                     <td data-label="Action"><button class="btn-sm btn-danger-outline delete-contribution" data-id="${c.id}" data-member="${escapeHtml(c.members?.name || 'Unknown')}" data-amount="${c.amount}">Del</button></td>
                                 </tr>
                             `).join('')}
-                            ${filteredContribs.length === 0 ? '<tr><td colspan="6">No contributions found</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></td>'}
+                            ${filteredContribs.length === 0 ? '<tr><td colspan="6">No contributions found</td></tr>' : ''}
                         </tbody>
                     </table>
                 </div>
