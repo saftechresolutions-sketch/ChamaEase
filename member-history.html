@@ -342,24 +342,24 @@
         .stat-box {
             background: #f8fafc;
             border-radius: 12px;
-            padding: 0.8rem;
+            padding: 0.7rem;
             text-align: center;
         }
 
         .stat-box h4 {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             color: #5b6e8c;
             margin-bottom: 0.2rem;
         }
 
         .stat-box .value {
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 800;
             color: var(--primary);
         }
 
         .stat-box small {
-            font-size: 0.6rem;
+            font-size: 0.55rem;
             color: #6c757d;
         }
 
@@ -450,7 +450,6 @@
             overflow-y: auto;
         }
 
-        /* Sidebar Overlay */
         .sidebar-overlay {
             display: none;
             position: fixed;
@@ -466,7 +465,6 @@
             display: block;
         }
 
-        /* Mobile Sidebar */
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -693,9 +691,9 @@
             csvRows.push([
                 m.name,
                 m.phone,
-                m.expected_contribution || 0,
-                m.total_contributed || 0,
-                m.balance || 0,
+                formatNumber(m.expected_contribution || 0),
+                formatNumber(m.total_contributed || 0),
+                formatNumber(m.balance || 0),
                 (m.balance || 0) === 0 ? 'Paid' : 'Unpaid',
                 `${paymentPercent}%`
             ]);
@@ -742,7 +740,7 @@
                 <div class="stat-box">
                     <h4>Paid Members</h4>
                     <div class="value">${paidCount}</div>
-                    <small>${((paidCount/filteredMembers.length)*100 || 0).toFixed(0)}%</small>
+                    <small>${filteredMembers.length > 0 ? ((paidCount/filteredMembers.length)*100).toFixed(0) : 0}%</small>
                 </div>
                 <div class="stat-box">
                     <h4>Total Expected</h4>
@@ -768,11 +766,11 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>Member</th>
+                                <th>Member Name</th>
                                 <th>Phone</th>
-                                <th>Expected</th>
-                                <th>Paid</th>
-                                <th>Balance</th>
+                                <th>Expected (KES)</th>
+                                <th>Paid (KES)</th>
+                                <th>Balance (KES)</th>
                                 <th>Status</th>
                                 <th>Progress</th>
                                 <th>Action</th>
@@ -786,13 +784,26 @@
                                 return `
                                     <tr>
                                         <td><strong>${escapeHtml(m.name)}</strong></td>
-                                        <td>${escapeHtml(m.phone)}</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span>
+                                        <td>${escapeHtml(m.phone)}</td>
+                                        <td>KES ${formatNumber(m.expected_contribution || 0)}</td>
+                                        <td><span style="color:var(--primary);font-weight:600;">KES ${formatNumber(m.total_contributed || 0)}</span></td>
+                                        <td><span style="color:${(m.balance || 0) > 0 ? '#dc2626' : '#2c7a4d'};font-weight:600;">KES ${formatNumber(m.balance || 0)}</span></td>
+                                        <td><span class="${(m.balance || 0) === 0 ? 'badge-paid' : 'badge-unpaid'}">${(m.balance || 0) === 0 ? 'Paid' : 'Unpaid'}</span></td>
+                                        <td style="min-width:100px;">
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: ${Math.min(paymentPercent, 100)}%"></div>
+                                            </div>
+                                            <small>${paymentPercent.toFixed(0)}%</small>
+                                        </td>
+                                        <td>
+                                            <button class="btn-sm btn-outline view-member-details" data-id="${m.id}">View History</button>
+                                        </td>
                                     </tr>
                                 `;
                             }).join('')}
                             ${filteredMembers.length === 0 ? '<tr><td colspan="8" style="text-align:center;">No members found</td></tr>' : ''}
                         </tbody>
-                     </div>
+                    </table>
                 </div>
             </div>
         `;
@@ -852,13 +863,22 @@
                 <h4 style="margin-top:1rem;">📅 Payment History</h4>
                 <div class="table-wrapper">
                     <table style="min-width:250px;">
-                        <thead><tr><th>Date</th><th>Amount</th><th>Method</th><th>Month</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th>Method</th>
+                                <th>Month</th>
+                            </tr>
+                        </thead>
                         <tbody>
                             ${contributions.map(c => `
                                 <tr>
-                                    <td>${c.date || '-'}</span></td>
-                                    <td>KES ${formatNumber(c.amount)}</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span>
-                                    </tr>
+                                    <td>${c.date || '-'}</td>
+                                    <td>KES ${formatNumber(c.amount)}</td>
+                                    <td>${c.method || '-'}</td>
+                                    <td>${c.month || '-'}</td>
+                                </tr>
                             `).join('')}
                             ${contributions.length === 0 ? '<tr><td colspan="4">No payment records yet</td></tr>' : ''}
                         </tbody>
@@ -883,7 +903,12 @@
     
     function escapeHtml(str) {
         if (!str) return '';
-        return String(str).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m] || m));
+        return String(str).replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
     }
 </script>
 </body>
