@@ -17,7 +17,7 @@
             min-height: 100vh;
             display: flex;
             align-items: center;
-            justify-content: center;
+            justifyContent: center;
             padding: 1.5rem;
         }
 
@@ -141,19 +141,37 @@
             text-align: center;
         }
 
-        .register-link, .reset-link {
+        .register-link {
             text-align: center;
             margin-top: 1rem;
             color: #5b6e8c;
         }
 
-        .register-link a, .reset-link a {
+        .register-link a {
             color: #2c7a4d;
             text-decoration: none;
             font-weight: 600;
         }
 
-        .register-link a:hover, .reset-link a:hover {
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+
+        .reset-link {
+            text-align: center;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .reset-link a {
+            color: #6c757d;
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+
+        .reset-link a:hover {
+            color: #2c7a4d;
             text-decoration: underline;
         }
 
@@ -172,39 +190,63 @@
             to { transform: rotate(360deg); }
         }
 
-        .mode-toggle {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            border-bottom: 1px solid #e2e8f0;
+        /* Reset Password Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
         }
 
-        .mode-btn {
-            flex: 1;
-            text-align: center;
-            padding: 0.8rem;
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 2rem;
+            padding: 2rem;
+            max-width: 450px;
+            width: 90%;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h2 {
+            font-size: 1.5rem;
+            color: #1e2a3e;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
             cursor: pointer;
-            color: #5b6e8c;
-            font-weight: 600;
-            border-bottom: 2px solid transparent;
+            color: #94a3b8;
             transition: all 0.2s;
         }
 
-        .mode-btn.active {
-            color: #2c7a4d;
-            border-bottom-color: #2c7a4d;
-        }
-
-        .mode-btn:hover:not(.active) {
-            color: #2c7a4d;
-        }
-
-        .hide {
-            display: none;
+        .modal-close:hover {
+            color: #dc2626;
         }
 
         @media (max-width: 640px) {
             .login-card {
+                padding: 1.5rem;
+            }
+            .modal-content {
                 padding: 1.5rem;
             }
         }
@@ -222,42 +264,46 @@
 
             <div id="messageArea"></div>
 
-            <!-- Mode Selection Tabs -->
-            <div class="mode-toggle">
-                <div class="mode-btn active" data-mode="login">Login</div>
-                <div class="mode-btn" data-mode="reset">Reset Password</div>
-            </div>
-
-            <!-- Login Form -->
             <form id="loginForm">
                 <div class="form-group">
                     <label>📧 Email Address</label>
-                    <input type="email" id="loginEmail" placeholder="admin@chama.com" required>
+                    <input type="email" id="email" placeholder="admin@chama.com" required>
                 </div>
 
                 <div class="form-group">
                     <label>🔒 Password</label>
-                    <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                    <input type="password" id="password" placeholder="Enter your password" required>
                 </div>
 
                 <button type="submit" id="loginBtn" class="btn">Login to Dashboard</button>
             </form>
 
-            <!-- Reset Password Form (Hidden by default) -->
-            <form id="resetForm" class="hide">
-                <div class="form-group">
-                    <label>📧 Email Address</label>
-                    <input type="email" id="resetEmail" placeholder="Enter your registered email" required>
-                </div>
-                <p style="font-size: 0.75rem; color: #5b6e8c; margin-bottom: 1rem;">
-                    We'll send you a password reset link to your email.
-                </p>
-                <button type="submit" id="resetBtn" class="btn">Send Reset Link</button>
-            </form>
-
-            <div class="register-link" id="registerLink">
+            <div class="register-link">
                 Don't have an account? <a href="#" id="showRegisterLink">Register now</a>
             </div>
+
+            <div class="reset-link">
+                <a href="#" id="showResetLink">Forgot Password?</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reset Password Modal -->
+    <div id="resetModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Reset Password</h2>
+                <button class="modal-close" id="closeModalBtn">&times;</button>
+            </div>
+            <div id="resetModalMessage"></div>
+            <div class="form-group">
+                <label>📧 Email Address</label>
+                <input type="email" id="resetEmail" placeholder="Enter your registered email" required>
+            </div>
+            <p style="font-size: 0.75rem; color: #5b6e8c; margin-bottom: 1rem;">
+                We'll send you a password reset link to your email.
+            </p>
+            <button id="sendResetBtn" class="btn">Send Reset Link</button>
         </div>
     </div>
 
@@ -267,28 +313,35 @@
     <script>
         // DOM Elements
         const loginForm = document.getElementById('loginForm');
-        const resetForm = document.getElementById('resetForm');
         const loginBtn = document.getElementById('loginBtn');
-        const resetBtn = document.getElementById('resetBtn');
-        const loginEmail = document.getElementById('loginEmail');
-        const loginPassword = document.getElementById('loginPassword');
-        const resetEmail = document.getElementById('resetEmail');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
         const messageArea = document.getElementById('messageArea');
         const showRegisterLink = document.getElementById('showRegisterLink');
-        const modeBtns = document.querySelectorAll('.mode-btn');
+        const showResetLink = document.getElementById('showResetLink');
+        const resetModal = document.getElementById('resetModal');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const sendResetBtn = document.getElementById('sendResetBtn');
+        const resetEmail = document.getElementById('resetEmail');
+        const resetModalMessage = document.getElementById('resetModalMessage');
 
         let isRegisterMode = false;
-        let currentMode = 'login'; // 'login' or 'reset'
 
         function showMessage(message, type = 'error') {
-            const messageClass = type === 'error' ? 'error-message' : (type === 'info' ? 'info-message' : 'success-message');
-            messageArea.innerHTML = `<div class="${messageClass}">${message}</div>`;
+            messageArea.innerHTML = `<div class="${type === 'error' ? 'error-message' : (type === 'info' ? 'info-message' : 'success-message')}">${message}</div>`;
             setTimeout(() => {
                 if (messageArea.innerHTML) messageArea.innerHTML = '';
             }, 5000);
         }
 
-        function setLoginLoading(loading) {
+        function showModalMessage(message, type = 'error') {
+            resetModalMessage.innerHTML = `<div class="${type === 'error' ? 'error-message' : 'success-message'}">${message}</div>`;
+            setTimeout(() => {
+                if (resetModalMessage.innerHTML) resetModalMessage.innerHTML = '';
+            }, 5000);
+        }
+
+        function setLoading(loading) {
             if (loading) {
                 loginBtn.disabled = true;
                 loginBtn.innerHTML = '<span class="loading"></span> Please wait...';
@@ -300,32 +353,24 @@
 
         function setResetLoading(loading) {
             if (loading) {
-                resetBtn.disabled = true;
-                resetBtn.innerHTML = '<span class="loading"></span> Sending...';
+                sendResetBtn.disabled = true;
+                sendResetBtn.innerHTML = '<span class="loading"></span> Sending...';
             } else {
-                resetBtn.disabled = false;
-                resetBtn.innerHTML = 'Send Reset Link';
+                sendResetBtn.disabled = false;
+                sendResetBtn.innerHTML = 'Send Reset Link';
             }
         }
 
-        // Switch between Login and Reset modes
-        function switchMode(mode) {
-            currentMode = mode;
-            
-            if (mode === 'login') {
-                loginForm.classList.remove('hide');
-                resetForm.classList.add('hide');
-                document.querySelector('.mode-btn[data-mode="login"]').classList.add('active');
-                document.querySelector('.mode-btn[data-mode="reset"]').classList.remove('active');
-                document.getElementById('registerLink').style.display = 'block';
-            } else {
-                loginForm.classList.add('hide');
-                resetForm.classList.remove('hide');
-                document.querySelector('.mode-btn[data-mode="reset"]').classList.add('active');
-                document.querySelector('.mode-btn[data-mode="login"]').classList.remove('active');
-                document.getElementById('registerLink').style.display = 'none';
-            }
-            messageArea.innerHTML = '';
+        // Open Reset Modal
+        function openResetModal() {
+            resetModal.classList.add('active');
+            resetEmail.value = '';
+            resetModalMessage.innerHTML = '';
+        }
+
+        // Close Reset Modal
+        function closeResetModal() {
+            resetModal.classList.remove('active');
         }
 
         // Handle Password Reset Request
@@ -337,18 +382,18 @@
             if (error) {
                 console.error("Reset error:", error);
                 if (error.message === 'User not found') {
-                    showMessage('No account found with this email address.', 'error');
+                    showModalMessage('No account found with this email address.', 'error');
                 } else {
-                    showMessage(error.message, 'error');
+                    showModalMessage(error.message, 'error');
                 }
                 return false;
             }
 
-            showMessage('✅ Password reset link sent! Please check your email inbox.', 'success');
-            // Switch back to login mode after 3 seconds
+            showModalMessage('✅ Password reset link sent! Please check your email inbox.', 'success');
+            // Close modal after 2 seconds
             setTimeout(() => {
-                switchMode('login');
-            }, 3000);
+                closeResetModal();
+            }, 2000);
             return true;
         }
 
@@ -362,7 +407,17 @@
             if (error) {
                 console.error("Login error:", error);
                 if (error.message === 'Invalid login credentials') {
-                    showMessage('Invalid email or password. Please try again.');
+                    showMessage('Invalid email or password. Please try again. <a href="#" id="inlineResetLink" style="color:#2c7a4d; text-decoration:underline;">Forgot password?</a>', 'error');
+                    // Add event listener to the inline reset link
+                    setTimeout(() => {
+                        const inlineLink = document.getElementById('inlineResetLink');
+                        if (inlineLink) {
+                            inlineLink.addEventListener('click', (e) => {
+                                e.preventDefault();
+                                openResetModal();
+                            });
+                        }
+                    }, 100);
                 } else if (error.message.includes('Email not confirmed')) {
                     showMessage('Please confirm your email address before logging in. Check your inbox for the confirmation link.', 'info');
                 } else {
@@ -417,28 +472,26 @@
                 isRegisterMode = false;
                 loginBtn.textContent = 'Login to Dashboard';
                 showRegisterLink.textContent = 'Register now';
-                loginEmail.value = '';
-                loginPassword.value = '';
-                loginEmail.value = email;
+                emailInput.value = '';
+                passwordInput.value = '';
+                emailInput.value = email;
             }
             return true;
         }
 
-        // Event Listeners
+        // Login Form Submit
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            if (currentMode !== 'login') return;
-            
-            const email = loginEmail.value.trim();
-            const password = loginPassword.value;
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
 
             if (!email || !password) {
                 showMessage('Please fill in all fields');
                 return;
             }
 
-            setLoginLoading(true);
+            setLoading(true);
 
             if (isRegisterMode) {
                 await handleRegister(email, password);
@@ -446,37 +499,12 @@
                 await handleLogin(email, password);
             }
 
-            setLoginLoading(false);
+            setLoading(false);
         });
 
-        resetForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const email = resetEmail.value.trim();
-
-            if (!email) {
-                showMessage('Please enter your email address');
-                return;
-            }
-
-            setResetLoading(true);
-            await handlePasswordReset(email);
-            setResetLoading(false);
-        });
-
-        // Mode toggle buttons
-        modeBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const mode = btn.getAttribute('data-mode');
-                switchMode(mode);
-            });
-        });
-
-        // Registration toggle (only visible in login mode)
+        // Register Link Click
         showRegisterLink.addEventListener('click', (e) => {
             e.preventDefault();
-            if (currentMode !== 'login') return;
-            
             isRegisterMode = !isRegisterMode;
             
             if (isRegisterMode) {
@@ -489,11 +517,43 @@
             }
         });
 
+        // Reset Password Link Click
+        showResetLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            openResetModal();
+        });
+
+        // Send Reset Button Click
+        sendResetBtn.addEventListener('click', async () => {
+            const email = resetEmail.value.trim();
+
+            if (!email) {
+                showModalMessage('Please enter your email address', 'error');
+                return;
+            }
+
+            setResetLoading(true);
+            await handlePasswordReset(email);
+            setResetLoading(false);
+        });
+
+        // Close Modal Events
+        closeModalBtn.addEventListener('click', closeResetModal);
+        resetModal.addEventListener('click', (e) => {
+            if (e.target === resetModal) closeResetModal();
+        });
+
+        // Press Enter in reset email field
+        resetEmail.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendResetBtn.click();
+            }
+        });
+
         // Check if already logged in
         async function checkExistingSession() {
             const isAuth = await isUserAuthenticated();
             if (isAuth) {
-                // Verify email is confirmed
                 const user = await getCurrentUser();
                 if (user?.email_confirmed_at) {
                     window.location.href = 'dashboard.html';
@@ -509,9 +569,6 @@
         async function checkForPasswordReset() {
             const hash = window.location.hash;
             if (hash && hash.includes('access_token') && hash.includes('type=recovery')) {
-                // User is coming from password reset email
-                showMessage('Please enter your new password below.', 'info');
-                
                 // Extract tokens from hash
                 const params = new URLSearchParams(hash.substring(1));
                 const accessToken = params.get('access_token');
