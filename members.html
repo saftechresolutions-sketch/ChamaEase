@@ -541,59 +541,23 @@
             <button class="sidebar-close" id="sidebarClose">✕</button>
         </div>
         <nav class="sidebar-nav">
-            <a href="dashboard.html" class="nav-item">
-                <span class="icon">📊</span>
-                <span class="label">Dashboard</span>
-            </a>
-            <a href="members.html" class="nav-item active">
-                <span class="icon">👥</span>
-                <span class="label">Members</span>
-            </a>
-            <a href="contributions.html" class="nav-item">
-                <span class="icon">💰</span>
-                <span class="label">Contributions</span>
-            </a>
-            
+            <a href="dashboard.html" class="nav-item"><span class="icon">📊</span><span class="label">Dashboard</span></a>
+            <a href="members.html" class="nav-item active"><span class="icon">👥</span><span class="label">Members</span></a>
+            <a href="contributions.html" class="nav-item"><span class="icon">💰</span><span class="label">Contributions</span></a>
             <div class="nav-divider"></div>
-            
-            <div class="nav-item" style="cursor: default; opacity: 0.7;">
-                <span class="icon">📜</span>
-                <span class="label">History</span>
-            </div>
+            <div class="nav-item" style="cursor: default; opacity: 0.7;"><span class="icon">📜</span><span class="label">History</span></div>
             <div class="nav-submenu">
-                <a href="contribution-history.html" class="nav-item">
-                    <span class="icon">📋</span>
-                    <span class="label">Contributions History</span>
-                </a>
-                <a href="member-history.html" class="nav-item">
-                    <span class="icon">👤</span>
-                    <span class="label">Members History</span>
-                </a>
+                <a href="contribution-history.html" class="nav-item"><span class="icon">📋</span><span class="label">Contributions History</span></a>
+                <a href="member-history.html" class="nav-item"><span class="icon">👤</span><span class="label">Members History</span></a>
             </div>
-            
             <div class="nav-divider"></div>
-            
-            <div class="nav-item" style="cursor: default; opacity: 0.7;">
-                <span class="icon">📈</span>
-                <span class="label">Analytics</span>
-            </div>
+            <div class="nav-item" style="cursor: default; opacity: 0.7;"><span class="icon">📈</span><span class="label">Analytics</span></div>
             <div class="nav-submenu">
-                <a href="statistics.html" class="nav-item">
-                    <span class="icon">📊</span>
-                    <span class="label">Monthly Statistics</span>
-                </a>
-                <a href="reports.html" class="nav-item">
-                    <span class="icon">📋</span>
-                    <span class="label">Reports</span>
-                </a>
+                <a href="statistics.html" class="nav-item"><span class="icon">📊</span><span class="label">Monthly Statistics</span></a>
+                <a href="reports.html" class="nav-item"><span class="icon">📋</span><span class="label">Reports</span></a>
             </div>
-            
             <div class="nav-divider"></div>
-            
-            <a href="settings.html" class="nav-item">
-                <span class="icon">⚙️</span>
-                <span class="label">Settings</span>
-            </a>
+            <a href="settings.html" class="nav-item"><span class="icon">⚙️</span><span class="label">Settings</span></a>
         </nav>
     </aside>
 
@@ -716,7 +680,7 @@
                                     </td>
                                 </tr>
                             `).join('')}
-                            ${filtered.length === 0 ? '<tr><td colspan="7" style="text-align:center;">No members found</td></tr>' : ''}
+                            ${filtered.length === 0 ? '<tr><td colspan="7" style="text-align:center;">No members found</td></td>' : ''}
                         </tbody>
                     </table>
                 </div>
@@ -790,6 +754,7 @@
         document.getElementById('cancelModalBtn').onclick = () => modal.remove();
     }
 
+    // Updated showSettleModal with custom amount input
     function showSettleModal(memberId, currentBalance) {
         if (currentBalance <= 0) { showToast('Balance is already zero', 'error'); return; }
         const member = allMembers.find(m => m.id === memberId);
@@ -797,24 +762,78 @@
         modal.className = 'modal';
         modal.innerHTML = `
             <div class="modal-content">
-                <h3>Settle Balance</h3>
+                <h3>Settle Payment</h3>
                 <p><strong>${escapeHtml(member?.name || 'Unknown')}</strong></p>
-                <p>Amount: KES ${formatNumber(currentBalance)}</p>
-                <div class="form-group"><label>Payment Method:</label><select id="settleMethodSelect"><option value="M-Pesa">M-Pesa</option><option value="Cash">Cash</option><option value="Bank Transfer">Bank Transfer</option></select></div>
-                <div class="form-group"><label>Date:</label><input type="date" id="settleDate" value="${new Date().toISOString().slice(0,10)}"></div>
-                <div style="display:flex; gap:10px; margin-top:1rem;"><button id="confirmSettleBtn" class="btn" style="flex:1;">Confirm</button><button id="cancelSettleBtn" class="btn-outline btn" style="flex:1;">Cancel</button></div>
+                <p>Outstanding Balance: KES ${formatNumber(currentBalance)}</p>
+                <div class="form-group">
+                    <label>Amount to Pay (KES):</label>
+                    <input type="number" id="settleAmount" class="settle-amount" placeholder="Enter amount" value="${currentBalance}" step="100" min="1" max="${currentBalance}">
+                    <small style="color:#666; font-size:0.65rem;">Max: KES ${formatNumber(currentBalance)}</small>
+                </div>
+                <div class="form-group">
+                    <label>Payment Method:</label>
+                    <select id="settleMethodSelect">
+                        <option value="M-Pesa">M-Pesa</option>
+                        <option value="Cash">Cash</option>
+                        <option value="Bank Transfer">Bank Transfer</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Date:</label>
+                    <input type="date" id="settleDate" value="${new Date().toISOString().slice(0,10)}">
+                </div>
+                <div style="display:flex; gap:10px; margin-top:1rem;">
+                    <button id="confirmSettleBtn" class="btn" style="flex:1;">Confirm Payment</button>
+                    <button id="cancelSettleBtn" class="btn-outline btn" style="flex:1;">Cancel</button>
+                </div>
             </div>
         `;
         document.body.appendChild(modal);
         
+        // Add validation for amount input
+        const amountInput = document.getElementById('settleAmount');
+        amountInput.addEventListener('change', function() {
+            let value = parseFloat(this.value);
+            if (isNaN(value)) value = 0;
+            if (value > currentBalance) {
+                this.value = currentBalance;
+                showToast(`Amount cannot exceed balance of KES ${formatNumber(currentBalance)}`, 'error');
+            } else if (value < 0) {
+                this.value = 0;
+            }
+        });
+        
         document.getElementById('confirmSettleBtn').onclick = async () => {
+            let amount = parseFloat(document.getElementById('settleAmount').value);
             const method = document.getElementById('settleMethodSelect').value;
             const date = document.getElementById('settleDate').value;
+            
+            if (isNaN(amount) || amount <= 0) {
+                showToast('Please enter a valid amount', 'error');
+                return;
+            }
+            if (amount > currentBalance) {
+                amount = currentBalance;
+            }
+            
             const user = await getCurrentUser();
-            const { error } = await supabaseClient.from('contributions').insert([{ member_id: memberId, amount: currentBalance, month: date.slice(0,7), date, method, type: 'Settlement', recorded_by: user?.id }]);
+            const { error } = await supabaseClient.from('contributions').insert([{ 
+                member_id: memberId, 
+                amount: amount, 
+                month: date.slice(0,7), 
+                date, 
+                method, 
+                type: 'Payment', 
+                recorded_by: user?.id 
+            }]);
             if (error) { showToast('Error: ' + error.message, 'error'); modal.remove(); return; }
             modal.remove();
-            showToast(`✅ Settled KES ${formatNumber(currentBalance)} via ${method}`, 'success');
+            const remainingBalance = currentBalance - amount;
+            if (remainingBalance > 0) {
+                showToast(`✅ Paid KES ${formatNumber(amount)}. Remaining balance: KES ${formatNumber(remainingBalance)}`, 'success');
+            } else {
+                showToast(`✅ Fully settled! Paid KES ${formatNumber(amount)}`, 'success');
+            }
             await loadMembers();
         };
         document.getElementById('cancelSettleBtn').onclick = () => modal.remove();
@@ -860,7 +879,7 @@
                 <p><strong>⚖️ Balance:</strong> KES ${formatNumber(member.balance)}</p>
                 <p><strong>📊 Status:</strong> <span class="${(member.balance || 0) === 0 ? 'badge-paid' : 'badge-unpaid'}">${(member.balance || 0) === 0 ? 'Paid' : 'Unpaid'}</span></p>
                 <h4 style="margin-top:1rem;">📅 Contribution History</h4>
-                <div class="table-wrapper"><table style="min-width:250px;"><thead><tr><th>Date</th><th>Amount</th><th>Method</th><th>Month</th></tr></thead><tbody>${contributions?.map(c => `<tr><td>${c.date || '-'}</td><td>KES ${formatNumber(c.amount)}</td><td>${c.method || '-'}</td><td>${c.month || '-'}</td></tr>`).join('') || '<tr><td colspan="4">No contributions yet</td></tr>'}</tbody></table></div>
+                <div class="table-wrapper"><table style="min-width:250px;"><thead><tr><th>Date</th><th>Amount</th><th>Method</th><th>Month</th></tr></thead><tbody>${contributions?.map(c => `<tr><td data-label="Date">${c.date || '-'}</td><td data-label="Amount">KES ${formatNumber(c.amount)}</span></td><td data-label="Method">${c.method || '-'}</td><td data-label="Month">${c.month || '-'}</td></tr>`).join('') || '<tr><td colspan="4">No contributions yet</td></tr>'}</tbody></table></div>
             </div>
         `;
         document.body.appendChild(modal);
