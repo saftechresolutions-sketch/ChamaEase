@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
     <title>ChamaEase | Reports & Analytics</title>
     <style>
         * {
@@ -25,18 +25,16 @@
             --warning: #e6a017;
             --gray-border: #e2e8f0;
             --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.04);
-            --radius-card: 20px;
+            --radius-card: 16px;
             --radius-btn: 32px;
             --sidebar-width: 280px;
         }
 
-        /* Layout with Sidebar */
         .app-wrapper {
             display: flex;
             min-height: 100vh;
         }
 
-        /* Sidebar Styles */
         .sidebar {
             width: var(--sidebar-width);
             background: white;
@@ -46,13 +44,14 @@
             top: 0;
             bottom: 0;
             overflow-y: auto;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease;
             z-index: 1000;
             box-shadow: var(--shadow-sm);
+            transform: translateX(0);
         }
 
         .sidebar-header {
-            padding: 1.2rem;
+            padding: 1rem;
             border-bottom: 1px solid var(--gray-border);
             display: flex;
             justify-content: space-between;
@@ -61,7 +60,7 @@
 
         .sidebar-logo {
             font-weight: 800;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             background: linear-gradient(135deg, var(--primary), #3b9b62);
             -webkit-background-clip: text;
             background-clip: text;
@@ -71,26 +70,32 @@
         .sidebar-close {
             background: none;
             border: none;
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             cursor: pointer;
             color: #94a3b8;
             transition: all 0.2s;
             display: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            align-items: center;
+            justify-content: center;
         }
 
         .sidebar-close:hover {
+            background: #fee2e2;
             color: var(--danger);
         }
 
         .sidebar-nav {
-            padding: 1rem 0;
+            padding: 0.8rem 0;
         }
 
         .nav-item {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 0.8rem 1.2rem;
+            gap: 10px;
+            padding: 0.7rem 1rem;
             margin: 0.2rem 0.8rem;
             border-radius: 12px;
             text-decoration: none;
@@ -110,42 +115,41 @@
         }
 
         .nav-item .icon {
-            font-size: 1.2rem;
-            width: 28px;
+            font-size: 1.1rem;
+            width: 26px;
             text-align: center;
         }
 
         .nav-item .label {
             font-weight: 500;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
         .nav-submenu {
-            padding-left: 3rem;
+            padding-left: 2.8rem;
         }
 
         .nav-submenu .nav-item {
-            padding: 0.6rem 1rem;
-            font-size: 0.85rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
         }
 
         .nav-divider {
             height: 1px;
             background: var(--gray-border);
-            margin: 0.8rem 1.2rem;
+            margin: 0.6rem 1rem;
         }
 
-        /* Main Content */
         .main-content {
             flex: 1;
             margin-left: var(--sidebar-width);
-            transition: all 0.3s ease;
+            transition: margin-left 0.3s ease;
+            width: calc(100% - var(--sidebar-width));
         }
 
-        /* Top Bar */
         .top-bar {
             background: white;
-            padding: 0.8rem 2rem;
+            padding: 0.7rem 1rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -157,16 +161,18 @@
         }
 
         .menu-toggle {
-            display: none;
             background: none;
             border: none;
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             cursor: pointer;
             color: var(--primary);
+            padding: 6px;
+            border-radius: 50%;
+            transition: all 0.2s;
         }
 
         .page-title {
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             font-weight: 600;
             color: #1e2a3e;
         }
@@ -174,22 +180,30 @@
         .user-info {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.6rem;
         }
 
         .user-email {
-            font-size: 0.85rem;
+            font-size: 0.7rem;
             color: #5b6e8c;
+            display: none;
+        }
+
+        @media (min-width: 480px) {
+            .user-email {
+                display: inline;
+            }
         }
 
         .logout-btn {
             background: transparent;
             border: 1px solid #dc2626;
             color: #dc2626;
-            padding: 0.4rem 1rem;
+            padding: 0.35rem 0.7rem;
             border-radius: 2rem;
             cursor: pointer;
             transition: all 0.2s;
+            font-size: 0.7rem;
         }
 
         .logout-btn:hover {
@@ -198,9 +212,9 @@
         }
 
         .container {
-            max-width: 1300px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 1.5rem;
+            padding: 1rem;
             width: 100%;
             min-height: 70vh;
         }
@@ -209,8 +223,8 @@
             background: white;
             border-radius: var(--radius-card);
             box-shadow: var(--shadow-sm);
-            padding: 1.2rem;
-            margin-bottom: 1.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
             border: 1px solid var(--gray-border);
         }
 
@@ -218,11 +232,11 @@
             border: none;
             background: var(--primary);
             color: white;
-            padding: 0.6rem 1.2rem;
+            padding: 0.5rem 1rem;
             border-radius: var(--radius-btn);
             font-weight: 600;
             cursor: pointer;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             transition: 0.2s;
             text-decoration: none;
             display: inline-block;
@@ -235,8 +249,8 @@
         }
 
         .btn-sm {
-            padding: 0.3rem 0.8rem;
-            font-size: 0.75rem;
+            padding: 0.25rem 0.6rem;
+            font-size: 0.65rem;
         }
 
         .table-wrapper {
@@ -248,67 +262,55 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.85rem;
+            font-size: 0.7rem;
+            min-width: 500px;
         }
         
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-            .sidebar.open {
-                transform: translateX(0);
-            }
-            .main-content {
-                margin-left: 0;
-            }
-            .menu-toggle {
-                display: block;
-            }
-            .sidebar-close {
-                display: block;
-            }
-            .container {
-                padding: 1rem;
-            }
-        }
-
-        @media (max-width: 640px) {
+        @media (min-width: 640px) {
             table {
-                font-size: 0.75rem;
-            }
-            th, td {
-                padding: 0.5rem 0.3rem;
+                font-size: 0.8rem;
+                min-width: auto;
             }
         }
 
         th, td {
             text-align: left;
-            padding: 0.7rem 0.5rem;
+            padding: 0.6rem 0.4rem;
             border-bottom: 1px solid var(--gray-border);
         }
 
         th {
             background: #f8fafc;
             font-weight: 600;
+            font-size: 0.7rem;
+        }
+
+        @media (min-width: 640px) {
+            th {
+                font-size: 0.8rem;
+            }
+            td {
+                font-size: 0.8rem;
+            }
         }
 
         .badge-paid {
             background: #dff0e4;
             color: #1f5a3a;
-            padding: 0.2rem 0.6rem;
+            padding: 0.15rem 0.5rem;
             border-radius: 30px;
             font-weight: 600;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             display: inline-block;
         }
 
         .badge-unpaid {
             background: #ffe6e5;
             color: #b91c1c;
-            padding: 0.2rem 0.6rem;
+            padding: 0.15rem 0.5rem;
             border-radius: 30px;
             font-weight: 600;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             display: inline-block;
         }
 
@@ -317,22 +319,22 @@
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 0.8rem;
-            margin-bottom: 1.2rem;
+            gap: 0.6rem;
+            margin-bottom: 1rem;
         }
 
         .filter-select {
-            padding: 0.5rem 1rem;
+            padding: 0.4rem 0.8rem;
             border-radius: 40px;
             border: 1px solid var(--gray-border);
             background: white;
-            max-width: 200px;
+            font-size: 0.75rem;
         }
 
         footer {
             text-align: center;
-            padding: 1rem;
-            font-size: 0.8rem;
+            padding: 0.8rem;
+            font-size: 0.65rem;
             color: #6c757d;
             border-top: 1px solid var(--gray-border);
             margin-top: 1rem;
@@ -340,8 +342,8 @@
 
         .loading-spinner {
             display: inline-block;
-            width: 40px;
-            height: 40px;
+            width: 30px;
+            height: 30px;
             border: 3px solid #e2e8f0;
             border-radius: 50%;
             border-top-color: var(--primary);
@@ -355,57 +357,68 @@
         .report-actions {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 8px;
             margin-bottom: 1rem;
         }
 
         .stats-summary {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (min-width: 640px) {
+            .stats-summary {
+                grid-template-columns: repeat(4, 1fr);
+            }
         }
 
         .stat-box {
             background: #f8fafc;
-            border-radius: 1rem;
-            padding: 1rem;
+            border-radius: 12px;
+            padding: 0.7rem;
             text-align: center;
         }
 
         .stat-box h4 {
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             color: #5b6e8c;
-            margin-bottom: 0.3rem;
+            margin-bottom: 0.2rem;
         }
 
         .stat-box .value {
-            font-size: 1.5rem;
+            font-size: 1rem;
             font-weight: 800;
             color: var(--primary);
         }
 
+        .stat-box small {
+            font-size: 0.6rem;
+            color: #6c757d;
+        }
+
         .monthly-card {
             background: #f8fafc;
-            border-radius: 1rem;
-            padding: 1rem;
-            margin-bottom: 1rem;
+            border-radius: 12px;
+            padding: 0.8rem;
+            margin-bottom: 0.8rem;
         }
         
         .monthly-title {
             font-weight: bold;
             color: var(--primary);
             margin-bottom: 0.5rem;
-            font-size: 1rem;
+            font-size: 0.85rem;
         }
 
         textarea {
             width: 100%;
             border-radius: 1rem;
-            padding: 0.8rem;
+            padding: 0.7rem;
             background: #f9fafb;
             font-family: monospace;
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             border: 1px solid var(--gray-border);
             resize: vertical;
         }
@@ -426,8 +439,28 @@
         }
 
         @media (max-width: 768px) {
-            .sidebar-overlay.active {
-                display: block;
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+            .sidebar-close {
+                display: flex;
+            }
+            .container {
+                padding: 0.8rem;
+            }
+            .flex-between {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .report-actions {
+                justify-content: center;
             }
         }
     </style>
@@ -437,7 +470,6 @@
 <div class="app-wrapper">
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
     
-    <!-- Sidebar Navigation -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">🌿 ChamaEase</div>
@@ -459,7 +491,6 @@
             
             <div class="nav-divider"></div>
             
-            <!-- History Section -->
             <div class="nav-item" style="cursor: default; opacity: 0.7;">
                 <span class="icon">📜</span>
                 <span class="label">History</span>
@@ -477,7 +508,6 @@
             
             <div class="nav-divider"></div>
             
-            <!-- Analytics Section -->
             <div class="nav-item" style="cursor: default; opacity: 0.7;">
                 <span class="icon">📈</span>
                 <span class="label">Analytics</span>
@@ -502,23 +532,22 @@
         </nav>
     </aside>
 
-    <!-- Main Content -->
     <main class="main-content">
         <div class="top-bar">
             <button class="menu-toggle" id="menuToggle">☰</button>
-            <div class="page-title">📋 Reports & Analytics</div>
+            <div class="page-title">📋 Reports</div>
             <div class="user-info">
                 <span class="user-email" id="userEmail"></span>
                 <button id="logoutBtn" class="logout-btn">Logout</button>
             </div>
         </div>
         <div id="app-root" class="container">
-            <div style="text-align: center; padding: 2rem;">
+            <div style="text-align: center; padding: 1.5rem;">
                 <div class="loading-spinner"></div>
-                <p>Loading reports...</p>
+                <p style="margin-top: 0.5rem; font-size: 0.8rem;">Loading reports...</p>
             </div>
         </div>
-        <footer>✨ Smart Chama Management · Monthly tracking · Filter & share reports</footer>
+        <footer>✨ Smart Chama Management · Filter & share reports</footer>
     </main>
 </div>
 
@@ -544,23 +573,12 @@
         sidebarOverlay.classList.remove('active');
     }
     
-    if (menuToggle) {
-        menuToggle.addEventListener('click', openSidebar);
-    }
+    if (menuToggle) menuToggle.addEventListener('click', openSidebar);
+    if (sidebarClose) sidebarClose.addEventListener('click', closeSidebar);
+    if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebar);
     
-    if (sidebarClose) {
-        sidebarClose.addEventListener('click', closeSidebar);
-    }
-    
-    if (sidebarOverlay) {
-        sidebarOverlay.addEventListener('click', closeSidebar);
-    }
-    
-    // Close sidebar on window resize if screen becomes larger
     window.addEventListener('resize', () => {
-        if (window.innerWidth > 768) {
-            closeSidebar();
-        }
+        if (window.innerWidth > 768) closeSidebar();
     });
 
     (async function() {
@@ -584,10 +602,7 @@
         try {
             const [membersRes, contributionsRes] = await Promise.all([
                 supabaseClient.from('members').select('*').order('name'),
-                supabaseClient.from('contributions').select(`
-                    *,
-                    members:member_id (name)
-                `).order('date', { ascending: false })
+                supabaseClient.from('contributions').select('*, members:member_id (name)').order('date', { ascending: false })
             ]);
             
             if (membersRes.error) throw membersRes.error;
@@ -603,11 +618,15 @@
             document.getElementById('app-root').innerHTML = `
                 <div class="card">
                     <h3>⚠️ Error Loading Data</h3>
-                    <p>${error.message}</p>
-                    <button class="btn" onclick="location.reload()">Retry</button>
+                    <p style="font-size:0.8rem;">${error.message}</p>
+                    <button class="btn" onclick="location.reload()" style="margin-top:0.5rem;">Retry</button>
                 </div>
             `;
         }
+    }
+
+    function formatNumber(num) {
+        return (num || 0).toLocaleString('en-KE');
     }
 
     function getUniqueMonths() {
@@ -629,21 +648,21 @@
         const monthLabel = currentReportFilter === 'all' ? 'ALL TIME' : currentReportFilter;
         
         const recordsText = filteredContribs.map(c => 
-            `${c.members?.name || 'Unknown'}: KES ${(c.amount || 0).toLocaleString()} on ${c.date} (${c.method})`
+            `${c.members?.name || 'Unknown'}: KES ${formatNumber(c.amount)} on ${c.date} (${c.method})`
         ).join('\n');
         
         return `🏆 CHAMA CONTRIBUTION REPORT 🏆
 📅 ${new Date().toLocaleDateString()} | Period: ${monthLabel}
 ━━━━━━━━━━━━━━━━━━━━
 ✅ PAID MEMBERS:
-${paidMembers.map((m, i) => `${i+1}. ${m.name} - KES ${(m.total_contributed || 0).toLocaleString()}`).join('\n') || 'None'}
+${paidMembers.map((m, i) => `${i+1}. ${m.name} - KES ${formatNumber(m.total_contributed)}`).join('\n') || 'None'}
 
 ⚠️ UNPAID MEMBERS (balance):
-${unpaidMembers.map((m, i) => `${i+1}. ${m.name} - Balance KES ${(m.balance || 0).toLocaleString()}`).join('\n') || 'All settled!'}
+${unpaidMembers.map((m, i) => `${i+1}. ${m.name} - Balance KES ${formatNumber(m.balance)}`).join('\n') || 'All settled!'}
 
 ━━━━━━━━━━━━━━━━━━━━
-💰 TOTAL COLLECTION (${monthLabel}): KES ${totalCollected.toLocaleString()}
-📊 TOTAL OUTSTANDING BALANCE: KES ${totalBalance.toLocaleString()}
+💰 TOTAL COLLECTION (${monthLabel}): KES ${formatNumber(totalCollected)}
+📊 TOTAL OUTSTANDING BALANCE: KES ${formatNumber(totalBalance)}
 👥 Total Members: ${allMembers.length}
 
 ━━━━━━━━━━━━━━━━━━━━
@@ -734,7 +753,6 @@ ${recordsText || 'No records for this period'}
         const totalBalance = allMembers.reduce((sum, m) => sum + (m.balance || 0), 0);
         const reportText = generateReportText();
         
-        // Group contributions by month for display
         const contributionsByMonth = {};
         filteredContribs.forEach(c => {
             if (!contributionsByMonth[c.month]) contributionsByMonth[c.month] = [];
@@ -744,7 +762,7 @@ ${recordsText || 'No records for this period'}
         const html = `
             <div class="card">
                 <div class="flex-between">
-                    <h2>📄 Reports & Analytics</h2>
+                    <h2 style="font-size:1.2rem;">📄 Reports</h2>
                     <select id="monthFilterSelect" class="filter-select">
                         <option value="all" ${currentReportFilter === 'all' ? 'selected' : ''}>All Records</option>
                         ${months.map(m => `<option value="${m}" ${currentReportFilter === m ? 'selected' : ''}>${m}</option>`).join('')}
@@ -752,103 +770,62 @@ ${recordsText || 'No records for this period'}
                 </div>
             </div>
             
-            <!-- Stats Summary -->
             <div class="stats-summary">
-                <div class="stat-box">
-                    <h4>Total Members</h4>
-                    <div class="value">${allMembers.length}</div>
-                </div>
-                <div class="stat-box">
-                    <h4>Total Collected</h4>
-                    <div class="value">KES ${(totalCollected/1000).toFixed(0)}k</div>
-                    <small>${totalCollected.toLocaleString()}</small>
-                </div>
-                <div class="stat-box">
-                    <h4>Paid Members</h4>
-                    <div class="value">${paidMembers.length}</div>
-                </div>
-                <div class="stat-box">
-                    <h4>Outstanding Balance</h4>
-                    <div class="value">KES ${(totalBalance/1000).toFixed(0)}k</div>
-                </div>
+                <div class="stat-box"><h4>Total Members</h4><div class="value">${allMembers.length}</div></div>
+                <div class="stat-box"><h4>Total Collected</h4><div class="value">KES ${(totalCollected/1000).toFixed(0)}k</div><small>${formatNumber(totalCollected)}</small></div>
+                <div class="stat-box"><h4>Paid Members</h4><div class="value">${paidMembers.length}</div></div>
+                <div class="stat-box"><h4>Outstanding</h4><div class="value">KES ${(totalBalance/1000).toFixed(0)}k</div></div>
             </div>
             
-            <!-- Report Actions -->
             <div class="card">
                 <div class="report-actions">
-                    <button id="copyReportBtn" class="btn">📋 Copy Report</button>
-                    <button id="whatsappBtn" class="btn">📱 Share to WhatsApp</button>
-                    <button id="exportExcelBtn" class="btn">📎 Export Excel</button>
-                    <button id="exportWordBtn" class="btn">📑 Export Word</button>
+                    <button id="copyReportBtn" class="btn">📋 Copy</button>
+                    <button id="whatsappBtn" class="btn">📱 WhatsApp</button>
+                    <button id="exportExcelBtn" class="btn">📎 Excel</button>
+                    <button id="exportWordBtn" class="btn">📑 Word</button>
                 </div>
-                <textarea id="reportPreview" rows="8" readonly>${escapeHtml(reportText)}</textarea>
+                <textarea id="reportPreview" rows="6" readonly>${escapeHtml(reportText)}</textarea>
             </div>
             
-            <!-- Paid Members Table -->
             <div class="card">
-                <h3>✅ Paid Members</h3>
+                <h3 style="font-size:1rem;">✅ Paid Members</h3>
                 <div class="table-wrapper">
                     <table>
-                        <thead><tr><th>#</th><th>Name</th><th>Phone</th><th>Total Paid (KES)</th></tr></thead>
+                        <thead><tr><th>#</th><th>Name</th><th>Phone</th><th>Total Paid</th></tr></thead>
                         <tbody>
-                            ${paidMembers.map((m, i) => `
-                                <tr>
-                                    <td>${i+1}</td>
-                                    <td>${escapeHtml(m.name)}</td>
-                                    <td>${escapeHtml(m.phone)}</td>
-                                    <td>KES ${(m.total_contributed || 0).toLocaleString()}</td>
-                                </tr>
-                            `).join('')}
+                            ${paidMembers.map((m, i) => `<tr><td>${i+1}</td><td><strong>${escapeHtml(m.name)}</strong></td><td>${escapeHtml(m.phone)}</td><td>KES ${formatNumber(m.total_contributed)}</td></tr>`).join('')}
                             ${paidMembers.length === 0 ? '<tr><td colspan="4">No paid members yet</td></tr>' : ''}
                         </tbody>
                     </table>
                 </div>
             </div>
             
-            <!-- Unpaid Members Table -->
             <div class="card">
-                <h3>⚠️ Unpaid Members</h3>
+                <h3 style="font-size:1rem;">⚠️ Unpaid Members</h3>
                 <div class="table-wrapper">
                     <table>
-                        <thead><tr><th>#</th><th>Name</th><th>Phone</th><th>Expected (KES)</th><th>Paid (KES)</th><th>Balance (KES)</th></tr></thead>
+                        <thead><tr><th>#</th><th>Name</th><th>Phone</th><th>Expected</th><th>Paid</th><th>Balance</th></tr></thead>
                         <tbody>
-                            ${unpaidMembers.map((m, i) => `
-                                <tr>
-                                    <td>${i+1}</td>
-                                    <td>${escapeHtml(m.name)}</td>
-                                    <td>${escapeHtml(m.phone)}</td>
-                                    <td>KES ${(m.expected_contribution || 0).toLocaleString()}</td>
-                                    <td>KES ${(m.total_contributed || 0).toLocaleString()}</td>
-                                    <td style="color:#dc2626; font-weight:600;">KES ${(m.balance || 0).toLocaleString()}</td>
-                                </tr>
-                            `).join('')}
+                            ${unpaidMembers.map((m, i) => `<tr><td>${i+1}</td><td><strong>${escapeHtml(m.name)}</strong></td><td>${escapeHtml(m.phone)}</td><td>KES ${formatNumber(m.expected_contribution)}</td><td>KES ${formatNumber(m.total_contributed)}</td><td style="color:#dc2626;">KES ${formatNumber(m.balance)}</td></tr>`).join('')}
                             ${unpaidMembers.length === 0 ? '<tr><td colspan="6">🎉 All members are fully paid!</td></tr>' : ''}
                         </tbody>
                     </table>
                 </div>
             </div>
             
-            <!-- Contribution History by Month -->
             <div class="card">
-                <h3>📜 Contribution History by Month</h3>
+                <h3 style="font-size:1rem;">📜 Contribution History by Month</h3>
                 ${Object.keys(contributionsByMonth).length === 0 ? '<p>No contributions for selected period</p>' : ''}
                 ${Object.entries(contributionsByMonth).map(([month, contribs]) => {
                     const monthTotal = contribs.reduce((s, c) => s + (c.amount || 0), 0);
                     return `
                         <div class="monthly-card">
-                            <div class="monthly-title">📆 ${month} - Total: KES ${monthTotal.toLocaleString()}</div>
+                            <div class="monthly-title">📆 ${month} - Total: KES ${formatNumber(monthTotal)}</div>
                             <div class="table-wrapper">
                                 <table style="min-width:300px;">
-                                    <thead><tr><th>Member</th><th>Amount (KES)</th><th>Date</th><th>Method</th></tr></thead>
+                                    <thead><tr><th>Member</th><th>Amount</th><th>Date</th><th>Method</th></tr></thead>
                                     <tbody>
-                                        ${contribs.map(c => `
-                                            <tr>
-                                                <td>${escapeHtml(c.members?.name || 'Unknown')}</td>
-                                                <td>KES ${(c.amount || 0).toLocaleString()}</td>
-                                                <td>${c.date || '-'}</td>
-                                                <td>${c.method || '-'}</td>
-                                            </tr>
-                                        `).join('')}
+                                        ${contribs.map(c => `<tr><td>${escapeHtml(c.members?.name || 'Unknown')}</td><td>KES ${formatNumber(c.amount)}</td><td>${c.date || '-'}</td><td>${c.method || '-'}</td></tr>`).join('')}
                                     </tbody>
                                 </table>
                             </div>
@@ -863,14 +840,7 @@ ${recordsText || 'No records for this period'}
     }
     
     function attachReportEvents() {
-        const monthFilter = document.getElementById('monthFilterSelect');
-        if (monthFilter) {
-            monthFilter.addEventListener('change', (e) => {
-                currentReportFilter = e.target.value;
-                renderReportsPage();
-            });
-        }
-        
+        document.getElementById('monthFilterSelect')?.addEventListener('change', (e) => { currentReportFilter = e.target.value; renderReportsPage(); });
         document.getElementById('copyReportBtn')?.addEventListener('click', copyReportToClipboard);
         document.getElementById('whatsappBtn')?.addEventListener('click', shareToWhatsApp);
         document.getElementById('exportExcelBtn')?.addEventListener('click', exportToExcel);
@@ -879,18 +849,7 @@ ${recordsText || 'No records for this period'}
     
     function showToast(message, type) {
         const toast = document.createElement('div');
-        toast.style.cssText = `
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: ${type === 'error' ? '#dc2626' : '#2c7a4d'};
-            color: white;
-            padding: 12px 20px;
-            border-radius: 40px;
-            font-size: 0.85rem;
-            z-index: 1002;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        `;
+        toast.style.cssText = `position:fixed; bottom:20px; right:20px; background:${type === 'error' ? '#dc2626' : '#2c7a4d'}; color:white; padding:10px 16px; border-radius:40px; font-size:0.75rem; z-index:1002; box-shadow:0 4px 12px rgba(0,0,0,0.15);`;
         toast.textContent = message;
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 3000);
@@ -898,12 +857,7 @@ ${recordsText || 'No records for this period'}
     
     function escapeHtml(str) {
         if (!str) return '';
-        return String(str).replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        });
+        return String(str).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m] || m));
     }
 </script>
 </body>
