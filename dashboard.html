@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>ChamaEase | Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+        }
+
+        body {
+            background: #f4f7fb;
+            color: #1e2a3e;
+        }
+
+        :root {
+            --primary: #2c7a4d;
+            --primary-light: #eaf5ef;
+            --primary-dark: #1f5a3a;
+            --danger: #dc4c4c;
+            --gray-border: #e2e8f0;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.04);
+            --radius-card: 20px;
+            --radius-btn: 32px;
+            --sidebar-width: 260px;
+            --sidebar-collapsed-width: 70px;
+        }
+
+        /* Layout with Sidebar */
+        .app-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: white;
+            border-right: 1px solid var(--gray-border);
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .sidebar-header {
+            padding: 1.2rem;
+            border-bottom: 1px solid var(--gray-border);
+            text-align: center;
+        }
+
+        .sidebar-logo {
+            font-weight: 800;
+            font-size: 1.3rem;
+            background: linear-gradient(135deg, var(--primary), #3b9b62);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.8rem 1.2rem;
+            margin: 0.2rem 0.8rem;
+            border-radius: 12px;
+            text-decoration: none;
+            color: #4a5568;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .nav-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .nav-item .icon {
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .nav-item .label {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        /* Submenu items */
+        .nav-submenu {
+            padding-left: 3rem;
+        }
+
+        .nav-submenu .nav-item {
+            padding: 0.6rem 1rem;
+            font-size: 0.85rem;
+        }
+
+        .nav-divider {
+            height: 1px;
+            background: var(--gray-border);
+            margin: 0.8rem 1.2rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            transition: all 0.3s ease;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background: white;
+            padding: 0.8rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--gray-border);
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 99;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--primary);
+        }
+
+        .page-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1e2a3e;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-email {
+            font-size: 0.85rem;
+            color: #5b6e8c;
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: 1px solid #dc2626;
+            color: #dc2626;
+            padding: 0.4rem 1rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: #dc2626;
+            color: white;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 1.5rem;
+            width: 100%;
+            min-height: 70vh;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 1.25rem;
+            padding: 1rem 0.8rem;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-border);
+        }
+
+        .stat-card h4 {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #5b6e8c;
+            margin-bottom: 0.4rem;
+        }
+
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1.2;
+        }
+
+        .stat-full {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-top: 0.2rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: var(--radius-card);
+            box-shadow: var(--shadow-sm);
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--gray-border);
+        }
+
+        .btn {
+            border: none;
+            background: var(--primary);
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: var(--radius-btn);
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-sm {
+            padding: 0.3rem 0.8rem;
+            font-size: 0.75rem;
+        }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .menu-toggle {
+                display: block;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.8rem;
+            }
+            .stat-number {
+                font-size: 1.4rem;
+            }
+        }
+
+        th, td {
+            text-align: left;
+            padding: 0.7rem 0.5rem;
+            border-bottom: 1px solid var(--gray-border);
+        }
+
+        th {
+            background: #f8fafc;
+            font-weight: 600;
+        }
+
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-bottom: 1.2rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.8rem;
+            color: #6c757d;
+            border-top: 1px solid var(--gray-border);
+            margin-top: 1rem;
+        }
+
+        .welcome-card {
+            background: linear-gradient(135deg, var(--primary), #3b9b62);
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+        
+        .welcome-card h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e2e8f0;
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .badge-paid {
+            background: #dff0e4;
+            color: #1f5a3a;
+            padding: 0.2rem 0.6rem;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.7rem;
+            display: inline-block;
+        }
+        
+        .badge-unpaid {
+            background: #ffe6e5;
+            color: #b91c1c;
+            padding: 0.2rem 0.6rem;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.7rem;
+            display: inline-block;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<div class="app-wrapper">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">🌿 ChamaEase</div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item active">
+                <span class="icon">📊</span>
+                <span class="label">Dashboard</span>
+            </a>
+            <a href="members.html" class="nav-item">
+                <span class="icon">👥</span>
+                <span class="label">Members</span>
+            </a>
+            <a href="contributions.html" class="nav-item">
+                <span class="icon">💰</span>
+                <span class="label">Contributions</span>
+            </a>
+            
+            <div class="nav-divider"></div>
+            
+            <!-- History Section -->
+            <div class="nav-item" style="cursor: default; opacity: 0.7;">
+                <span class="icon">📜</span>
+                <span class="label">History</span>
+            </div>
+            <div class="nav-submenu">
+                <a href="contribution-history.html" class="nav-item">
+                    <span class="icon">📋</span>
+                    <span class="label">Contributions History</span>
+                </a>
+                <a href="member-history.html" class="nav-item">
+                    <span class="icon">👤</span>
+                    <span class="label">Members History</span>
+                </a>
+            </div>
+            
+            <div class="nav-divider"></div>
+            
+            <!-- Analytics Section -->
+            <div class="nav-item" style="cursor: default; opacity: 0.7;">
+                <span class="icon">📈</span>
+                <span class="label">Analytics</span>
+            </div>
+            <div class="nav-submenu">
+                <a href="statistics.html" class="nav-item">
+                    <span class="icon">📊</span>
+                    <span class="label">Monthly Statistics</span>
+                </a>
+                <a href="reports.html" class="nav-item">
+                    <span class="icon">📋</span>
+                    <span class="label">Reports</span>
+                </a>
+            </div>
+            
+            <div class="nav-divider"></div>
+            
+            <a href="settings.html" class="nav-item">
+                <span class="icon">⚙️</span>
+                <span class="label">Settings</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="top-bar">
+            <button class="menu-toggle" id="menuToggle">☰</button>
+            <div class="page-title">Dashboard</div>
+            <div class="user-info">
+                <span class="user-email" id="userEmail"></span>
+                <button id="logoutBtn" class="logout-btn">Logout</button>
+            </div>
+        </div>
+        <div id="app-root" class="container">
+            <div style="text-align: center; padding: 2rem;">
+                <div class="loading-spinner"></div>
+                <p>Loading dashboard...</p>
+            </div>
+        </div>
+        <footer>✨ Smart Chama Management · sidebar navigation · Enhanced analytics</footer>
+    </main>
+</div>
+
+<script src="supabase-config.js"></script>
+<script>
+    // Sidebar toggle functionality
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    
+    if (menuToggle) {
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+        });
+    }
+    
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', (e) => {
+        if (window.innerWidth <= 768) {
+            if (!sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
+                sidebar.classList.remove('open');
+            }
+        }
+    });
+
+    // Check authentication and protect page
+    (async function() {
+        const isAuth = await protectPage();
+        if (!isAuth) return;
+        
+        const user = await getCurrentUser();
+        if (user) {
+            document.getElementById('userEmail').textContent = user.email || 'Admin';
+        }
+        
+        await loadDashboardData();
+    })();
+
+    // Logout functionality
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+        await logoutUser();
+        window.location.href = 'index.html';
+    });
+
+    function formatNumber(num) {
+        return num.toLocaleString('en-KE');
+    }
+
+    async function loadDashboardData() {
+        const container = document.getElementById('app-root');
+        
+        try {
+            // Fetch all members
+            const { data: members, error: membersError } = await supabaseClient
+                .from('members')
+                .select('*')
+                .order('name');
+            
+            if (membersError) throw membersError;
+            
+            // Fetch all contributions with member names
+            const { data: contributions, error: contribError } = await supabaseClient
+                .from('contributions')
+                .select(`
+                    *,
+                    members:member_id (name)
+                `)
+                .order('date', { ascending: false })
+                .limit(10);
+            
+            if (contribError) throw contribError;
+            
+            // Calculate statistics
+            const totalMembers = members?.length || 0;
+            const totalCollected = members?.reduce((sum, m) => sum + (m.total_contributed || 0), 0) || 0;
+            const paidMembers = members?.filter(m => (m.balance || 0) === 0).length || 0;
+            const totalBalance = members?.reduce((sum, m) => sum + (m.balance || 0), 0) || 0;
+            
+            const statsHtml = `
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h4>👥 MEMBERS</h4>
+                        <div class="stat-number">${totalMembers}</div>
+                    </div>
+                    <div class="stat-card">
+                        <h4>💰 TOTAL COLLECTED</h4>
+                        <div class="stat-number">KES ${(totalCollected/1000).toFixed(0)}k</div>
+                        <div class="stat-full">${formatNumber(totalCollected)}</div>
+                    </div>
+                    <div class="stat-card">
+                        <h4>✅ PAID MEMBERS</h4>
+                        <div class="stat-number">${paidMembers}</div>
+                        <div class="stat-full">out of ${totalMembers}</div>
+                    </div>
+                    <div class="stat-card">
+                        <h4>⏳ OUTSTANDING BALANCE</h4>
+                        <div class="stat-number">KES ${(totalBalance/1000).toFixed(0)}k</div>
+                        <div class="stat-full">${formatNumber(totalBalance)}</div>
+                    </div>
+                </div>
+            `;
+            
+            const recentHtml = `
+                <div class="card">
+                    <div class="flex-between">
+                        <h3>📋 Recent Contributions</h3>
+                        <a href="contributions.html" class="btn-sm btn-outline" style="text-decoration:none;">+ Record</a>
+                    </div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Member</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                    <th>Method</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${contributions?.map(c => `
+                                    <tr>
+                                        <td>${c.members?.name || 'Unknown'}</td>
+                                        <td>KES ${formatNumber(c.amount || 0)}</td>
+                                        <td>${c.date || '-'}</td>
+                                        <td>${c.method || '-'}</td>
+                                    </tr>
+                                `).join('') || '<tr><td colspan="4">No contributions yet</td></tr>'}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+            
+            const buttonsHtml = `
+                <div class="flex-between" style="margin-top:0.5rem;">
+                    <a href="members.html" class="btn" style="text-decoration:none;">📇 Manage Members</a>
+                    <a href="contributions.html" class="btn-outline btn" style="text-decoration:none;">➕ Add Contribution</a>
+                    <a href="statistics.html" class="btn-outline btn" style="text-decoration:none;">📊 View Statistics</a>
+                </div>
+            `;
+            
+            container.innerHTML = `
+                <div class="welcome-card card">
+                    <h1>📊 Welcome to ChamaEase</h1>
+                    <p>Your digital Chama management system - replace spreadsheets with smart tracking</p>
+                </div>
+                ${statsHtml}
+                ${recentHtml}
+                ${buttonsHtml}
+            `;
+            
+        } catch (error) {
+            console.error("Error loading dashboard:", error);
+            container.innerHTML = `
+                <div class="card">
+                    <h3>⚠️ Error Loading Data</h3>
+                    <p>${error.message}</p>
+                    <button class="btn" onclick="location.reload()">Retry</button>
+                </div>
+            `;
+        }
+    }
+</script>
+</body>
+</html>

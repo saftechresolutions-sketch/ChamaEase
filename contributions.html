@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>ChamaEase | Contributions Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+        }
+
+        body {
+            background: #f4f7fb;
+            color: #1e2a3e;
+        }
+
+        :root {
+            --primary: #2c7a4d;
+            --primary-light: #eaf5ef;
+            --primary-dark: #1f5a3a;
+            --danger: #dc4c4c;
+            --warning: #e6a017;
+            --gray-border: #e2e8f0;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.04);
+            --radius-card: 20px;
+            --radius-btn: 32px;
+            --sidebar-width: 280px;
+        }
+
+        /* Layout with Sidebar */
+        .app-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: white;
+            border-right: 1px solid var(--gray-border);
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .sidebar-header {
+            padding: 1.2rem;
+            border-bottom: 1px solid var(--gray-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-logo {
+            font-weight: 800;
+            font-size: 1.3rem;
+            background: linear-gradient(135deg, var(--primary), #3b9b62);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .sidebar-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #94a3b8;
+            transition: all 0.2s;
+            display: none;
+        }
+
+        .sidebar-close:hover {
+            color: var(--danger);
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.8rem 1.2rem;
+            margin: 0.2rem 0.8rem;
+            border-radius: 12px;
+            text-decoration: none;
+            color: #4a5568;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .nav-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .nav-item .icon {
+            font-size: 1.2rem;
+            width: 28px;
+            text-align: center;
+        }
+
+        .nav-item .label {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .nav-submenu {
+            padding-left: 3rem;
+        }
+
+        .nav-submenu .nav-item {
+            padding: 0.6rem 1rem;
+            font-size: 0.85rem;
+        }
+
+        .nav-divider {
+            height: 1px;
+            background: var(--gray-border);
+            margin: 0.8rem 1.2rem;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            transition: all 0.3s ease;
+        }
+
+        .top-bar {
+            background: white;
+            padding: 0.8rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--gray-border);
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 99;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--primary);
+        }
+
+        .page-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1e2a3e;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-email {
+            font-size: 0.85rem;
+            color: #5b6e8c;
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: 1px solid #dc2626;
+            color: #dc2626;
+            padding: 0.4rem 1rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: #dc2626;
+            color: white;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 1.5rem;
+            width: 100%;
+            min-height: 70vh;
+        }
+
+        .card {
+            background: white;
+            border-radius: var(--radius-card);
+            box-shadow: var(--shadow-sm);
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--gray-border);
+        }
+
+        .btn {
+            border: none;
+            background: var(--primary);
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: var(--radius-btn);
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-sm {
+            padding: 0.3rem 0.8rem;
+            font-size: 0.75rem;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+        }
+
+        .btn-danger-outline {
+            background: transparent;
+            border: 1px solid var(--danger);
+            color: var(--danger);
+        }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .menu-toggle {
+                display: block;
+            }
+            .sidebar-close {
+                display: block;
+            }
+            .container {
+                padding: 1rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            table {
+                font-size: 0.75rem;
+            }
+            th, td {
+                padding: 0.5rem 0.3rem;
+            }
+        }
+
+        th, td {
+            text-align: left;
+            padding: 0.7rem 0.5rem;
+            border-bottom: 1px solid var(--gray-border);
+        }
+
+        th {
+            background: #f8fafc;
+            font-weight: 600;
+        }
+
+        .badge-paid {
+            background: #dff0e4;
+            color: #1f5a3a;
+            padding: 0.2rem 0.6rem;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.7rem;
+            display: inline-block;
+        }
+
+        .badge-unpaid {
+            background: #ffe6e5;
+            color: #b91c1c;
+            padding: 0.2rem 0.6rem;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.7rem;
+            display: inline-block;
+        }
+
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .filter-select {
+            padding: 0.5rem 1rem;
+            border-radius: 40px;
+            border: 1px solid var(--gray-border);
+            background: white;
+            max-width: 200px;
+        }
+
+        input, select {
+            padding: 0.6rem;
+            border-radius: 1rem;
+            border: 1px solid #cbd5e1;
+            width: 100%;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.8rem;
+            color: #6c757d;
+            border-top: 1px solid var(--gray-border);
+            margin-top: 1rem;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e2e8f0;
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1001;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.3rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .error-message {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 0.8rem;
+            border-radius: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+        }
+
+        .success-message {
+            background: #dff0e4;
+            color: #2c7a4d;
+            padding: 0.8rem;
+            border-radius: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+            gap: 0.8rem;
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar-overlay.active {
+                display: block;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<div class="app-wrapper">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">🌿 ChamaEase</div>
+            <button class="sidebar-close" id="sidebarClose">✕</button>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">
+                <span class="icon">📊</span>
+                <span class="label">Dashboard</span>
+            </a>
+            <a href="members.html" class="nav-item">
+                <span class="icon">👥</span>
+                <span class="label">Members</span>
+            </a>
+            <a href="contributions.html" class="nav-item active">
+                <span class="icon">💰</span>
+                <span class="label">Contributions</span>
+            </a>
+            
+            <div class="nav-divider"></div>
+            
+            <div class="nav-item" style="cursor: default; opacity: 0.7;">
+                <span class="icon">📜</span>
+                <span class="label">History</span>
+            </div>
+            <div class="nav-submenu">
+                <a href="contribution-history.html" class="nav-item">
+                    <span class="icon">📋</span>
+                    <span class="label">Contributions History</span>
+                </a>
+                <a href="member-history.html" class="nav-item">
+                    <span class="icon">👤</span>
+                    <span class="label">Members History</span>
+                </a>
+            </div>
+            
+            <div class="nav-divider"></div>
+            
+            <div class="nav-item" style="cursor: default; opacity: 0.7;">
+                <span class="icon">📈</span>
+                <span class="label">Analytics</span>
+            </div>
+            <div class="nav-submenu">
+                <a href="statistics.html" class="nav-item">
+                    <span class="icon">📊</span>
+                    <span class="label">Monthly Statistics</span>
+                </a>
+                <a href="reports.html" class="nav-item">
+                    <span class="icon">📋</span>
+                    <span class="label">Reports</span>
+                </a>
+            </div>
+            
+            <div class="nav-divider"></div>
+            
+            <a href="settings.html" class="nav-item">
+                <span class="icon">⚙️</span>
+                <span class="label">Settings</span>
+            </a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <div class="top-bar">
+            <button class="menu-toggle" id="menuToggle">☰</button>
+            <div class="page-title">💰 Contributions Management</div>
+            <div class="user-info">
+                <span class="user-email" id="userEmail"></span>
+                <button id="logoutBtn" class="logout-btn">Logout</button>
+            </div>
+        </div>
+        <div id="app-root" class="container">
+            <div style="text-align: center; padding: 2rem;">
+                <div class="loading-spinner"></div>
+                <p>Loading contributions...</p>
+            </div>
+        </div>
+        <footer>✨ Smart Chama Management · Monthly tracking · Filter & share reports</footer>
+    </main>
+</div>
+
+<script src="supabase-config.js"></script>
+<script>
+    let allMembers = [];
+    let allContributions = [];
+    let currentMonthFilter = 'all';
+
+    // Sidebar functionality
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarClose = document.getElementById('sidebarClose');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    
+    function openSidebar() {
+        sidebar.classList.add('open');
+        sidebarOverlay.classList.add('active');
+    }
+    
+    function closeSidebar() {
+        sidebar.classList.remove('open');
+        sidebarOverlay.classList.remove('active');
+    }
+    
+    if (menuToggle) menuToggle.addEventListener('click', openSidebar);
+    if (sidebarClose) sidebarClose.addEventListener('click', closeSidebar);
+    if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebar);
+    
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) closeSidebar();
+    });
+
+    (async function() {
+        const isAuth = await protectPage();
+        if (!isAuth) return;
+        
+        const user = await getCurrentUser();
+        if (user) document.getElementById('userEmail').textContent = user.email || 'Admin';
+        
+        await loadData();
+    })();
+
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+        await logoutUser();
+        window.location.href = 'index.html';
+    });
+
+    async function loadData() {
+        try {
+            const { data: members, error: membersError } = await supabaseClient
+                .from('members')
+                .select('*')
+                .order('name');
+            
+            if (membersError) throw membersError;
+            allMembers = members || [];
+            
+            const { data: contributions, error: contribError } = await supabaseClient
+                .from('contributions')
+                .select(`*, members:member_id (name)`)
+                .order('date', { ascending: false });
+            
+            if (contribError) throw contribError;
+            allContributions = contributions || [];
+            
+            renderContributionsPage();
+            
+        } catch (error) {
+            console.error("Error loading data:", error);
+            document.getElementById('app-root').innerHTML = `
+                <div class="card">
+                    <h3>⚠️ Error Loading Data</h3>
+                    <p>${error.message}</p>
+                    <button class="btn" onclick="location.reload()">Retry</button>
+                </div>
+            `;
+        }
+    }
+
+    function getUniqueMonths() {
+        let months = [...new Set(allContributions.map(c => c.month))];
+        return months.sort().reverse();
+    }
+
+    function getFilteredContributions() {
+        if (currentMonthFilter === 'all') return allContributions;
+        return allContributions.filter(c => c.month === currentMonthFilter);
+    }
+
+    function renderContributionsPage() {
+        const container = document.getElementById('app-root');
+        const months = getUniqueMonths();
+        const filteredContribs = getFilteredContributions();
+        const totalCollected = filteredContribs.reduce((sum, c) => sum + (c.amount || 0), 0);
+        const paidMembers = allMembers.filter(m => (m.balance || 0) === 0);
+        const unpaidMembers = allMembers.filter(m => (m.balance || 0) > 0);
+        
+        const html = `
+            <div class="history-header">
+                <h2>💰 Contributions Management</h2>
+                <button class="btn-sm btn-outline" id="refreshBtn">🔄 Refresh</button>
+            </div>
+            
+            <div class="card">
+                <h3>➕ Record New Contribution</h3>
+                <div style="display:flex; flex-wrap:wrap; gap:0.8rem; align-items:end;">
+                    <select id="memberSelect" style="flex:1; min-width:140px;">
+                        <option value="">-- Select Member --</option>
+                        ${allMembers.map(m => `<option value="${m.id}">${escapeHtml(m.name)}</option>`).join('')}
+                    </select>
+                    <input type="number" id="contributionAmount" placeholder="Amount (KES)" style="flex:1;">
+                    <input type="month" id="contributionMonth" value="${new Date().toISOString().slice(0,7)}" style="flex:1;">
+                    <input type="date" id="contributionDate" value="${new Date().toISOString().slice(0,10)}" style="flex:1;">
+                    <select id="paymentMethod" style="flex:1;">
+                        <option value="M-Pesa">M-Pesa</option>
+                        <option value="Cash">Cash</option>
+                        <option value="Bank Transfer">Bank Transfer</option>
+                    </select>
+                    <button id="saveContributionBtn" class="btn">💾 Save Contribution</button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="flex-between">
+                    <h3>🔍 Filter Contributions</h3>
+                    <select id="monthFilterSelect" class="filter-select">
+                        <option value="all" ${currentMonthFilter === 'all' ? 'selected' : ''}>All Records</option>
+                        ${months.map(m => `<option value="${m}" ${currentMonthFilter === m ? 'selected' : ''}>${m}</option>`).join('')}
+                    </select>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>✅ Paid Members</h3>
+                <div class="table-wrapper">
+                    <table><thead><tr><th>Name</th><th>Total Paid (KES)</th><th>Status</th></tr></thead>
+                    <tbody>${paidMembers.map(m => `<tr><td>${escapeHtml(m.name)}</td><td>KES ${(m.total_contributed || 0).toLocaleString()}</td><td><span class="badge-paid">Paid</span></td></tr>`).join('')}
+                    ${paidMembers.length === 0 ? '<tr><td colspan="3">No paid members yet</td></tr>' : ''}</tbody></table>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>⚠️ Unpaid Members (with balance)</h3>
+                <div class="table-wrapper">
+                    <table><thead><tr><th>Name</th><th>Outstanding Balance (KES)</th><th>Action</th></tr></thead>
+                    <tbody>${unpaidMembers.map(m => `<tr><td>${escapeHtml(m.name)}</td><td>KES ${(m.balance || 0).toLocaleString()}</td><td><button class="btn-sm btn-outline settle-balance" data-id="${m.id}" data-balance="${m.balance || 0}">Settle Now</button></td></tr>`).join('')}
+                    ${unpaidMembers.length === 0 ? '<tr><td colspan="3">🎉 Everyone is up to date!</td></tr>' : ''}</tbody></table>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>📜 Contribution History ${currentMonthFilter !== 'all' ? `- ${currentMonthFilter}` : '(All Records)'}</h3>
+                <p><strong>Total Collected: KES ${totalCollected.toLocaleString()}</strong></p>
+                <div class="table-wrapper">
+                    <table><thead><tr><th>Member</th><th>Amount (KES)</th><th>Date</th><th>Month</th><th>Method</th><th>Action</th></tr></thead>
+                    <tbody>${filteredContribs.map(c => `<tr><td>${escapeHtml(c.members?.name || 'Unknown')}</td><td>KES ${c.amount?.toLocaleString() || 0}</td><td>${c.date || '-'}</td><td>${c.month || '-'}</td><td>${c.method || '-'}</td><td><button class="btn-sm btn-danger-outline delete-contribution" data-id="${c.id}" data-member="${escapeHtml(c.members?.name || 'Unknown')}" data-amount="${c.amount}">Delete</button></td></tr>`).join('')}
+                    ${filteredContribs.length === 0 ? '<tr><td colspan="6">No contributions found</td></tr>' : ''}</tbody></table>
+                </div>
+            </div>
+        `;
+        
+        container.innerHTML = html;
+        attachEvents();
+    }
+    
+    function attachEvents() {
+        document.getElementById('saveContributionBtn')?.addEventListener('click', saveContribution);
+        document.getElementById('monthFilterSelect')?.addEventListener('change', (e) => { currentMonthFilter = e.target.value; renderContributionsPage(); });
+        document.getElementById('refreshBtn')?.addEventListener('click', () => loadData());
+        document.querySelectorAll('.settle-balance').forEach(btn => btn.addEventListener('click', () => showSettleModal(btn.dataset.id, parseFloat(btn.dataset.balance))));
+        document.querySelectorAll('.delete-contribution').forEach(btn => btn.addEventListener('click', () => confirmDeleteContribution(btn.dataset.id, btn.dataset.member, btn.dataset.amount)));
+    }
+    
+    async function saveContribution() {
+        const memberId = document.getElementById('memberSelect').value;
+        const amount = parseFloat(document.getElementById('contributionAmount').value);
+        const month = document.getElementById('contributionMonth').value;
+        const date = document.getElementById('contributionDate').value;
+        const method = document.getElementById('paymentMethod').value;
+        
+        if (!memberId || isNaN(amount) || amount <= 0 || !date) {
+            showToast('Please fill all fields correctly', 'error');
+            return;
+        }
+        
+        const user = await getCurrentUser();
+        const { error } = await supabaseClient.from('contributions').insert([{
+            member_id: memberId, amount, month, date, method, type: 'Monthly', recorded_by: user?.id
+        }]);
+        
+        if (error) { showToast('Error: ' + error.message, 'error'); return; }
+        
+        showToast('✅ Contribution saved successfully!', 'success');
+        document.getElementById('memberSelect').value = '';
+        document.getElementById('contributionAmount').value = '';
+        await loadData();
+    }
+    
+    function showSettleModal(memberId, currentBalance) {
+        if (currentBalance <= 0) { showToast('Balance is already zero', 'error'); return; }
+        
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <h3>Settle Balance</h3>
+                <p><strong>Member:</strong> ${escapeHtml(allMembers.find(m => m.id === memberId)?.name || 'Unknown')}</p>
+                <p><strong>Amount:</strong> KES ${currentBalance.toLocaleString()}</p>
+                <div class="form-group"><label>Payment Method:</label><select id="settleMethodSelect"><option value="M-Pesa">M-Pesa</option><option value="Cash">Cash</option><option value="Bank Transfer">Bank Transfer</option></select></div>
+                <div class="form-group"><label>Date:</label><input type="date" id="settleDate" value="${new Date().toISOString().slice(0,10)}"></div>
+                <div style="display:flex; gap:10px;"><button id="confirmSettleBtn" class="btn" style="flex:1;">Confirm</button><button id="cancelSettleBtn" class="btn-outline btn" style="flex:1;">Cancel</button></div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        
+        document.getElementById('confirmSettleBtn').onclick = async () => {
+            const method = document.getElementById('settleMethodSelect').value;
+            const date = document.getElementById('settleDate').value;
+            const user = await getCurrentUser();
+            const { error } = await supabaseClient.from('contributions').insert([{
+                member_id: memberId, amount: currentBalance, month: date.slice(0,7), date, method, type: 'Settlement', recorded_by: user?.id
+            }]);
+            if (error) { showToast('Error: ' + error.message, 'error'); modal.remove(); return; }
+            modal.remove();
+            showToast(`✅ Settled KES ${currentBalance.toLocaleString()} via ${method}`, 'success');
+            await loadData();
+        };
+        document.getElementById('cancelSettleBtn').onclick = () => modal.remove();
+    }
+    
+    async function confirmDeleteContribution(id, memberName, amount) {
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <h3>⚠️ Delete Contribution</h3>
+                <p>Delete contribution for <strong>${memberName}</strong> of KES ${parseFloat(amount).toLocaleString()}?</p>
+                <div style="display:flex; gap:10px;"><button id="confirmDeleteBtn" class="btn btn-danger" style="flex:1;">Delete</button><button id="cancelModalBtn" class="btn-outline btn" style="flex:1;">Cancel</button></div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        
+        document.getElementById('confirmDeleteBtn').onclick = async () => {
+            const { error } = await supabaseClient.from('contributions').delete().eq('id', id);
+            if (error) { showToast('Error: ' + error.message, 'error'); modal.remove(); return; }
+            modal.remove();
+            showToast('✅ Contribution deleted successfully!', 'success');
+            await loadData();
+        };
+        document.getElementById('cancelModalBtn').onclick = () => modal.remove();
+    }
+    
+    function showToast(message, type) {
+        const toast = document.createElement('div');
+        toast.style.cssText = `position:fixed; bottom:20px; right:20px; background:${type === 'error' ? '#dc2626' : '#2c7a4d'}; color:white; padding:12px 20px; border-radius:40px; font-size:0.85rem; z-index:1002;`;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m] || m));
+    }
+</script>
+</body>
+</html>

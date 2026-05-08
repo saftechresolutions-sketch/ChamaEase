@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>ChamaEase | Statistics & Analytics</title>
+    <!-- Chart.js for beautiful charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+        }
+
+        body {
+            background: #f4f7fb;
+            color: #1e2a3e;
+        }
+
+        :root {
+            --primary: #2c7a4d;
+            --primary-light: #eaf5ef;
+            --primary-dark: #1f5a3a;
+            --danger: #dc4c4c;
+            --warning: #e6a017;
+            --gray-border: #e2e8f0;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.04);
+            --radius-card: 20px;
+            --radius-btn: 32px;
+            --sidebar-width: 260px;
+        }
+
+        .app-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            background: white;
+            border-right: 1px solid var(--gray-border);
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .sidebar-header {
+            padding: 1.2rem;
+            border-bottom: 1px solid var(--gray-border);
+            text-align: center;
+        }
+
+        .sidebar-logo {
+            font-weight: 800;
+            font-size: 1.3rem;
+            background: linear-gradient(135deg, var(--primary), #3b9b62);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.8rem 1.2rem;
+            margin: 0.2rem 0.8rem;
+            border-radius: 12px;
+            text-decoration: none;
+            color: #4a5568;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .nav-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .nav-item .icon {
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .nav-item .label {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .nav-submenu {
+            padding-left: 3rem;
+        }
+
+        .nav-submenu .nav-item {
+            padding: 0.6rem 1rem;
+            font-size: 0.85rem;
+        }
+
+        .nav-divider {
+            height: 1px;
+            background: var(--gray-border);
+            margin: 0.8rem 1.2rem;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            transition: all 0.3s ease;
+        }
+
+        .top-bar {
+            background: white;
+            padding: 0.8rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--gray-border);
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 99;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--primary);
+        }
+
+        .page-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1e2a3e;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-email {
+            font-size: 0.85rem;
+            color: #5b6e8c;
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: 1px solid #dc2626;
+            color: #dc2626;
+            padding: 0.4rem 1rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: #dc2626;
+            color: white;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem;
+            width: 100%;
+            min-height: 70vh;
+        }
+
+        .card {
+            background: white;
+            border-radius: var(--radius-card);
+            box-shadow: var(--shadow-sm);
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--gray-border);
+        }
+
+        .btn {
+            border: none;
+            background: var(--primary);
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: var(--radius-btn);
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-sm {
+            padding: 0.3rem 0.8rem;
+            font-size: 0.75rem;
+        }
+
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-select {
+            padding: 0.5rem 1rem;
+            border-radius: 40px;
+            border: 1px solid var(--gray-border);
+            background: white;
+            min-width: 150px;
+        }
+
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-box {
+            background: #f8fafc;
+            border-radius: 1rem;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .stat-box h4 {
+            font-size: 0.8rem;
+            color: #5b6e8c;
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-box .value {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .chart-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 1rem;
+            padding: 1rem;
+            border: 1px solid var(--gray-border);
+        }
+
+        .chart-container canvas {
+            max-height: 300px;
+            width: 100%;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.8rem;
+            color: #6c757d;
+            border-top: 1px solid var(--gray-border);
+            margin-top: 1rem;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e2e8f0;
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .menu-toggle {
+                display: block;
+            }
+            .chart-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<div class="app-wrapper">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">🌿 ChamaEase</div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">
+                <span class="icon">📊</span>
+                <span class="label">Dashboard</span>
+            </a>
+            <a href="members.html" class="nav-item">
+                <span class="icon">👥</span>
+                <span class="label">Members</span>
+            </a>
+            <a href="contributions.html" class="nav-item">
+                <span class="icon">💰</span>
+                <span class="label">Contributions</span>
+            </a>
+            
+            <div class="nav-divider"></div>
+            
+            <div class="nav-item" style="cursor: default; opacity: 0.7;">
+                <span class="icon">📜</span>
+                <span class="label">History</span>
+            </div>
+            <div class="nav-submenu">
+                <a href="contribution-history.html" class="nav-item">
+                    <span class="icon">📋</span>
+                    <span class="label">Contributions History</span>
+                </a>
+                <a href="member-history.html" class="nav-item">
+                    <span class="icon">👤</span>
+                    <span class="label">Members History</span>
+                </a>
+            </div>
+            
+            <div class="nav-divider"></div>
+            
+            <div class="nav-item" style="cursor: default; opacity: 0.7;">
+                <span class="icon">📈</span>
+                <span class="label">Analytics</span>
+            </div>
+            <div class="nav-submenu">
+                <a href="statistics.html" class="nav-item active">
+                    <span class="icon">📊</span>
+                    <span class="label">Monthly Statistics</span>
+                </a>
+                <a href="reports.html" class="nav-item">
+                    <span class="icon">📋</span>
+                    <span class="label">Reports</span>
+                </a>
+            </div>
+            
+            <div class="nav-divider"></div>
+            
+            <a href="settings.html" class="nav-item">
+                <span class="icon">⚙️</span>
+                <span class="label">Settings</span>
+            </a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <div class="top-bar">
+            <button class="menu-toggle" id="menuToggle">☰</button>
+            <div class="page-title">📊 Statistics & Analytics</div>
+            <div class="user-info">
+                <span class="user-email" id="userEmail"></span>
+                <button id="logoutBtn" class="logout-btn">Logout</button>
+            </div>
+        </div>
+        <div id="app-root" class="container">
+            <div style="text-align: center; padding: 2rem;">
+                <div class="loading-spinner"></div>
+                <p>Loading statistics...</p>
+            </div>
+        </div>
+        <footer>✨ Smart Chama Management · Visual analytics and trends</footer>
+    </main>
+</div>
+
+<script src="supabase-config.js"></script>
+<script>
+    let allMembers = [];
+    let allContributions = [];
+    let currentYear = 'all';
+    let monthlyChart = null;
+    let paymentMethodChart = null;
+
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    
+    if (menuToggle) {
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+        });
+    }
+    
+    document.addEventListener('click', (e) => {
+        if (window.innerWidth <= 768) {
+            if (!sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
+                sidebar.classList.remove('open');
+            }
+        }
+    });
+
+    (async function() {
+        const isAuth = await protectPage();
+        if (!isAuth) return;
+        
+        const user = await getCurrentUser();
+        if (user) {
+            document.getElementById('userEmail').textContent = user.email || 'Admin';
+        }
+        
+        await loadData();
+    })();
+
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+        await logoutUser();
+        window.location.href = 'index.html';
+    });
+
+    async function loadData() {
+        try {
+            const [membersRes, contribRes] = await Promise.all([
+                supabaseClient.from('members').select('*'),
+                supabaseClient.from('contributions').select('*, members:member_id (name)')
+            ]);
+            
+            if (membersRes.error) throw membersRes.error;
+            if (contribRes.error) throw contribRes.error;
+            
+            allMembers = membersRes.data || [];
+            allContributions = contribRes.data || [];
+            
+            renderStatistics();
+            
+        } catch (error) {
+            console.error("Error loading data:", error);
+            document.getElementById('app-root').innerHTML = `
+                <div class="card">
+                    <h3>⚠️ Error Loading Data</h3>
+                    <p>${error.message}</p>
+                    <button class="btn" onclick="location.reload()">Retry</button>
+                </div>
+            `;
+        }
+    }
+
+    function formatNumber(num) {
+        return num?.toLocaleString('en-KE') || '0';
+    }
+
+    function getFilteredContributions() {
+        if (currentYear === 'all') return allContributions;
+        return allContributions.filter(c => {
+            const year = c.date?.slice(0,4);
+            return year === currentYear;
+        });
+    }
+
+    function getMonthlyData() {
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const monthlyTotals = new Array(12).fill(0);
+        
+        const filtered = getFilteredContributions();
+        filtered.forEach(c => {
+            if (c.date) {
+                const month = new Date(c.date).getMonth();
+                monthlyTotals[month] += c.amount || 0;
+            }
+        });
+        
+        return { months, monthlyTotals };
+    }
+
+    function getYearlyData() {
+        const yearlyMap = new Map();
+        
+        allContributions.forEach(c => {
+            if (c.date) {
+                const year = c.date.slice(0,4);
+                yearlyMap.set(year, (yearlyMap.get(year) || 0) + (c.amount || 0));
+            }
+        });
+        
+        const years = Array.from(yearlyMap.keys()).sort();
+        const totals = years.map(y => yearlyMap.get(y));
+        
+        return { years, totals };
+    }
+
+    function getPaymentMethodData() {
+        const methodMap = new Map();
+        
+        allContributions.forEach(c => {
+            const method = c.method || 'Other';
+            methodMap.set(method, (methodMap.get(method) || 0) + (c.amount || 0));
+        });
+        
+        const methods = Array.from(methodMap.keys());
+        const amounts = methods.map(m => methodMap.get(m));
+        
+        return { methods, amounts };
+    }
+
+    function getTopContributors() {
+        const contributorMap = new Map();
+        
+        allContributions.forEach(c => {
+            const name = c.members?.name || 'Unknown';
+            contributorMap.set(name, (contributorMap.get(name) || 0) + (c.amount || 0));
+        });
+        
+        return Array.from(contributorMap.entries())
+            .map(([name, amount]) => ({ name, amount }))
+            .sort((a, b) => b.amount - a.amount)
+            .slice(0, 5);
+    }
+
+    function destroyCharts() {
+        if (monthlyChart) monthlyChart.destroy();
+        if (paymentMethodChart) paymentMethodChart.destroy();
+    }
+
+    function renderStatistics() {
+        const container = document.getElementById('app-root');
+        const filtered = getFilteredContributions();
+        const totalCollected = filtered.reduce((sum, c) => sum + (c.amount || 0), 0);
+        const totalExpected = allMembers.reduce((sum, m) => sum + (m.expected_contribution || 0), 0);
+        const totalBalance = allMembers.reduce((sum, m) => sum + (m.balance || 0), 0);
+        const paidMembers = allMembers.filter(m => (m.balance || 0) === 0).length;
+        const uniqueYears = [...new Set(allContributions.map(c => c.date?.slice(0,4)).filter(y => y))].sort().reverse();
+        
+        const monthlyData = getMonthlyData();
+        const yearlyData = getYearlyData();
+        const methodData = getPaymentMethodData();
+        const topContributors = getTopContributors();
+        
+        const html = `
+            <div class="card">
+                <div class="flex-between">
+                    <h2>📊 Financial Statistics</h2>
+                    <div class="filter-bar" style="margin-bottom:0;">
+                        <select id="yearFilter" class="filter-select">
+                            <option value="all" ${currentYear === 'all' ? 'selected' : ''}>All Years</option>
+                            ${uniqueYears.map(y => `<option value="${y}" ${currentYear === y ? 'selected' : ''}>${y}</option>`).join('')}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stats-summary">
+                <div class="stat-box">
+                    <h4>Total Members</h4>
+                    <div class="value">${allMembers.length}</div>
+                </div>
+                <div class="stat-box">
+                    <h4>Paid Members</h4>
+                    <div class="value">${paidMembers}</div>
+                    <small>${((paidMembers/allMembers.length)*100 || 0).toFixed(0)}%</small>
+                </div>
+                <div class="stat-box">
+                    <h4>Total Expected</h4>
+                    <div class="value">KES ${(totalExpected/1000).toFixed(0)}k</div>
+                </div>
+                <div class="stat-box">
+                    <h4>Total Collected</h4>
+                    <div class="value">KES ${(totalCollected/1000).toFixed(0)}k</div>
+                    <small>${formatNumber(totalCollected)}</small>
+                </div>
+                <div class="stat-box">
+                    <h4>Outstanding Balance</h4>
+                    <div class="value">KES ${(totalBalance/1000).toFixed(0)}k</div>
+                </div>
+                <div class="stat-box">
+                    <h4>Collection Rate</h4>
+                    <div class="value">${totalExpected > 0 ? ((totalCollected/totalExpected)*100).toFixed(1) : 0}%</div>
+                </div>
+            </div>
+            
+            <div class="chart-row">
+                <div class="chart-container">
+                    <h3>📈 Monthly Contributions (${currentYear === 'all' ? 'All Years' : currentYear})</h3>
+                    <canvas id="monthlyChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>🥧 Payment Methods Distribution</h3>
+                    <canvas id="paymentMethodChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-row">
+                <div class="chart-container">
+                    <h3>📅 Yearly Trends</h3>
+                    <canvas id="yearlyChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>🏆 Top 5 Contributors</h3>
+                    <div class="table-wrapper">
+                        <table style="min-width:200px;">
+                            <thead><tr><th>Member</th><th>Total Amount</th></tr></thead>
+                            <tbody>
+                                ${topContributors.map(c => `
+                                    <tr>
+                                        <td>${c.name}</td>
+                                        <td><span style="color:var(--primary);font-weight:600;">KES ${formatNumber(c.amount)}</span></td>
+                                    </tr>
+                                `).join('')}
+                                ${topContributors.length === 0 ? '<tr><td colspan="2">No contributions yet</td></tr>' : ''}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>📋 Detailed Statistics</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Value</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Total Contribution Records</td><td><strong>${filtered.length}</strong></td><td>Across ${new Set(filtered.map(c => c.member_id)).size} members</td></tr>
+                            <tr><td>Average Contribution per Member</td><td><strong>KES ${formatNumber(totalCollected / (allMembers.length || 1))}</strong></td><td>Expected: KES ${formatNumber(totalExpected / (allMembers.length || 1))}</td></tr>
+                            <tr><td>Payment Methods Used</td><td><strong>${methodData.methods.length}</strong></td><td>${methodData.methods.join(', ')}</td></tr>
+                            <tr><td>Active Months with Contributions</td><td><strong>${new Set(filtered.map(c => c.month)).size}</strong></td><td>Monthly tracking active</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+        
+        container.innerHTML = html;
+        
+        // Create charts after DOM is ready
+        setTimeout(() => {
+            createCharts();
+        }, 100);
+        
+        document.getElementById('yearFilter')?.addEventListener('change', (e) => {
+            currentYear = e.target.value;
+            renderStatistics();
+        });
+    }
+    
+    function createCharts() {
+        const monthlyData = getMonthlyData();
+        const yearlyData = getYearlyData();
+        const methodData = getPaymentMethodData();
+        
+        // Monthly Chart
+        const monthlyCtx = document.getElementById('monthlyChart')?.getContext('2d');
+        if (monthlyCtx) {
+            if (monthlyChart) monthlyChart.destroy();
+            monthlyChart = new Chart(monthlyCtx, {
+                type: 'bar',
+                data: {
+                    labels: monthlyData.months,
+                    datasets: [{
+                        label: `Contributions (KES) - ${currentYear === 'all' ? 'All Years' : currentYear}`,
+                        data: monthlyData.monthlyTotals,
+                        backgroundColor: '#2c7a4d',
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: { callbacks: { label: (ctx) => `KES ${formatNumber(ctx.raw)}` } }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, title: { display: true, text: 'Amount (KES)' } },
+                        x: { title: { display: true, text: 'Month' } }
+                    }
+                }
+            });
+        }
+        
+        // Payment Method Chart (Pie)
+        const methodCtx = document.getElementById('paymentMethodChart')?.getContext('2d');
+        if (methodCtx) {
+            if (paymentMethodChart) paymentMethodChart.destroy();
+            paymentMethodChart = new Chart(methodCtx, {
+                type: 'pie',
+                data: {
+                    labels: methodData.methods,
+                    datasets: [{
+                        data: methodData.amounts,
+                        backgroundColor: ['#2c7a4d', '#3b9b62', '#5cb85c', '#8bc34a', '#a5d6a7'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { position: 'right' },
+                        tooltip: { callbacks: { label: (ctx) => `${ctx.label}: KES ${formatNumber(ctx.raw)}` } }
+                    }
+                }
+            });
+        }
+        
+        // Yearly Chart (Line)
+        const yearlyCtx = document.getElementById('yearlyChart')?.getContext('2d');
+        if (yearlyCtx && yearlyData.years.length > 0) {
+            new Chart(yearlyCtx, {
+                type: 'line',
+                data: {
+                    labels: yearlyData.years,
+                    datasets: [{
+                        label: 'Yearly Contributions (KES)',
+                        data: yearlyData.totals,
+                        borderColor: '#2c7a4d',
+                        backgroundColor: 'rgba(44, 122, 77, 0.1)',
+                        fill: true,
+                        tension: 0.3,
+                        pointBackgroundColor: '#2c7a4d',
+                        pointRadius: 5,
+                        pointHoverRadius: 7
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        tooltip: { callbacks: { label: (ctx) => `KES ${formatNumber(ctx.raw)}` } }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, title: { display: true, text: 'Amount (KES)' } },
+                        x: { title: { display: true, text: 'Year' } }
+                    }
+                }
+            });
+        }
+    }
+</script>
+</body>
+</html>

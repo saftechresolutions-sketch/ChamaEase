@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>ChamaEase | Contribution History</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+        }
+
+        body {
+            background: #f4f7fb;
+            color: #1e2a3e;
+        }
+
+        :root {
+            --primary: #2c7a4d;
+            --primary-light: #eaf5ef;
+            --primary-dark: #1f5a3a;
+            --danger: #dc4c4c;
+            --warning: #e6a017;
+            --gray-border: #e2e8f0;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.04);
+            --radius-card: 20px;
+            --radius-btn: 32px;
+            --sidebar-width: 260px;
+        }
+
+        /* Layout with Sidebar */
+        .app-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: white;
+            border-right: 1px solid var(--gray-border);
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .sidebar-header {
+            padding: 1.2rem;
+            border-bottom: 1px solid var(--gray-border);
+            text-align: center;
+        }
+
+        .sidebar-logo {
+            font-weight: 800;
+            font-size: 1.3rem;
+            background: linear-gradient(135deg, var(--primary), #3b9b62);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.8rem 1.2rem;
+            margin: 0.2rem 0.8rem;
+            border-radius: 12px;
+            text-decoration: none;
+            color: #4a5568;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .nav-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .nav-item .icon {
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .nav-item .label {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .nav-submenu {
+            padding-left: 3rem;
+        }
+
+        .nav-submenu .nav-item {
+            padding: 0.6rem 1rem;
+            font-size: 0.85rem;
+        }
+
+        .nav-divider {
+            height: 1px;
+            background: var(--gray-border);
+            margin: 0.8rem 1.2rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            transition: all 0.3s ease;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background: white;
+            padding: 0.8rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--gray-border);
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 99;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--primary);
+        }
+
+        .page-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1e2a3e;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-email {
+            font-size: 0.85rem;
+            color: #5b6e8c;
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: 1px solid #dc2626;
+            color: #dc2626;
+            padding: 0.4rem 1rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: #dc2626;
+            color: white;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem;
+            width: 100%;
+            min-height: 70vh;
+        }
+
+        .card {
+            background: white;
+            border-radius: var(--radius-card);
+            box-shadow: var(--shadow-sm);
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--gray-border);
+        }
+
+        .btn {
+            border: none;
+            background: var(--primary);
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: var(--radius-btn);
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-sm {
+            padding: 0.3rem 0.8rem;
+            font-size: 0.75rem;
+        }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .menu-toggle {
+                display: block;
+            }
+            table {
+                font-size: 0.75rem;
+            }
+            th, td {
+                padding: 0.5rem 0.3rem;
+            }
+        }
+
+        th, td {
+            text-align: left;
+            padding: 0.7rem 0.5rem;
+            border-bottom: 1px solid var(--gray-border);
+        }
+
+        th {
+            background: #f8fafc;
+            font-weight: 600;
+        }
+
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-select, .filter-input {
+            padding: 0.5rem 1rem;
+            border-radius: 40px;
+            border: 1px solid var(--gray-border);
+            background: white;
+            min-width: 150px;
+        }
+
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-box {
+            background: #f8fafc;
+            border-radius: 1rem;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .stat-box h4 {
+            font-size: 0.8rem;
+            color: #5b6e8c;
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-box .value {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.8rem;
+            color: #6c757d;
+            border-top: 1px solid var(--gray-border);
+            margin-top: 1rem;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e2e8f0;
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .report-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 1rem;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<div class="app-wrapper">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">🌿 ChamaEase</div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">
+                <span class="icon">📊</span>
+                <span class="label">Dashboard</span>
+            </a>
+            <a href="members.html" class="nav-item">
+                <span class="icon">👥</span>
+                <span class="label">Members</span>
+            </a>
+            <a href="contributions.html" class="nav-item">
+                <span class="icon">💰</span>
+                <span class="label">Contributions</span>
+            </a>
+            
+            <div class="nav-divider"></div>
+            
+            <div class="nav-item" style="cursor: default; opacity: 0.7;">
+                <span class="icon">📜</span>
+                <span class="label">History</span>
+            </div>
+            <div class="nav-submenu">
+                <a href="contribution-history.html" class="nav-item active">
+                    <span class="icon">📋</span>
+                    <span class="label">Contributions History</span>
+                </a>
+                <a href="member-history.html" class="nav-item">
+                    <span class="icon">👤</span>
+                    <span class="label">Members History</span>
+                </a>
+            </div>
+            
+            <div class="nav-divider"></div>
+            
+            <div class="nav-item" style="cursor: default; opacity: 0.7;">
+                <span class="icon">📈</span>
+                <span class="label">Analytics</span>
+            </div>
+            <div class="nav-submenu">
+                <a href="statistics.html" class="nav-item">
+                    <span class="icon">📊</span>
+                    <span class="label">Monthly Statistics</span>
+                </a>
+                <a href="reports.html" class="nav-item">
+                    <span class="icon">📋</span>
+                    <span class="label">Reports</span>
+                </a>
+            </div>
+            
+            <div class="nav-divider"></div>
+            
+            <a href="settings.html" class="nav-item">
+                <span class="icon">⚙️</span>
+                <span class="label">Settings</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="top-bar">
+            <button class="menu-toggle" id="menuToggle">☰</button>
+            <div class="page-title">📜 Contribution History</div>
+            <div class="user-info">
+                <span class="user-email" id="userEmail"></span>
+                <button id="logoutBtn" class="logout-btn">Logout</button>
+            </div>
+        </div>
+        <div id="app-root" class="container">
+            <div style="text-align: center; padding: 2rem;">
+                <div class="loading-spinner"></div>
+                <p>Loading contribution history...</p>
+            </div>
+        </div>
+        <footer>✨ Smart Chama Management · Full contribution history with filters</footer>
+    </main>
+</div>
+
+<script src="supabase-config.js"></script>
+<script>
+    let allContributions = [];
+    let allMembers = [];
+    let currentFilters = {
+        month: 'all',
+        year: 'all',
+        member: 'all',
+        method: 'all'
+    };
+
+    // Sidebar toggle
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    
+    if (menuToggle) {
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+        });
+    }
+    
+    document.addEventListener('click', (e) => {
+        if (window.innerWidth <= 768) {
+            if (!sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
+                sidebar.classList.remove('open');
+            }
+        }
+    });
+
+    (async function() {
+        const isAuth = await protectPage();
+        if (!isAuth) return;
+        
+        const user = await getCurrentUser();
+        if (user) {
+            document.getElementById('userEmail').textContent = user.email || 'Admin';
+        }
+        
+        await loadData();
+    })();
+
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+        await logoutUser();
+        window.location.href = 'index.html';
+    });
+
+    async function loadData() {
+        try {
+            const [membersRes, contribRes] = await Promise.all([
+                supabaseClient.from('members').select('*').order('name'),
+                supabaseClient.from('contributions').select(`
+                    *,
+                    members:member_id (name, phone)
+                `).order('date', { ascending: false })
+            ]);
+            
+            if (membersRes.error) throw membersRes.error;
+            if (contribRes.error) throw contribRes.error;
+            
+            allMembers = membersRes.data || [];
+            allContributions = contribRes.data || [];
+            
+            renderHistoryPage();
+            
+        } catch (error) {
+            console.error("Error loading data:", error);
+            document.getElementById('app-root').innerHTML = `
+                <div class="card">
+                    <h3>⚠️ Error Loading Data</h3>
+                    <p>${error.message}</p>
+                    <button class="btn" onclick="location.reload()">Retry</button>
+                </div>
+            `;
+        }
+    }
+
+    function getUniqueMonths() {
+        const months = [...new Set(allContributions.map(c => c.month))];
+        return months.sort().reverse();
+    }
+
+    function getUniqueYears() {
+        const years = [...new Set(allContributions.map(c => c.year || c.date?.slice(0,4)))];
+        return years.filter(y => y).sort().reverse();
+    }
+
+    function getFilteredContributions() {
+        return allContributions.filter(c => {
+            if (currentFilters.month !== 'all' && c.month !== currentFilters.month) return false;
+            if (currentFilters.year !== 'all') {
+                const contribYear = c.year || c.date?.slice(0,4);
+                if (contribYear !== currentFilters.year) return false;
+            }
+            if (currentFilters.member !== 'all' && c.member_id !== currentFilters.member) return false;
+            if (currentFilters.method !== 'all' && c.method !== currentFilters.method) return false;
+            return true;
+        });
+    }
+
+    function formatNumber(num) {
+        return num?.toLocaleString('en-KE') || '0';
+    }
+
+    function exportToCSV() {
+        const filtered = getFilteredContributions();
+        let csvRows = [
+            ['Contribution History Report'],
+            [`Generated: ${new Date().toLocaleString()}`],
+            [`Filters: Month=${currentFilters.month}, Year=${currentFilters.year}, Member=${currentFilters.member}, Method=${currentFilters.method}`],
+            [],
+            ['Date', 'Member Name', 'Phone', 'Amount (KES)', 'Month', 'Payment Method', 'Type']
+        ];
+        
+        filtered.forEach(c => {
+            csvRows.push([
+                c.date || '',
+                c.members?.name || 'Unknown',
+                c.members?.phone || '',
+                c.amount || 0,
+                c.month || '',
+                c.method || '',
+                c.type || 'Monthly'
+            ]);
+        });
+        
+        csvRows.push([], ['SUMMARY']);
+        const totalAmount = filtered.reduce((sum, c) => sum + (c.amount || 0), 0);
+        csvRows.push(['Total Records', filtered.length]);
+        csvRows.push(['Total Amount', `KES ${formatNumber(totalAmount)}`]);
+        
+        const csv = csvRows.map(row => row.join(',')).join('\n');
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `contribution_history_${new Date().toISOString().slice(0,10)}.csv`;
+        link.click();
+        URL.revokeObjectURL(link.href);
+        showToast('✅ CSV exported successfully!', 'success');
+    }
+
+    async function copyToClipboard() {
+        const filtered = getFilteredContributions();
+        const totalAmount = filtered.reduce((sum, c) => sum + (c.amount || 0), 0);
+        
+        let text = `🏆 CONTRIBUTION HISTORY REPORT 🏆\n`;
+        text += `📅 Generated: ${new Date().toLocaleString()}\n`;
+        text += `━━━━━━━━━━━━━━━━━━━━\n\n`;
+        text += `📊 Total Records: ${filtered.length}\n`;
+        text += `💰 Total Amount: KES ${formatNumber(totalAmount)}\n`;
+        text += `━━━━━━━━━━━━━━━━━━━━\n\n`;
+        text += `📜 DETAILED RECORDS:\n`;
+        
+        filtered.forEach((c, i) => {
+            text += `${i+1}. ${c.date} | ${c.members?.name} | KES ${formatNumber(c.amount)} | ${c.method}\n`;
+        });
+        
+        await navigator.clipboard.writeText(text);
+        showToast('✅ Report copied to clipboard!', 'success');
+    }
+
+    function renderHistoryPage() {
+        const container = document.getElementById('app-root');
+        const filtered = getFilteredContributions();
+        const months = getUniqueMonths();
+        const years = getUniqueYears();
+        const totalAmount = filtered.reduce((sum, c) => sum + (c.amount || 0), 0);
+        
+        const html = `
+            <div class="card">
+                <div class="flex-between">
+                    <h2>📜 Contribution History</h2>
+                    <div class="report-actions">
+                        <button id="copyBtn" class="btn-sm btn-outline">📋 Copy</button>
+                        <button id="exportCSVBtn" class="btn-sm btn-outline">📎 Export CSV</button>
+                    </div>
+                </div>
+                
+                <!-- Filter Bar -->
+                <div class="filter-bar">
+                    <select id="monthFilter" class="filter-select">
+                        <option value="all" ${currentFilters.month === 'all' ? 'selected' : ''}>All Months</option>
+                        ${months.map(m => `<option value="${m}" ${currentFilters.month === m ? 'selected' : ''}>${m}</option>`).join('')}
+                    </select>
+                    
+                    <select id="yearFilter" class="filter-select">
+                        <option value="all" ${currentFilters.year === 'all' ? 'selected' : ''}>All Years</option>
+                        ${years.map(y => `<option value="${y}" ${currentFilters.year === y ? 'selected' : ''}>${y}</option>`).join('')}
+                    </select>
+                    
+                    <select id="memberFilter" class="filter-select">
+                        <option value="all" ${currentFilters.member === 'all' ? 'selected' : ''}>All Members</option>
+                        ${allMembers.map(m => `<option value="${m.id}" ${currentFilters.member === m.id ? 'selected' : ''}>${m.name}</option>`).join('')}
+                    </select>
+                    
+                    <select id="methodFilter" class="filter-select">
+                        <option value="all" ${currentFilters.method === 'all' ? 'selected' : ''}>All Methods</option>
+                        <option value="M-Pesa" ${currentFilters.method === 'M-Pesa' ? 'selected' : ''}>M-Pesa</option>
+                        <option value="Cash" ${currentFilters.method === 'Cash' ? 'selected' : ''}>Cash</option>
+                        <option value="Bank Transfer" ${currentFilters.method === 'Bank Transfer' ? 'selected' : ''}>Bank Transfer</option>
+                    </select>
+                    
+                    <button id="resetFiltersBtn" class="btn-sm btn-outline">🔄 Reset Filters</button>
+                </div>
+            </div>
+            
+            <!-- Statistics Summary -->
+            <div class="stats-summary">
+                <div class="stat-box">
+                    <h4>Total Records</h4>
+                    <div class="value">${filtered.length}</div>
+                </div>
+                <div class="stat-box">
+                    <h4>Total Amount</h4>
+                    <div class="value">KES ${(totalAmount/1000).toFixed(0)}k</div>
+                    <small>${formatNumber(totalAmount)}</small>
+                </div>
+                <div class="stat-box">
+                    <h4>Unique Members</h4>
+                    <div class="value">${new Set(filtered.map(c => c.member_id)).size}</div>
+                </div>
+                <div class="stat-box">
+                    <h4>Payment Methods</h4>
+                    <div class="value">${new Set(filtered.map(c => c.method)).size}</div>
+                </div>
+            </div>
+            
+            <!-- Contributions Table -->
+            <div class="card">
+                <h3>📋 Contribution Records</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Member Name</th>
+                                <th>Phone</th>
+                                <th>Amount (KES)</th>
+                                <th>Month</th>
+                                <th>Payment Method</th>
+                                <th>Type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${filtered.map(c => `
+                                <tr>
+                                    <td>${c.date || '-'}</td>
+                                    <td>${c.members?.name || 'Unknown'}</strong></td>
+                                    <td>${c.members?.phone || '-'}</td>
+                                    <td><span style="font-weight:600;color:var(--primary);">KES ${formatNumber(c.amount)}</span></td>
+                                    <td>${c.month || '-'}</td>
+                                    </td>${c.method || '-'}</td>
+                                    <td>${c.type || 'Monthly'}</td>
+                                </tr>
+                            `).join('')}
+                            ${filtered.length === 0 ? '<tr><td colspan="7" style="text-align:center;">No contributions found for selected filters</td></tr>' : ''}
+                        </tbody>
+                     </div>
+                </div>
+            </div>
+        `;
+        
+        container.innerHTML = html;
+        attachEvents();
+    }
+    
+    function attachEvents() {
+        document.getElementById('monthFilter')?.addEventListener('change', (e) => {
+            currentFilters.month = e.target.value;
+            renderHistoryPage();
+        });
+        
+        document.getElementById('yearFilter')?.addEventListener('change', (e) => {
+            currentFilters.year = e.target.value;
+            renderHistoryPage();
+        });
+        
+        document.getElementById('memberFilter')?.addEventListener('change', (e) => {
+            currentFilters.member = e.target.value;
+            renderHistoryPage();
+        });
+        
+        document.getElementById('methodFilter')?.addEventListener('change', (e) => {
+            currentFilters.method = e.target.value;
+            renderHistoryPage();
+        });
+        
+        document.getElementById('resetFiltersBtn')?.addEventListener('click', () => {
+            currentFilters = { month: 'all', year: 'all', member: 'all', method: 'all' };
+            renderHistoryPage();
+        });
+        
+        document.getElementById('copyBtn')?.addEventListener('click', copyToClipboard);
+        document.getElementById('exportCSVBtn')?.addEventListener('click', exportToCSV);
+    }
+    
+    function showToast(message, type) {
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: ${type === 'error' ? '#dc2626' : '#2c7a4d'};
+            color: white;
+            padding: 12px 20px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            z-index: 1001;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: slideIn 0.3s ease;
+        `;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>ChamaEase | Members Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+        }
+
+        body {
+            background: #f4f7fb;
+            color: #1e2a3e;
+        }
+
+        :root {
+            --primary: #2c7a4d;
+            --primary-light: #eaf5ef;
+            --primary-dark: #1f5a3a;
+            --danger: #dc4c4c;
+            --warning: #e6a017;
+            --gray-border: #e2e8f0;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.04);
+            --radius-card: 20px;
+            --radius-btn: 32px;
+            --sidebar-width: 280px;
+        }
+
+        /* Layout with Sidebar */
+        .app-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: white;
+            border-right: 1px solid var(--gray-border);
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .sidebar-header {
+            padding: 1.2rem;
+            border-bottom: 1px solid var(--gray-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-logo {
+            font-weight: 800;
+            font-size: 1.3rem;
+            background: linear-gradient(135deg, var(--primary), #3b9b62);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .sidebar-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #94a3b8;
+            transition: all 0.2s;
+            display: none;
+        }
+
+        .sidebar-close:hover {
+            color: var(--danger);
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.8rem 1.2rem;
+            margin: 0.2rem 0.8rem;
+            border-radius: 12px;
+            text-decoration: none;
+            color: #4a5568;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .nav-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .nav-item .icon {
+            font-size: 1.2rem;
+            width: 28px;
+            text-align: center;
+        }
+
+        .nav-item .label {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        /* Submenu items */
+        .nav-submenu {
+            padding-left: 3rem;
+        }
+
+        .nav-submenu .nav-item {
+            padding: 0.6rem 1rem;
+            font-size: 0.85rem;
+        }
+
+        .nav-divider {
+            height: 1px;
+            background: var(--gray-border);
+            margin: 0.8rem 1.2rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            transition: all 0.3s ease;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background: white;
+            padding: 0.8rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--gray-border);
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 99;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--primary);
+        }
+
+        .page-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1e2a3e;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-email {
+            font-size: 0.85rem;
+            color: #5b6e8c;
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: 1px solid #dc2626;
+            color: #dc2626;
+            padding: 0.4rem 1rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: #dc2626;
+            color: white;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 1.5rem;
+            width: 100%;
+            min-height: 70vh;
+        }
+
+        .card {
+            background: white;
+            border-radius: var(--radius-card);
+            box-shadow: var(--shadow-sm);
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--gray-border);
+        }
+
+        .btn {
+            border: none;
+            background: var(--primary);
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: var(--radius-btn);
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-sm {
+            padding: 0.3rem 0.8rem;
+            font-size: 0.75rem;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+        }
+
+        .btn-danger-outline {
+            background: transparent;
+            border: 1px solid var(--danger);
+            color: var(--danger);
+        }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .menu-toggle {
+                display: block;
+            }
+            .sidebar-close {
+                display: block;
+            }
+            .container {
+                padding: 1rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            table {
+                font-size: 0.75rem;
+            }
+            th, td {
+                padding: 0.5rem 0.3rem;
+            }
+        }
+
+        th, td {
+            text-align: left;
+            padding: 0.7rem 0.5rem;
+            border-bottom: 1px solid var(--gray-border);
+        }
+
+        th {
+            background: #f8fafc;
+            font-weight: 600;
+        }
+
+        .badge-paid {
+            background: #dff0e4;
+            color: #1f5a3a;
+            padding: 0.2rem 0.6rem;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.7rem;
+            display: inline-block;
+        }
+
+        .badge-unpaid {
+            background: #ffe6e5;
+            color: #b91c1c;
+            padding: 0.2rem 0.6rem;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.7rem;
+            display: inline-block;
+        }
+
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .search-bar {
+            padding: 0.5rem 1rem;
+            border-radius: 40px;
+            border: 1px solid var(--gray-border);
+            background: white;
+            width: 100%;
+            max-width: 260px;
+        }
+
+        input, select {
+            padding: 0.6rem;
+            border-radius: 1rem;
+            border: 1px solid #cbd5e1;
+            width: 100%;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.8rem;
+            color: #6c757d;
+            border-top: 1px solid var(--gray-border);
+            margin-top: 1rem;
+        }
+
+        .action-group {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e2e8f0;
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1001;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.3rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .error-message {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 0.8rem;
+            border-radius: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+        }
+
+        .success-message {
+            background: #dff0e4;
+            color: #2c7a4d;
+            padding: 0.8rem;
+            border-radius: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+        }
+
+        /* Overlay for mobile */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar-overlay.active {
+                display: block;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<div class="app-wrapper">
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">🌿 ChamaEase</div>
+            <button class="sidebar-close" id="sidebarClose">✕</button>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">
+                <span class="icon">📊</span>
+                <span class="label">Dashboard</span>
+            </a>
+            <a href="members.html" class="nav-item active">
+                <span class="icon">👥</span>
+                <span class="label">Members</span>
+            </a>
+            <a href="contributions.html" class="nav-item">
+                <span class="icon">💰</span>
+                <span class="label">Contributions</span>
+            </a>
+            
+            <div class="nav-divider"></div>
+            
+            <!-- History Section -->
+            <div class="nav-item" style="cursor: default; opacity: 0.7;">
+                <span class="icon">📜</span>
+                <span class="label">History</span>
+            </div>
+            <div class="nav-submenu">
+                <a href="contribution-history.html" class="nav-item">
+                    <span class="icon">📋</span>
+                    <span class="label">Contributions History</span>
+                </a>
+                <a href="member-history.html" class="nav-item">
+                    <span class="icon">👤</span>
+                    <span class="label">Members History</span>
+                </a>
+            </div>
+            
+            <div class="nav-divider"></div>
+            
+            <!-- Analytics Section -->
+            <div class="nav-item" style="cursor: default; opacity: 0.7;">
+                <span class="icon">📈</span>
+                <span class="label">Analytics</span>
+            </div>
+            <div class="nav-submenu">
+                <a href="statistics.html" class="nav-item">
+                    <span class="icon">📊</span>
+                    <span class="label">Monthly Statistics</span>
+                </a>
+                <a href="reports.html" class="nav-item">
+                    <span class="icon">📋</span>
+                    <span class="label">Reports</span>
+                </a>
+            </div>
+            
+            <div class="nav-divider"></div>
+            
+            <a href="settings.html" class="nav-item">
+                <span class="icon">⚙️</span>
+                <span class="label">Settings</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="top-bar">
+            <button class="menu-toggle" id="menuToggle">☰</button>
+            <div class="page-title">👥 Members Management</div>
+            <div class="user-info">
+                <span class="user-email" id="userEmail"></span>
+                <button id="logoutBtn" class="logout-btn">Logout</button>
+            </div>
+        </div>
+        <div id="app-root" class="container">
+            <div style="text-align: center; padding: 2rem;">
+                <div class="loading-spinner"></div>
+                <p>Loading members...</p>
+            </div>
+        </div>
+        <footer>✨ Smart Chama Management · Monthly tracking · Filter & share reports</footer>
+    </main>
+</div>
+
+<script src="supabase-config.js"></script>
+<script>
+    let allMembers = [];
+    let searchTerm = '';
+
+    // Sidebar functionality
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarClose = document.getElementById('sidebarClose');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    
+    function openSidebar() {
+        sidebar.classList.add('open');
+        sidebarOverlay.classList.add('active');
+    }
+    
+    function closeSidebar() {
+        sidebar.classList.remove('open');
+        sidebarOverlay.classList.remove('active');
+    }
+    
+    if (menuToggle) {
+        menuToggle.addEventListener('click', openSidebar);
+    }
+    
+    if (sidebarClose) {
+        sidebarClose.addEventListener('click', closeSidebar);
+    }
+    
+    if (sidebarOverlay) {
+        sidebarOverlay.addEventListener('click', closeSidebar);
+    }
+    
+    // Close sidebar on window resize if screen becomes larger
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) {
+            closeSidebar();
+        }
+    });
+
+    // Check authentication and protect page
+    (async function() {
+        const isAuth = await protectPage();
+        if (!isAuth) return;
+        
+        const user = await getCurrentUser();
+        if (user) {
+            document.getElementById('userEmail').textContent = user.email || 'Admin';
+        }
+        
+        await loadMembers();
+    })();
+
+    // Logout functionality
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+        await logoutUser();
+        window.location.href = 'index.html';
+    });
+
+    async function loadMembers() {
+        const container = document.getElementById('app-root');
+        
+        try {
+            const { data: members, error } = await supabaseClient
+                .from('members')
+                .select('*')
+                .order('name');
+            
+            if (error) throw error;
+            
+            allMembers = members || [];
+            renderMembersList();
+            
+        } catch (error) {
+            console.error("Error loading members:", error);
+            container.innerHTML = `
+                <div class="card">
+                    <h3>⚠️ Error Loading Members</h3>
+                    <p>${error.message}</p>
+                    <button class="btn" onclick="location.reload()">Retry</button>
+                </div>
+            `;
+        }
+    }
+
+    function renderMembersList() {
+        const container = document.getElementById('app-root');
+        
+        let filtered = allMembers;
+        if (searchTerm) {
+            filtered = allMembers.filter(m => 
+                m.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                m.phone.includes(searchTerm)
+            );
+        }
+        
+        const html = `
+            <div class="flex-between">
+                <h2>👥 Members Management</h2>
+                <button class="btn" id="addMemberBtn">+ Add Member</button>
+            </div>
+            <div class="flex-between">
+                <input type="text" id="searchMemberInput" class="search-bar" placeholder="🔍 Search by name or phone..." value="${searchTerm}">
+            </div>
+            <div class="card">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Phone</th>
+                                <th>Expected (KES)</th>
+                                <th>Paid (KES)</th>
+                                <th>Balance (KES)</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${filtered.map(m => `
+                                <tr>
+                                    <td><strong>${escapeHtml(m.name)}</strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong></strong>
+                                    <td>
+                            `).join('')}
+                            ${filtered.length === 0 ? '<tr><td colspan="7" style="text-align:center;">No members found</td></tr>' : ''}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+        
+        container.innerHTML = html;
+        
+        // Attach event listeners
+        document.getElementById('searchMemberInput')?.addEventListener('input', (e) => {
+            searchTerm = e.target.value;
+            renderMembersList();
+        });
+        
+        document.getElementById('addMemberBtn')?.addEventListener('click', showAddMemberModal);
+        
+        document.querySelectorAll('.view-detail').forEach(btn => {
+            btn.addEventListener('click', () => showMemberDetails(btn.dataset.id));
+        });
+        
+        document.querySelectorAll('.edit-member').forEach(btn => {
+            btn.addEventListener('click', () => showEditMemberModal(btn.dataset.id, btn.dataset.name, btn.dataset.phone, btn.dataset.expected));
+        });
+        
+        document.querySelectorAll('.delete-member').forEach(btn => {
+            btn.addEventListener('click', () => confirmDeleteMember(btn.dataset.id, btn.dataset.name));
+        });
+    }
+
+    function showAddMemberModal() {
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <h3>➕ Add New Member</h3>
+                <div id="modalMessage"></div>
+                <div class="form-group">
+                    <label>Full Name *</label>
+                    <input type="text" id="memberName" placeholder="Enter full name">
+                </div>
+                <div class="form-group">
+                    <label>Phone Number *</label>
+                    <input type="tel" id="memberPhone" placeholder="0712345678">
+                </div>
+                <div class="form-group">
+                    <label>Expected Monthly Contribution (KES) *</label>
+                    <input type="number" id="memberExpected" placeholder="0" value="0">
+                </div>
+                <div style="display:flex; gap:10px; margin-top:1rem;">
+                    <button id="confirmAddBtn" class="btn" style="flex:1;">Add Member</button>
+                    <button id="cancelModalBtn" class="btn-outline btn" style="flex:1;">Cancel</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        
+        document.getElementById('confirmAddBtn').onclick = async () => {
+            const name = document.getElementById('memberName').value.trim();
+            const phone = document.getElementById('memberPhone').value.trim();
+            const expected = parseFloat(document.getElementById('memberExpected').value) || 0;
+            
+            if (!name || !phone) {
+                showModalMessage('Please fill in name and phone number', 'error');
+                return;
+            }
+            
+            const { data, error } = await supabaseClient
+                .from('members')
+                .insert([{
+                    name: name,
+                    phone: phone,
+                    expected_contribution: expected,
+                    total_contributed: 0,
+                    balance: expected,
+                    status: expected > 0 ? 'unpaid' : 'paid'
+                }])
+                .select();
+            
+            if (error) {
+                showModalMessage(error.message, 'error');
+                return;
+            }
+            
+            modal.remove();
+            await loadMembers();
+            showToast('✅ Member added successfully!', 'success');
+        };
+        
+        document.getElementById('cancelModalBtn').onclick = () => modal.remove();
+    }
+
+    function showEditMemberModal(id, name, phone, expected) {
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <h3>✏️ Edit Member</h3>
+                <div id="modalMessage"></div>
+                <div class="form-group">
+                    <label>Full Name *</label>
+                    <input type="text" id="memberName" value="${escapeHtml(name)}">
+                </div>
+                <div class="form-group">
+                    <label>Phone Number *</label>
+                    <input type="tel" id="memberPhone" value="${escapeHtml(phone)}">
+                </div>
+                <div class="form-group">
+                    <label>Expected Monthly Contribution (KES)</label>
+                    <input type="number" id="memberExpected" value="${expected}">
+                </div>
+                <div style="display:flex; gap:10px; margin-top:1rem;">
+                    <button id="confirmEditBtn" class="btn" style="flex:1;">Save Changes</button>
+                    <button id="cancelModalBtn" class="btn-outline btn" style="flex:1;">Cancel</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        
+        document.getElementById('confirmEditBtn').onclick = async () => {
+            const newName = document.getElementById('memberName').value.trim();
+            const newPhone = document.getElementById('memberPhone').value.trim();
+            const newExpected = parseFloat(document.getElementById('memberExpected').value) || 0;
+            
+            if (!newName || !newPhone) {
+                showModalMessage('Please fill in name and phone number', 'error');
+                return;
+            }
+            
+            const { error } = await supabaseClient
+                .from('members')
+                .update({
+                    name: newName,
+                    phone: newPhone,
+                    expected_contribution: newExpected
+                })
+                .eq('id', id);
+            
+            if (error) {
+                showModalMessage(error.message, 'error');
+                return;
+            }
+            
+            modal.remove();
+            await loadMembers();
+            showToast('✅ Member updated successfully!', 'success');
+        };
+        
+        document.getElementById('cancelModalBtn').onclick = () => modal.remove();
+    }
+
+    function confirmDeleteMember(id, name) {
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <h3>⚠️ Delete Member</h3>
+                <p>Are you sure you want to delete <strong>${escapeHtml(name)}</strong>?</p>
+                <p style="color:#dc2626; font-size:0.8rem;">This will also delete all contribution records for this member.</p>
+                <div style="display:flex; gap:10px; margin-top:1rem;">
+                    <button id="confirmDeleteBtn" class="btn btn-danger" style="flex:1;">Delete</button>
+                    <button id="cancelModalBtn" class="btn-outline btn" style="flex:1;">Cancel</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        
+        document.getElementById('confirmDeleteBtn').onclick = async () => {
+            const { error } = await supabaseClient
+                .from('members')
+                .delete()
+                .eq('id', id);
+            
+            if (error) {
+                alert('Error deleting member: ' + error.message);
+                modal.remove();
+                return;
+            }
+            
+            modal.remove();
+            await loadMembers();
+            showToast('✅ Member deleted successfully!', 'success');
+        };
+        
+        document.getElementById('cancelModalBtn').onclick = () => modal.remove();
+    }
+
+    async function showMemberDetails(memberId) {
+        const member = allMembers.find(m => m.id === memberId);
+        if (!member) return;
+        
+        const { data: contributions, error } = await supabaseClient
+            .from('contributions')
+            .select('*')
+            .eq('member_id', memberId)
+            .order('date', { ascending: false });
+        
+        if (error) {
+            alert('Error loading contributions: ' + error.message);
+            return;
+        }
+        
+        const totalPaid = contributions?.reduce((sum, c) => sum + c.amount, 0) || 0;
+        
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.innerHTML = `
+            <div class="modal-content" style="max-width: 600px; max-height: 80vh; overflow-y: auto;">
+                <h3>👤 ${escapeHtml(member.name)}</h3>
+                <p><strong>📞 Phone:</strong> ${escapeHtml(member.phone)}</p>
+                <p><strong>💰 Expected:</strong> KES ${(member.expected_contribution || 0).toLocaleString()}</p>
+                <p><strong>💵 Total Paid:</strong> KES ${(totalPaid || 0).toLocaleString()}</p>
+                <p><strong>⚖️ Balance:</strong> KES ${(member.balance || 0).toLocaleString()}</p>
+                <p><strong>📊 Status:</strong> <span class="${(member.balance || 0) === 0 ? 'badge-paid' : 'badge-unpaid'}">${(member.balance || 0) === 0 ? 'Paid' : 'Unpaid'}</span></p>
+                
+                <h4 style="margin-top:1rem;">📅 Contribution History</h4>
+                <div class="table-wrapper">
+                    <table style="min-width: 300px;">
+                        <thead>
+                            <tr><th>Date</th><th>Amount</th><th>Method</th><th>Month</th></tr>
+                        </thead>
+                        <tbody>
+                            ${contributions?.map(c => `
+                                <tr>
+                                    <td>${c.date || '-'}</td>
+                                    <td>KES ${c.amount?.toLocaleString() || 0}</td>
+                                    <td>${c.method || '-'}</td>
+                                    <td>${c.month || '-'}</td>
+                                </tr>
+                            `).join('') || '<tr><td colspan="4">No contributions yet</td></tr>'}
+                        </tbody>
+                    </table>
+                </div>
+                <div style="margin-top:1rem;">
+                    <button id="closeModalBtn" class="btn" style="width:100%;">Close</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        
+        document.getElementById('closeModalBtn').onclick = () => modal.remove();
+    }
+
+    function showModalMessage(message, type) {
+        const msgDiv = document.getElementById('modalMessage');
+        if (msgDiv) {
+            msgDiv.innerHTML = `<div class="${type === 'error' ? 'error-message' : 'success-message'}">${message}</div>`;
+            setTimeout(() => {
+                if (msgDiv.innerHTML) msgDiv.innerHTML = '';
+            }, 3000);
+        }
+    }
+
+    function showToast(message, type) {
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: ${type === 'error' ? '#dc2626' : '#2c7a4d'};
+            color: white;
+            padding: 12px 20px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            z-index: 1002;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        `;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+</script>
+</body>
+</html>
