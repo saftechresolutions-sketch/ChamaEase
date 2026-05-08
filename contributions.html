@@ -636,8 +636,8 @@
             </div></div>
             <div class="card"><div class="flex-between"><h3>🔍 Filter</h3><select id="monthFilterSelect" class="filter-select"><option value="all" ${currentMonthFilter === 'all' ? 'selected' : ''}>All Records</option>${months.map(m => `<option value="${m}" ${currentMonthFilter === m ? 'selected' : ''}>${m}</option>`).join('')}</select></div></div>
             <div class="card"><h3>✅ Paid Members</h3><div class="table-wrapper"><table><thead><tr><th>Name</th><th>Total Paid</th><th>Status</th></tr></thead><tbody>${paidMembers.map(m => `<tr><td data-label="Name"><strong>${escapeHtml(m.name)}</strong></td><td data-label="Total Paid">KES ${formatNumber(m.total_contributed)}</td><td data-label="Status"><span class="badge-paid">Paid</span></td></tr>`).join('')}${paidMembers.length === 0 ? '<tr><td colspan="3">No paid members yet</td></tr>' : ''}</tbody></table></div></div>
-            <div class="card"><h3>⚠️ Unpaid Members</h3><div class="table-wrapper"><table><thead><tr><th>Name</th><th>Balance</th><th>Action</th></tr></thead><tbody>${unpaidMembers.map(m => `<tr><td data-label="Name"><strong>${escapeHtml(m.name)}</strong></td><td data-label="Balance">KES ${formatNumber(m.balance)}</td><td data-label="Action"><button class="btn-sm btn-outline settle-balance" data-id="${m.id}" data-balance="${m.balance || 0}">Settle</button></td></tr>`).join('')}${unpaidMembers.length === 0 ? '<tr><td colspan="3">🎉 Everyone is up to date!</td></tr>' : ''}</tbody></table></div></div>
-            <div class="card"><h3>📜 Contribution History ${currentMonthFilter !== 'all' ? `- ${currentMonthFilter}` : ''}</h3><p><strong>Total: KES ${formatNumber(totalCollected)}</strong></p><div class="table-wrapper"><table><thead><tr><th>Member</th><th>Amount</th><th>Date</th><th>Month</th><th>Method</th><th>Action</th></tr></thead><tbody>${filteredContribs.map(c => `<tr><td data-label="Member">${escapeHtml(c.members?.name || 'Unknown')}</td><td data-label="Amount">KES ${formatNumber(c.amount)}</td><td data-label="Date">${c.date || '-'}</td><td data-label="Month">${c.month || '-'}</td><td data-label="Method">${c.method || '-'}</td><td data-label="Action"><button class="btn-sm btn-danger-outline delete-contribution" data-id="${c.id}" data-member="${escapeHtml(c.members?.name || 'Unknown')}" data-amount="${c.amount}">Del</button></td></tr>`).join('')}${filteredContribs.length === 0 ? '<tr><td colspan="6">No contributions found</td></tr>' : ''}</tbody></table></div></div>
+            <div class="card"><h3>⚠️ Unpaid Members</h3><div class="table-wrapper"><tr><thead><tr><th>Name</th><th>Balance</th><th>Action</th></tr></thead><tbody>${unpaidMembers.map(m => `<tr><td data-label="Name"><strong>${escapeHtml(m.name)}</strong></td><td data-label="Balance">KES ${formatNumber(m.balance)}</span></td><td data-label="Action"><button class="btn-sm btn-outline settle-balance" data-id="${m.id}" data-balance="${m.balance || 0}">Settle</button></td></tr>`).join('')}${unpaidMembers.length === 0 ? '<tr><td colspan="3">🎉 Everyone is up to date!</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><table></tbody></table></div></div>
+            <div class="card"><h3>📜 Contribution History ${currentMonthFilter !== 'all' ? `- ${currentMonthFilter}` : ''}</h3><p><strong>Total: KES ${formatNumber(totalCollected)}</strong></p><div class="table-wrapper"><table><thead><tr><th>Member</th><th>Amount</th><th>Date</th><th>Month</th><th>Method</th><th>Action</th></tr></thead><tbody>${filteredContribs.map(c => `<tr><td data-label="Member">${escapeHtml(c.members?.name || 'Unknown')}</td><td data-label="Amount">KES ${formatNumber(c.amount)}</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></td></tbody></table></div></div>
         `;
         container.innerHTML = html;
         
@@ -666,21 +666,88 @@
         await loadData();
     }
     
+    // Updated showSettleModal with custom amount input for contributions page
     function showSettleModal(memberId, currentBalance) {
         if (currentBalance <= 0) { showToast('Balance is zero', 'error'); return; }
         const member = allMembers.find(m => m.id === memberId);
         const modal = document.createElement('div');
         modal.className = 'modal';
-        modal.innerHTML = `<div class="modal-content"><h3>Settle Balance</h3><p><strong>${escapeHtml(member?.name || 'Unknown')}</strong></p><p>Amount: KES ${formatNumber(currentBalance)}</p><div class="form-group"><label>Payment Method:</label><select id="settleMethodSelect"><option value="M-Pesa">M-Pesa</option><option value="Cash">Cash</option><option value="Bank Transfer">Bank Transfer</option></select></div><div class="form-group"><label>Date:</label><input type="date" id="settleDate" value="${new Date().toISOString().slice(0,10)}"></div><div style="display:flex; gap:10px; margin-top:1rem;"><button id="confirmSettleBtn" class="btn" style="flex:1;">Confirm</button><button id="cancelSettleBtn" class="btn-outline btn" style="flex:1;">Cancel</button></div></div>`;
+        modal.innerHTML = `
+            <div class="modal-content">
+                <h3>Settle Payment</h3>
+                <p><strong>${escapeHtml(member?.name || 'Unknown')}</strong></p>
+                <p>Outstanding Balance: KES ${formatNumber(currentBalance)}</p>
+                <div class="form-group">
+                    <label>Amount to Pay (KES):</label>
+                    <input type="number" id="settleAmount" class="settle-amount" placeholder="Enter amount" value="${currentBalance}" step="100" min="1" max="${currentBalance}">
+                    <small style="color:#666; font-size:0.65rem;">Max: KES ${formatNumber(currentBalance)}</small>
+                </div>
+                <div class="form-group">
+                    <label>Payment Method:</label>
+                    <select id="settleMethodSelect">
+                        <option value="M-Pesa">M-Pesa</option>
+                        <option value="Cash">Cash</option>
+                        <option value="Bank Transfer">Bank Transfer</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Date:</label>
+                    <input type="date" id="settleDate" value="${new Date().toISOString().slice(0,10)}">
+                </div>
+                <div style="display:flex; gap:10px; margin-top:1rem;">
+                    <button id="confirmSettleBtn" class="btn" style="flex:1;">Confirm Payment</button>
+                    <button id="cancelSettleBtn" class="btn-outline btn" style="flex:1;">Cancel</button>
+                </div>
+            </div>
+        `;
         document.body.appendChild(modal);
+        
+        // Add validation for amount input
+        const amountInput = document.getElementById('settleAmount');
+        if (amountInput) {
+            amountInput.addEventListener('change', function() {
+                let value = parseFloat(this.value);
+                if (isNaN(value)) value = 0;
+                if (value > currentBalance) {
+                    this.value = currentBalance;
+                    showToast(`Amount cannot exceed balance of KES ${formatNumber(currentBalance)}`, 'error');
+                } else if (value < 0) {
+                    this.value = 0;
+                }
+            });
+        }
+        
         document.getElementById('confirmSettleBtn').onclick = async () => {
+            let amount = parseFloat(document.getElementById('settleAmount').value);
             const method = document.getElementById('settleMethodSelect').value;
             const date = document.getElementById('settleDate').value;
+            
+            if (isNaN(amount) || amount <= 0) {
+                showToast('Please enter a valid amount', 'error');
+                return;
+            }
+            if (amount > currentBalance) {
+                amount = currentBalance;
+            }
+            
             const user = await getCurrentUser();
-            const { error } = await supabaseClient.from('contributions').insert([{ member_id: memberId, amount: currentBalance, month: date.slice(0,7), date, method, type: 'Settlement', recorded_by: user?.id }]);
+            const { error } = await supabaseClient.from('contributions').insert([{ 
+                member_id: memberId, 
+                amount: amount, 
+                month: date.slice(0,7), 
+                date, 
+                method, 
+                type: 'Payment', 
+                recorded_by: user?.id 
+            }]);
             if (error) { showToast('Error: ' + error.message, 'error'); modal.remove(); return; }
             modal.remove();
-            showToast(`✅ Settled KES ${formatNumber(currentBalance)} via ${method}`, 'success');
+            const remainingBalance = currentBalance - amount;
+            if (remainingBalance > 0) {
+                showToast(`✅ Paid KES ${formatNumber(amount)}. Remaining: KES ${formatNumber(remainingBalance)}`, 'success');
+            } else {
+                showToast(`✅ Fully settled! Paid KES ${formatNumber(amount)}`, 'success');
+            }
             await loadData();
         };
         document.getElementById('cancelSettleBtn').onclick = () => modal.remove();
