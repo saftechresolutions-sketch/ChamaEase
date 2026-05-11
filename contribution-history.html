@@ -30,11 +30,13 @@
             --sidebar-width: 280px;
         }
 
+        /* Layout with Sidebar */
         .app-wrapper {
             display: flex;
             min-height: 100vh;
         }
 
+        /* Sidebar Styles */
         .sidebar {
             width: var(--sidebar-width);
             background: white;
@@ -140,6 +142,7 @@
             margin: 0.6rem 1rem;
         }
 
+        /* Main Content */
         .main-content {
             flex: 1;
             margin-left: var(--sidebar-width);
@@ -147,6 +150,7 @@
             width: calc(100% - var(--sidebar-width));
         }
 
+        /* Top Bar */
         .top-bar {
             background: white;
             padding: 0.7rem 1rem;
@@ -387,6 +391,7 @@
             gap: 8px;
         }
 
+        /* Sidebar Overlay */
         .sidebar-overlay {
             display: none;
             position: fixed;
@@ -402,6 +407,7 @@
             display: block;
         }
 
+        /* Mobile Sidebar */
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -758,9 +764,9 @@
                         <thead>
                             <tr>
                                 <th>Date</th>
-                                <th>Member Name</th>
+                                <th>Member</th>
                                 <th>Phone</th>
-                                <th>Amount (KES)</th>
+                                <th>Amount</th>
                                 <th>Month</th>
                                 <th>Method</th>
                                 <th>Type</th>
@@ -769,18 +775,14 @@
                         <tbody>
                             ${filtered.map(c => `
                                 <tr>
-                                    <td>${c.date || '-'}</td>
-                                    <td><strong>${escapeHtml(c.members?.name || 'Unknown')}</strong></td>
-                                    <td>${c.members?.phone || '-'}</td>
-                                    <td><span style="color:var(--primary); font-weight:600;">KES ${formatNumber(c.amount)}</span></td>
-                                    <td>${c.month || '-'}</td>
-                                    <td>${c.method || '-'}</td>
-                                    <td>${c.type || 'Monthly'}</td>
-                                </tr>
+                                    <td>${c.date || '-'}</span></td>
+                                    <td><strong>${escapeHtml(c.members?.name || 'Unknown')}</strong></span></td>
+                                    <td>${c.members?.phone || '-'}</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span>
+                                    <tr>
                             `).join('')}
-                            ${filtered.length === 0 ? '<tr><td colspan="7" style="text-align:center;">No contributions found for selected filters</td></tr>' : ''}
+                            ${filtered.length === 0 ? '<tr><td colspan="7" style="text-align:center;">No contributions found</td></tr>' : ''}
                         </tbody>
-                    </table>
+                    </div>
                 </div>
             </div>
         `;
@@ -829,12 +831,7 @@
     
     function escapeHtml(str) {
         if (!str) return '';
-        return String(str).replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        });
+        return String(str).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m] || m));
     }
 </script>
 </body>
