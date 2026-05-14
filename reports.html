@@ -476,69 +476,33 @@
             <button class="sidebar-close" id="sidebarClose">✕</button>
         </div>
         <nav class="sidebar-nav">
-            <a href="dashboard.html" class="nav-item">
-                <span class="icon">📊</span>
-                <span class="label">Dashboard</span>
-            </a>
-            <a href="members.html" class="nav-item">
-                <span class="icon">👥</span>
-                <span class="label">Members</span>
-            </a>
-            <a href="contributions.html" class="nav-item">
-                <span class="icon">💰</span>
-                <span class="label">Contributions</span>
-            </a>
-            
+            <a href="dashboard.html" class="nav-item"><span class="icon">📊</span><span class="label">DASHBOARD</span></a>
+            <a href="members.html" class="nav-item"><span class="icon">👥</span><span class="label">MEMBERS</span></a>
+            <a href="contributions.html" class="nav-item"><span class="icon">💰</span><span class="label">CONTRIBUTIONS</span></a>
             <div class="nav-divider"></div>
-            
-            <div class="nav-item" style="cursor: default; opacity: 0.7;">
-                <span class="icon">📜</span>
-                <span class="label">History</span>
-            </div>
+            <div class="nav-item" style="cursor: default; opacity: 0.7;"><span class="icon">📜</span><span class="label">HISTORY</span></div>
             <div class="nav-submenu">
-                <a href="contribution-history.html" class="nav-item">
-                    <span class="icon">📋</span>
-                    <span class="label">Contributions History</span>
-                </a>
-                <a href="member-history.html" class="nav-item">
-                    <span class="icon">👤</span>
-                    <span class="label">Members History</span>
-                </a>
+                <a href="contribution-history.html" class="nav-item"><span class="icon">📋</span><span class="label">CONTRIBUTIONS HISTORY</span></a>
+                <a href="member-history.html" class="nav-item"><span class="icon">👤</span><span class="label">MEMBERS HISTORY</span></a>
             </div>
-            
             <div class="nav-divider"></div>
-            
-            <div class="nav-item" style="cursor: default; opacity: 0.7;">
-                <span class="icon">📈</span>
-                <span class="label">Analytics</span>
-            </div>
+            <div class="nav-item" style="cursor: default; opacity: 0.7;"><span class="icon">📈</span><span class="label">ANALYTICS</span></div>
             <div class="nav-submenu">
-                <a href="statistics.html" class="nav-item">
-                    <span class="icon">📊</span>
-                    <span class="label">Monthly Statistics</span>
-                </a>
-                <a href="reports.html" class="nav-item active">
-                    <span class="icon">📋</span>
-                    <span class="label">Reports</span>
-                </a>
+                <a href="statistics.html" class="nav-item"><span class="icon">📊</span><span class="label">MONTHLY STATISTICS</span></a>
+                <a href="reports.html" class="nav-item active"><span class="icon">📋</span><span class="label">REPORTS</span></a>
             </div>
-            
             <div class="nav-divider"></div>
-            
-            <a href="settings.html" class="nav-item">
-                <span class="icon">⚙️</span>
-                <span class="label">Settings</span>
-            </a>
+            <a href="settings.html" class="nav-item"><span class="icon">⚙️</span><span class="label">SETTINGS</span></a>
         </nav>
     </aside>
 
     <main class="main-content">
         <div class="top-bar">
             <button class="menu-toggle" id="menuToggle">☰</button>
-            <div class="page-title">📋 Reports</div>
+            <div class="page-title">📋 REPORTS</div>
             <div class="user-info">
                 <span class="user-email" id="userEmail"></span>
-                <button id="logoutBtn" class="logout-btn">Logout</button>
+                <button id="logoutBtn" class="logout-btn">LOGOUT</button>
             </div>
         </div>
         <div id="app-root" class="container">
@@ -557,7 +521,6 @@
     let allContributions = [];
     let currentReportFilter = 'all';
 
-    // Sidebar functionality
     const menuToggle = document.getElementById('menuToggle');
     const sidebar = document.getElementById('sidebar');
     const sidebarClose = document.getElementById('sidebarClose');
@@ -619,7 +582,7 @@
                 <div class="card">
                     <h3>⚠️ Error Loading Data</h3>
                     <p style="font-size:0.8rem;">${error.message}</p>
-                    <button class="btn" onclick="location.reload()" style="margin-top:0.5rem;">Retry</button>
+                    <button class="btn" onclick="location.reload()" style="margin-top:0.5rem;">RETRY</button>
                 </div>
             `;
         }
@@ -639,50 +602,60 @@
         return allContributions.filter(c => c.month === currentReportFilter);
     }
 
+    function getMonthLabel() {
+        if (currentReportFilter === 'all') return 'ALL TIME';
+        return currentReportFilter;
+    }
+
     function generateReportText() {
         const filteredContribs = getFilteredContributions();
         const paidMembers = allMembers.filter(m => (m.balance || 0) === 0);
         const unpaidMembers = allMembers.filter(m => (m.balance || 0) > 0);
         const totalCollected = filteredContribs.reduce((sum, c) => sum + (c.amount || 0), 0);
         const totalBalance = allMembers.reduce((sum, m) => sum + (m.balance || 0), 0);
-        const monthLabel = currentReportFilter === 'all' ? 'ALL TIME' : currentReportFilter;
+        const totalLoan = allMembers.reduce((sum, m) => sum + (m.loan_balance || 0), 0);
+        const monthLabel = getMonthLabel();
         
         const recordsText = filteredContribs.map(c => 
-            `${c.members?.name || 'Unknown'}: KES ${formatNumber(c.amount)} on ${c.date} (${c.method})`
+            `   • ${c.date} | ${c.members?.name || 'Unknown'} | KES ${formatNumber(c.amount)} | ${c.method}`
         ).join('\n');
         
         return `🏆 CHAMA CONTRIBUTION REPORT 🏆
-📅 ${new Date().toLocaleDateString()} | Period: ${monthLabel}
-━━━━━━━━━━━━━━━━━━━━
+📅 DATE: ${new Date().toLocaleDateString()} | PERIOD: ${monthLabel}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ✅ PAID MEMBERS:
-${paidMembers.map((m, i) => `${i+1}. ${m.name} - KES ${formatNumber(m.total_contributed)}`).join('\n') || 'None'}
+${paidMembers.map((m, i) => `   ${i+1}. ${m.name} - KES ${formatNumber(m.total_contributed)}`).join('\n') || '   None'}
 
-⚠️ UNPAID MEMBERS (balance):
-${unpaidMembers.map((m, i) => `${i+1}. ${m.name} - Balance KES ${formatNumber(m.balance)}`).join('\n') || 'All settled!'}
+⚠️ UNPAID MEMBERS (BALANCE):
+${unpaidMembers.map((m, i) => `   ${i+1}. ${m.name} - BALANCE KES ${formatNumber(m.balance)}`).join('\n') || '   All settled!'}
 
-━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 💰 TOTAL COLLECTION (${monthLabel}): KES ${formatNumber(totalCollected)}
 📊 TOTAL OUTSTANDING BALANCE: KES ${formatNumber(totalBalance)}
-👥 Total Members: ${allMembers.length}
+🏦 TOTAL LOAN BALANCE: KES ${formatNumber(totalLoan)}
+👥 TOTAL MEMBERS: ${allMembers.length}
 
-━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📜 CONTRIBUTION RECORDS (${monthLabel}):
-${recordsText || 'No records for this period'}
-━━━━━━━━━━━━━━━━━━━━
-✨ ChamaEase Report ✨`;
+${recordsText || '   No records for this period'}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✨ Generated by ChamaEase - Smart Chama Management ✨`;
     }
 
     function exportToExcel() {
+        const period = getMonthLabel();
+        if (!confirm(`⚠️ CONFIRM EXPORT\n\nYou are about to EXPORT the report for:\n📆 PERIOD: ${period}\n\nDo you want to proceed?`)) return;
+        
         const filteredContribs = getFilteredContributions();
         const monthLabel = currentReportFilter === 'all' ? 'All_Records' : currentReportFilter;
         
         let csvRows = [
             ['CHAMA CONTRIBUTION REPORT'],
             [`Generated: ${new Date().toLocaleString()}`],
-            [`Period: ${currentReportFilter === 'all' ? 'All Time' : currentReportFilter}`],
+            [`Period: ${period}`],
             [],
             ['MEMBER CONTRIBUTIONS'],
-            ['Member Name', 'Amount (KES)', 'Date', 'Month', 'Payment Method', 'Type']
+            ['MEMBER', 'AMOUNT (KES)', 'DATE', 'MONTH', 'PAYMENT METHOD', 'TYPE']
         ];
         
         filteredContribs.forEach(c => {
@@ -697,7 +670,7 @@ ${recordsText || 'No records for this period'}
         });
         
         csvRows.push([], ['MEMBER SUMMARY']);
-        csvRows.push(['Member Name', 'Total Paid (KES)', 'Expected (KES)', 'Balance (KES)', 'Status']);
+        csvRows.push(['MEMBER', 'TOTAL PAID (KES)', 'EXPECTED (KES)', 'BALANCE (KES)', 'LOAN BALANCE (KES)', 'STATUS']);
         
         allMembers.forEach(m => {
             csvRows.push([
@@ -705,7 +678,8 @@ ${recordsText || 'No records for this period'}
                 m.total_contributed || 0,
                 m.expected_contribution || 0,
                 m.balance || 0,
-                (m.balance || 0) === 0 ? 'Paid' : 'Unpaid'
+                m.loan_balance || 0,
+                (m.balance || 0) === 0 ? 'PAID' : 'UNPAID'
             ]);
         });
         
@@ -720,6 +694,9 @@ ${recordsText || 'No records for this period'}
     }
 
     function exportToWord() {
+        const period = getMonthLabel();
+        if (!confirm(`⚠️ CONFIRM EXPORT\n\nYou are about to EXPORT the report as WORD document for:\n📆 PERIOD: ${period}\n\nDo you want to proceed?`)) return;
+        
         const reportText = generateReportText();
         const blob = new Blob([reportText], { type: 'application/msword' });
         const link = document.createElement('a');
@@ -732,12 +709,18 @@ ${recordsText || 'No records for this period'}
     }
 
     function shareToWhatsApp() {
+        const period = getMonthLabel();
+        if (!confirm(`⚠️ CONFIRM SHARE\n\nYou are about to SHARE the report to WhatsApp for:\n📆 PERIOD: ${period}\n\nDo you want to proceed?`)) return;
+        
         const reportText = generateReportText();
         const encodedText = encodeURIComponent(reportText);
         window.open(`https://wa.me/?text=${encodedText}`, '_blank');
     }
 
     async function copyReportToClipboard() {
+        const period = getMonthLabel();
+        if (!confirm(`⚠️ CONFIRM COPY\n\nYou are about to COPY the report for:\n📆 PERIOD: ${period}\n\nDo you want to proceed?`)) return;
+        
         const reportText = generateReportText();
         await navigator.clipboard.writeText(reportText);
         showToast('✅ Report copied to clipboard!', 'success');
@@ -751,6 +734,7 @@ ${recordsText || 'No records for this period'}
         const unpaidMembers = allMembers.filter(m => (m.balance || 0) > 0);
         const totalCollected = filteredContribs.reduce((sum, c) => sum + (c.amount || 0), 0);
         const totalBalance = allMembers.reduce((sum, m) => sum + (m.balance || 0), 0);
+        const totalLoan = allMembers.reduce((sum, m) => sum + (m.loan_balance || 0), 0);
         const reportText = generateReportText();
         
         const contributionsByMonth = {};
@@ -762,70 +746,120 @@ ${recordsText || 'No records for this period'}
         const html = `
             <div class="card">
                 <div class="flex-between">
-                    <h2 style="font-size:1.2rem;">📄 Reports</h2>
+                    <h2 style="font-size:1.2rem;">📄 REPORTS</h2>
                     <select id="monthFilterSelect" class="filter-select">
-                        <option value="all" ${currentReportFilter === 'all' ? 'selected' : ''}>All Records</option>
+                        <option value="all" ${currentReportFilter === 'all' ? 'selected' : ''}>ALL RECORDS</option>
                         ${months.map(m => `<option value="${m}" ${currentReportFilter === m ? 'selected' : ''}>${m}</option>`).join('')}
                     </select>
+                </div>
+                <div style="margin-top:0.5rem; font-size:0.7rem; color:#666;">
+                    📌 CURRENT PERIOD: <strong>${getMonthLabel()}</strong>
                 </div>
             </div>
             
             <div class="stats-summary">
-                <div class="stat-box"><h4>Total Members</h4><div class="value">${allMembers.length}</div></div>
-                <div class="stat-box"><h4>Total Collected</h4><div class="value">KES ${(totalCollected/1000).toFixed(0)}k</div><small>${formatNumber(totalCollected)}</small></div>
-                <div class="stat-box"><h4>Paid Members</h4><div class="value">${paidMembers.length}</div></div>
-                <div class="stat-box"><h4>Outstanding</h4><div class="value">KES ${(totalBalance/1000).toFixed(0)}k</div></div>
+                <div class="stat-box"><h4>TOTAL MEMBERS</h4><div class="value">${allMembers.length}</div></div>
+                <div class="stat-box"><h4>TOTAL COLLECTED</h4><div class="value">KES ${(totalCollected/1000).toFixed(0)}k</div><small>${formatNumber(totalCollected)}</small></div>
+                <div class="stat-box"><h4>PAID MEMBERS</h4><div class="value">${paidMembers.length}</div></div>
+                <div class="stat-box"><h4>OUTSTANDING BALANCE</h4><div class="value">KES ${(totalBalance/1000).toFixed(0)}k</div></div>
+                <div class="stat-box"><h4>TOTAL LOAN</h4><div class="value">KES ${(totalLoan/1000).toFixed(0)}k</div></div>
             </div>
             
             <div class="card">
                 <div class="report-actions">
-                    <button id="copyReportBtn" class="btn">📋 Copy</button>
-                    <button id="whatsappBtn" class="btn">share to WhatsApp</button>
-                    <button id="exportExcelBtn" class="btn">📎 download as spreesheet</button>
-                    <button id="exportWordBtn" class="btn">📑as document</button>
+                    <button id="copyReportBtn" class="btn">📋 COPY REPORT</button>
+                    <button id="whatsappBtn" class="btn">📱 SHARE TO WHATSAPP</button>
+                    <button id="exportExcelBtn" class="btn">📎 EXPORT AS EXCEL</button>
+                    <button id="exportWordBtn" class="btn">📑 EXPORT AS WORD</button>
                 </div>
-                <textarea id="reportPreview" rows="6" readonly>${escapeHtml(reportText)}</textarea>
+                <textarea id="reportPreview" rows="8" readonly>${escapeHtml(reportText)}</textarea>
             </div>
             
             <div class="card">
-                <h3 style="font-size:1rem;">✅ Paid Members</h3>
+                <h3 style="font-size:1rem;">✅ PAID MEMBERS</h3>
                 <div class="table-wrapper">
                     <table>
-                        <thead><tr><th>#</th><th>Name</th><th>Phone</th><th>Total Paid</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>MEMBER</th>
+                                <th>PHONE</th>
+                                <th>TOTAL PAID</th>
+                            </tr>
+                        </thead>
                         <tbody>
-                            ${paidMembers.map((m, i) => `<tr><td>${i+1}</td><td><strong>${escapeHtml(m.name)}</strong></td><td>${escapeHtml(m.phone)}</td><td>KES ${formatNumber(m.total_contributed)}</td></tr>`).join('')}
-                            ${paidMembers.length === 0 ? '<tr><td colspan="4">No paid members yet</td></tr>' : ''}
+                            ${paidMembers.map((m, i) => `
+                                <tr>
+                                    <td data-label="#">${i+1}</td>
+                                    <td data-label="MEMBER"><strong>${escapeHtml(m.name)}</strong></td>
+                                    <td data-label="PHONE">${escapeHtml(m.phone)}</span></td>
+                                    <td data-label="TOTAL PAID">KES ${formatNumber(m.total_contributed)}</span></td>
+                                </tr>
+                            `).join('')}
+                            ${paidMembers.length === 0 ? '<tr><td colspan="4">No paid members yet</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></td>'}
                         </tbody>
                     </table>
                 </div>
             </div>
             
             <div class="card">
-                <h3 style="font-size:1rem;">⚠️ Unpaid Members</h3>
+                <h3 style="font-size:1rem;">⚠️ UNPAID MEMBERS</h3>
                 <div class="table-wrapper">
                     <table>
-                        <thead><tr><th>#</th><th>Name</th><th>Phone</th><th>Expected</th><th>Paid</th><th>Balance</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>MEMBER</th>
+                                <th>PHONE</th>
+                                <th>EXPECTED</th>
+                                <th>PAID</th>
+                                <th>BALANCE</th>
+                            </tr>
+                        </thead>
                         <tbody>
-                            ${unpaidMembers.map((m, i) => `<tr><td>${i+1}</td><td><strong>${escapeHtml(m.name)}</strong></td><td>${escapeHtml(m.phone)}</td><td>KES ${formatNumber(m.expected_contribution)}</td><td>KES ${formatNumber(m.total_contributed)}</td><td style="color:#dc2626;">KES ${formatNumber(m.balance)}</td></tr>`).join('')}
-                            ${unpaidMembers.length === 0 ? '<tr><td colspan="6">🎉 All members are fully paid!</td></tr>' : ''}
+                            ${unpaidMembers.map((m, i) => `
+                                <tr>
+                                    <td data-label="#">${i+1}</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></td>
+                                    <td data-label="MEMBER"><strong>${escapeHtml(m.name)}</strong></td>
+                                    <td data-label="PHONE">${escapeHtml(m.phone)}</span></td>
+                                    <td data-label="EXPECTED">KES ${formatNumber(m.expected_contribution)}</span></td>
+                                    <td data-label="PAID">KES ${formatNumber(m.total_contributed)}</span></td>
+                                    <td data-label="BALANCE"><span style="color:#dc2626; font-weight:600;">KES ${formatNumber(m.balance)}</span></td>
+                                </tr>
+                            `).join('')}
+                            ${unpaidMembers.length === 0 ? '<tr><td colspan="6">🎉 All members are fully paid!</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></tr>'}
                         </tbody>
                     </table>
                 </div>
             </div>
             
             <div class="card">
-                <h3 style="font-size:1rem;">📜 Contribution History by Month</h3>
+                <h3 style="font-size:1rem;">📜 CONTRIBUTION HISTORY BY MONTH</h3>
                 ${Object.keys(contributionsByMonth).length === 0 ? '<p>No contributions for selected period</p>' : ''}
                 ${Object.entries(contributionsByMonth).map(([month, contribs]) => {
                     const monthTotal = contribs.reduce((s, c) => s + (c.amount || 0), 0);
                     return `
                         <div class="monthly-card">
-                            <div class="monthly-title">📆 ${month} - Total: KES ${formatNumber(monthTotal)}</div>
+                            <div class="monthly-title">📆 ${month} - TOTAL: KES ${formatNumber(monthTotal)}</div>
                             <div class="table-wrapper">
                                 <table style="min-width:300px;">
-                                    <thead><tr><th>Member</th><th>Amount</th><th>Date</th><th>Method</th></tr></thead>
+                                    <thead>
+                                        <tr>
+                                            <th>MEMBER</th>
+                                            <th>AMOUNT</th>
+                                            <th>DATE</th>
+                                            <th>METHOD</th>
+                                        </tr>
+                                    </thead>
                                     <tbody>
-                                        ${contribs.map(c => `<tr><td>${escapeHtml(c.members?.name || 'Unknown')}</td><td>KES ${formatNumber(c.amount)}</td><td>${c.date || '-'}</td><td>${c.method || '-'}</td></tr>`).join('')}
+                                        ${contribs.map(c => `
+                                            <tr>
+                                                <td data-label="MEMBER">${escapeHtml(c.members?.name || 'Unknown')}</span></td>
+                                                <td data-label="AMOUNT">KES ${formatNumber(c.amount)}</span></td>
+                                                <td data-label="DATE">${c.date || '-'}</span></td>
+                                                <td data-label="METHOD">${c.method || '-'}</span></td>
+                                            </tr>
+                                        `).join('')}
                                     </tbody>
                                 </table>
                             </div>
@@ -857,7 +891,12 @@ ${recordsText || 'No records for this period'}
     
     function escapeHtml(str) {
         if (!str) return '';
-        return String(str).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m] || m));
+        return String(str).replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
     }
 </script>
 </body>
