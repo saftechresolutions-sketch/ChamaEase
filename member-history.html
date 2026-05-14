@@ -421,6 +421,16 @@
             display: inline-block;
         }
 
+        .badge-loan {
+            background: #fef3c7;
+            color: #d97706;
+            padding: 0.15rem 0.5rem;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.65rem;
+            display: inline-block;
+        }
+
         .report-actions {
             display: flex;
             flex-wrap: wrap;
@@ -508,66 +518,30 @@
             <button class="sidebar-close" id="sidebarClose">✕</button>
         </div>
         <nav class="sidebar-nav">
-            <a href="dashboard.html" class="nav-item">
-                <span class="icon">📊</span>
-                <span class="label">Dashboard</span>
-            </a>
-            <a href="members.html" class="nav-item">
-                <span class="icon">👥</span>
-                <span class="label">Members</span>
-            </a>
-            <a href="contributions.html" class="nav-item">
-                <span class="icon">💰</span>
-                <span class="label">Contributions</span>
-            </a>
-            
+            <a href="dashboard.html" class="nav-item"><span class="icon">📊</span><span class="label">Dashboard</span></a>
+            <a href="members.html" class="nav-item"><span class="icon">👥</span><span class="label">Members</span></a>
+            <a href="contributions.html" class="nav-item"><span class="icon">💰</span><span class="label">Contributions</span></a>
             <div class="nav-divider"></div>
-            
-            <div class="nav-item" style="cursor: default; opacity: 0.7;">
-                <span class="icon">📜</span>
-                <span class="label">History</span>
-            </div>
+            <div class="nav-item" style="cursor: default; opacity: 0.7;"><span class="icon">📜</span><span class="label">History</span></div>
             <div class="nav-submenu">
-                <a href="contribution-history.html" class="nav-item">
-                    <span class="icon">📋</span>
-                    <span class="label">Contributions History</span>
-                </a>
-                <a href="member-history.html" class="nav-item active">
-                    <span class="icon">👤</span>
-                    <span class="label">Members History</span>
-                </a>
+                <a href="contribution-history.html" class="nav-item"><span class="icon">📋</span><span class="label">Contributions History</span></a>
+                <a href="member-history.html" class="nav-item active"><span class="icon">👤</span><span class="label">Members History</span></a>
             </div>
-            
             <div class="nav-divider"></div>
-            
-            <div class="nav-item" style="cursor: default; opacity: 0.7;">
-                <span class="icon">📈</span>
-                <span class="label">Analytics</span>
-            </div>
+            <div class="nav-item" style="cursor: default; opacity: 0.7;"><span class="icon">📈</span><span class="label">Analytics</span></div>
             <div class="nav-submenu">
-                <a href="statistics.html" class="nav-item">
-                    <span class="icon">📊</span>
-                    <span class="label">Monthly Statistics</span>
-                </a>
-                <a href="reports.html" class="nav-item">
-                    <span class="icon">📋</span>
-                    <span class="label">Reports</span>
-                </a>
+                <a href="statistics.html" class="nav-item"><span class="icon">📊</span><span class="label">Monthly Statistics</span></a>
+                <a href="reports.html" class="nav-item"><span class="icon">📋</span><span class="label">Reports</span></a>
             </div>
-            
             <div class="nav-divider"></div>
-            
-            <a href="settings.html" class="nav-item">
-                <span class="icon">⚙️</span>
-                <span class="label">Settings</span>
-            </a>
+            <a href="settings.html" class="nav-item"><span class="icon">⚙️</span><span class="label">Settings</span></a>
         </nav>
     </aside>
 
     <main class="main-content">
         <div class="top-bar">
             <button class="menu-toggle" id="menuToggle">☰</button>
-            <div class="page-title">👤 Member History</div>
+            <div class="page-title">👤 MEMBER HISTORY</div>
             <div class="user-info">
                 <span class="user-email" id="userEmail"></span>
                 <button id="logoutBtn" class="logout-btn">Logout</button>
@@ -631,6 +605,10 @@
         window.location.href = 'index.html';
     });
 
+    function formatNumber(num) {
+        return (num || 0).toLocaleString('en-KE');
+    }
+
     async function loadData() {
         try {
             const [membersRes, contribRes] = await Promise.all([
@@ -661,10 +639,6 @@
         }
     }
 
-    function formatNumber(num) {
-        return (num || 0).toLocaleString('en-KE');
-    }
-
     function getMemberContributions(memberId) {
         return allContributions.filter(c => c.member_id === memberId);
     }
@@ -673,17 +647,17 @@
         if (!searchTerm) return allMembers;
         return allMembers.filter(m => 
             m.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            m.phone.includes(searchTerm)
+            (m.phone && m.phone.includes(searchTerm))
         );
     }
 
     function exportMemberData() {
         const members = getFilteredMembers();
         let csvRows = [
-            ['Member History Report'],
+            ['MEMBER HISTORY REPORT'],
             [`Generated: ${new Date().toLocaleString()}`],
             [],
-            ['Member Name', 'Phone', 'Expected (KES)', 'Total Paid (KES)', 'Balance (KES)', 'Status', 'Payment %']
+            ['MEMBER', 'PHONE', 'EXPECTED (KES)', 'TOTAL PAID (KES)', 'MONTHLY BALANCE (KES)', 'LOAN BALANCE (KES)', 'STATUS', 'PAYMENT %']
         ];
         
         members.forEach(m => {
@@ -696,7 +670,8 @@
                 m.expected_contribution || 0,
                 m.total_contributed || 0,
                 m.balance || 0,
-                (m.balance || 0) === 0 ? 'Paid' : 'Unpaid',
+                m.loan_balance || 0,
+                (m.balance || 0) === 0 ? 'PAID' : 'UNPAID',
                 `${paymentPercent}%`
             ]);
         });
@@ -717,65 +692,67 @@
         const totalExpected = filteredMembers.reduce((sum, m) => sum + (m.expected_contribution || 0), 0);
         const totalPaid = filteredMembers.reduce((sum, m) => sum + (m.total_contributed || 0), 0);
         const totalBalance = filteredMembers.reduce((sum, m) => sum + (m.balance || 0), 0);
+        const totalLoan = filteredMembers.reduce((sum, m) => sum + (m.loan_balance || 0), 0);
         const paidCount = filteredMembers.filter(m => (m.balance || 0) === 0).length;
         
         const html = `
             <div class="card">
                 <div class="flex-between">
-                    <h2 style="font-size:1.2rem;">👤 Member History</h2>
+                    <h2 style="font-size:1.2rem;">👤 MEMBER HISTORY</h2>
                     <div class="report-actions">
-                        <button id="exportBtn" class="btn-sm btn-outline">📎 Export</button>
+                        <button id="exportBtn" class="btn-sm btn-outline">📎 EXPORT</button>
                     </div>
                 </div>
                 
                 <div class="filter-bar">
-                    <input type="text" id="searchInput" class="search-input" placeholder="🔍 Search by name or phone..." value="${escapeHtml(searchTerm)}">
-                    <button id="resetSearchBtn" class="btn-sm btn-outline">Reset</button>
+                    <input type="text" id="searchInput" class="search-input" placeholder="🔍 SEARCH BY NAME OR PHONE..." value="${escapeHtml(searchTerm)}">
+                    <button id="resetSearchBtn" class="btn-sm btn-outline">RESET</button>
                 </div>
             </div>
             
             <div class="stats-summary">
                 <div class="stat-box">
-                    <h4>Total Members</h4>
+                    <h4>TOTAL MEMBERS</h4>
                     <div class="value">${filteredMembers.length}</div>
                 </div>
                 <div class="stat-box">
-                    <h4>Paid Members</h4>
+                    <h4>PAID MEMBERS</h4>
                     <div class="value">${paidCount}</div>
-                    <small>${((paidCount/filteredMembers.length)*100 || 0).toFixed(0)}%</small>
+                    <small>${filteredMembers.length > 0 ? ((paidCount/filteredMembers.length)*100).toFixed(0) : 0}%</small>
                 </div>
                 <div class="stat-box">
-                    <h4>Total Expected</h4>
+                    <h4>TOTAL EXPECTED</h4>
                     <div class="value">KES ${(totalExpected/1000).toFixed(0)}k</div>
                 </div>
                 <div class="stat-box">
-                    <h4>Total Paid</h4>
+                    <h4>TOTAL PAID</h4>
                     <div class="value">KES ${(totalPaid/1000).toFixed(0)}k</div>
                 </div>
                 <div class="stat-box">
-                    <h4>Outstanding</h4>
+                    <h4>TOTAL BALANCE</h4>
                     <div class="value">KES ${(totalBalance/1000).toFixed(0)}k</div>
                 </div>
                 <div class="stat-box">
-                    <h4>Collection Rate</h4>
-                    <div class="value">${totalExpected > 0 ? ((totalPaid/totalExpected)*100).toFixed(1) : 0}%</div>
+                    <h4>TOTAL LOAN</h4>
+                    <div class="value">KES ${(totalLoan/1000).toFixed(0)}k</div>
                 </div>
             </div>
             
             <div class="card">
-                <h3 style="font-size:1rem;">📋 Member Performance</h3>
+                <h3 style="font-size:1rem;">📋 MEMBER PERFORMANCE</h3>
                 <div class="table-wrapper">
                     <table>
                         <thead>
                             <tr>
-                                <th>Member</th>
-                                <th>Phone</th>
-                                <th>Expected</th>
-                                <th>Paid</th>
-                                <th>Balance</th>
-                                <th>Status</th>
-                                <th>Progress</th>
-                                <th>Action</th>
+                                <th>MEMBER</th>
+                                <th>PHONE</th>
+                                <th>EXPECTED</th>
+                                <th>PAID</th>
+                                <th>MONTHLY BALANCE</th>
+                                <th>LOAN BALANCE</th>
+                                <th>STATUS</th>
+                                <th>PROGRESS</th>
+                                <th>ACTION</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -785,14 +762,28 @@
                                     : 0;
                                 return `
                                     <tr>
-                                        <td><strong>${escapeHtml(m.name)}</strong></td>
-                                        <td>${escapeHtml(m.phone)}</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span>
-                                    </tr>
+                                        <td data-label="MEMBER"><strong>${escapeHtml(m.name)}</strong></td>
+                                        <td data-label="PHONE">${escapeHtml(m.phone)}</span></td>
+                                        <td data-label="EXPECTED">KES ${formatNumber(m.expected_contribution)}</span></td>
+                                        <td data-label="PAID">KES ${formatNumber(m.total_contributed)}</span></td>
+                                        <td data-label="MONTHLY BALANCE"><span style="color:${(m.balance || 0) > 0 ? '#dc2626' : '#2c7a4d'}; font-weight:600;">KES ${formatNumber(m.balance)}</span></td>
+                                        <td data-label="LOAN BALANCE"><span class="badge-loan">KES ${formatNumber(m.loan_balance || 0)}</span></td>
+                                        <td data-label="STATUS"><span class="${(m.balance || 0) === 0 ? 'badge-paid' : 'badge-unpaid'}">${(m.balance || 0) === 0 ? 'PAID' : 'UNPAID'}</span></td>
+                                        <td data-label="PROGRESS" style="min-width:100px;">
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: ${Math.min(paymentPercent, 100)}%"></div>
+                                            </div>
+                                            <small>${paymentPercent.toFixed(0)}%</small>
+                                        </td>
+                                        <td data-label="ACTION">
+                                            <button class="btn-sm btn-outline view-member-details" data-id="${m.id}">VIEW HISTORY</button>
+                                        </td>
+                                    </table>
                                 `;
                             }).join('')}
-                            ${filteredMembers.length === 0 ? '<tr><td colspan="8" style="text-align:center;">No members found</td></tr>' : ''}
+                            ${filteredMembers.length === 0 ? '<tr><td colspan="9" style="text-align:center;">No members found</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></td>'}
                         </tbody>
-                     </div>
+                    </table>
                 </div>
             </div>
         `;
@@ -840,27 +831,37 @@
                     <h3>👤 ${escapeHtml(member.name)}</h3>
                     <button class="close-modal" style="background:none; border:none; font-size:1.3rem; cursor:pointer;">&times;</button>
                 </div>
-                <p><strong>📞 Phone:</strong> ${escapeHtml(member.phone)}</p>
-                <p><strong>💰 Expected:</strong> KES ${formatNumber(member.expected_contribution || 0)}</p>
-                <p><strong>💵 Total Paid:</strong> KES ${formatNumber(totalPaid)}</p>
-                <p><strong>⚖️ Balance:</strong> KES ${formatNumber(member.balance || 0)}</p>
-                <p><strong>📊 Progress:</strong> ${paymentPercent}%</p>
+                <p><strong>📞 PHONE:</strong> ${escapeHtml(member.phone)}</p>
+                <p><strong>💰 EXPECTED:</strong> KES ${formatNumber(member.expected_contribution || 0)}</p>
+                <p><strong>💵 TOTAL PAID:</strong> KES ${formatNumber(totalPaid)}</p>
+                <p><strong>⚖️ MONTHLY BALANCE:</strong> KES ${formatNumber(member.balance || 0)}</p>
+                <p><strong>🏦 LOAN BALANCE:</strong> <span class="badge-loan">KES ${formatNumber(member.loan_balance || 0)}</span></p>
+                <p><strong>📊 PAYMENT PROGRESS:</strong> ${paymentPercent}%</p>
                 <div class="progress-bar" style="margin-bottom:1rem;">
                     <div class="progress-fill" style="width: ${paymentPercent}%"></div>
                 </div>
                 
-                <h4 style="margin-top:1rem;">📅 Payment History</h4>
+                <h4 style="margin-top:1rem;">📅 PAYMENT HISTORY</h4>
                 <div class="table-wrapper">
                     <table style="min-width:250px;">
-                        <thead><tr><th>Date</th><th>Amount</th><th>Method</th><th>Month</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>DATE</th>
+                                <th>AMOUNT</th>
+                                <th>METHOD</th>
+                                <th>MONTH</th>
+                            </tr>
+                        </thead>
                         <tbody>
                             ${contributions.map(c => `
                                 <tr>
-                                    <td>${c.date || '-'}</span></td>
-                                    <td>KES ${formatNumber(c.amount)}</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span>
-                                    </tr>
+                                    <td data-label="DATE">${c.date || '-'}</td>
+                                    <td data-label="AMOUNT">KES ${formatNumber(c.amount)}</span></td>
+                                    <td data-label="METHOD">${c.method || '-'}</td>
+                                    <td data-label="MONTH">${c.month || '-'}</td>
+                                </tr>
                             `).join('')}
-                            ${contributions.length === 0 ? '<tr><td colspan="4">No payment records yet</td></tr>' : ''}
+                            ${contributions.length === 0 ? '<tr><td colspan="4">No payment records yet</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></td>'}
                         </tbody>
                     </table>
                 </div>
@@ -883,7 +884,12 @@
     
     function escapeHtml(str) {
         if (!str) return '';
-        return String(str).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m] || m));
+        return String(str).replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
     }
 </script>
 </body>
