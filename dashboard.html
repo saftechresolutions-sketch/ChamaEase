@@ -29,13 +29,11 @@
             --sidebar-width: 280px;
         }
 
-        /* Layout with Sidebar */
         .app-wrapper {
             display: flex;
             min-height: 100vh;
         }
 
-        /* Sidebar Styles */
         .sidebar {
             width: var(--sidebar-width);
             background: white;
@@ -52,7 +50,7 @@
         }
 
         .sidebar-header {
-            padding: 1.2rem;
+            padding: 1rem;
             border-bottom: 1px solid var(--gray-border);
             display: flex;
             justify-content: space-between;
@@ -61,7 +59,7 @@
 
         .sidebar-logo {
             font-weight: 800;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             background: linear-gradient(135deg, var(--primary), #3b9b62);
             -webkit-background-clip: text;
             background-clip: text;
@@ -71,10 +69,9 @@
         .sidebar-close {
             background: none;
             border: none;
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             cursor: pointer;
             color: #94a3b8;
-            transition: all 0.2s;
             display: none;
             width: 32px;
             height: 32px;
@@ -89,14 +86,14 @@
         }
 
         .sidebar-nav {
-            padding: 1rem 0;
+            padding: 0.8rem 0;
         }
 
         .nav-item {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 0.8rem 1rem;
+            gap: 10px;
+            padding: 0.7rem 1rem;
             margin: 0.2rem 0.8rem;
             border-radius: 12px;
             text-decoration: none;
@@ -116,33 +113,31 @@
         }
 
         .nav-item .icon {
-            font-size: 1.2rem;
-            width: 28px;
+            font-size: 1.1rem;
+            width: 26px;
             text-align: center;
         }
 
         .nav-item .label {
             font-weight: 500;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
-        /* Submenu items */
         .nav-submenu {
-            padding-left: 3rem;
+            padding-left: 2.8rem;
         }
 
         .nav-submenu .nav-item {
-            padding: 0.6rem 1rem;
-            font-size: 0.85rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
         }
 
         .nav-divider {
             height: 1px;
             background: var(--gray-border);
-            margin: 0.8rem 1.2rem;
+            margin: 0.6rem 1rem;
         }
 
-        /* Main Content */
         .main-content {
             flex: 1;
             margin-left: var(--sidebar-width);
@@ -150,10 +145,9 @@
             width: calc(100% - var(--sidebar-width));
         }
 
-        /* Top Bar */
         .top-bar {
             background: white;
-            padding: 0.8rem 1rem;
+            padding: 0.7rem 1rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -167,63 +161,15 @@
         .menu-toggle {
             background: none;
             border: none;
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             cursor: pointer;
             color: var(--primary);
-            padding: 8px;
+            padding: 6px;
             border-radius: 50%;
-            transition: all 0.2s;
-            position: relative;
-        }
-
-        .menu-toggle:hover {
-            background: var(--primary-light);
-        }
-
-        /* Animated hand pointing to menu */
-        .hand-pointer {
-            position: fixed;
-            top: 70px;
-            left: 15px;
-            background: var(--primary);
-            color: white;
-            padding: 6px 12px;
-            border-radius: 40px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            z-index: 98;
-            animation: bounce 1s ease-in-out infinite;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-            pointer-events: none;
-        }
-
-        .hand-pointer span {
-            font-size: 1rem;
-            animation: point 0.8s ease-in-out infinite;
-            display: inline-block;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); opacity: 1; }
-            50% { transform: translateY(-5px); opacity: 0.9; }
-        }
-
-        @keyframes point {
-            0%, 100% { transform: translateX(0); }
-            50% { transform: translateX(5px); }
-        }
-
-        @media (min-width: 769px) {
-            .hand-pointer {
-                display: none;
-            }
         }
 
         .page-title {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 600;
             color: #1e2a3e;
         }
@@ -231,11 +177,11 @@
         .user-info {
             display: flex;
             align-items: center;
-            gap: 0.8rem;
+            gap: 0.6rem;
         }
 
         .user-email {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: #5b6e8c;
             display: none;
         }
@@ -250,11 +196,10 @@
             background: transparent;
             border: 1px solid #dc2626;
             color: #dc2626;
-            padding: 0.4rem 0.8rem;
+            padding: 0.35rem 0.7rem;
             border-radius: 2rem;
             cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
         }
 
         .logout-btn:hover {
@@ -262,7 +207,6 @@
             color: white;
         }
 
-        /* Container */
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -271,7 +215,6 @@
             min-height: 70vh;
         }
 
-        /* Stats Grid - Mobile First */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -281,8 +224,7 @@
 
         @media (min-width: 640px) {
             .stats-grid {
-                grid-template-columns: repeat(4, 1fr);
-                gap: 1rem;
+                grid-template-columns: repeat(3, 1fr);
             }
         }
 
@@ -307,7 +249,6 @@
             font-size: 1.3rem;
             font-weight: 800;
             color: var(--primary);
-            line-height: 1.2;
         }
 
         .stat-full {
@@ -334,9 +275,9 @@
             font-weight: 600;
             cursor: pointer;
             font-size: 0.8rem;
-            transition: 0.2s;
             text-decoration: none;
             display: inline-block;
+            text-align: center;
         }
 
         .btn-outline {
@@ -361,12 +302,6 @@
             border-collapse: collapse;
             font-size: 0.75rem;
             min-width: 400px;
-        }
-        
-        @media (min-width: 640px) {
-            table {
-                font-size: 0.85rem;
-            }
         }
 
         th, td {
@@ -409,11 +344,6 @@
             margin-bottom: 0.3rem;
         }
 
-        .welcome-card p {
-            font-size: 0.8rem;
-            opacity: 0.95;
-        }
-
         .loading-spinner {
             display: inline-block;
             width: 30px;
@@ -428,7 +358,6 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Sidebar Overlay */
         .sidebar-overlay {
             display: none;
             position: fixed;
@@ -444,7 +373,6 @@
             display: block;
         }
 
-        /* Mobile Sidebar */
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -459,300 +387,112 @@
             .sidebar-close {
                 display: flex;
             }
-        }
-
-        /* Hide hand pointer after user interacts with menu */
-        .hand-pointer.hide {
-            display: none;
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 <div class="app-wrapper">
-    <!-- Sidebar Overlay -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
     
-    <!-- Animated Hand Pointer -->
-    <div class="hand-pointer" id="handPointer">
-        <span>👆👆</span> Click here for menu
-    </div>
-    
-    <!-- Sidebar Navigation -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">🌿 ChamaEase</div>
             <button class="sidebar-close" id="sidebarClose">✕</button>
         </div>
         <nav class="sidebar-nav">
-            <a href="index.html" class="nav-item active">
-                <span class="icon">📊</span>
-                <span class="label">Dashboard</span>
-            </a>
-            <a href="members.html" class="nav-item">
-                <span class="icon">👥</span>
-                <span class="label">Members</span>
-            </a>
-            <a href="contributions.html" class="nav-item">
-                <span class="icon">💰</span>
-                <span class="label">Contributions</span>
-            </a>
-            
+            <a href="dashboard.html" class="nav-item active"><span class="icon">📊</span><span class="label">DASHBOARD</span></a>
+            <a href="members.html" class="nav-item"><span class="icon">👥</span><span class="label">MEMBERS</span></a>
+            <a href="contributions.html" class="nav-item"><span class="icon">💰</span><span class="label">CONTRIBUTIONS</span></a>
             <div class="nav-divider"></div>
-            
-            <!-- History Section -->
-            <div class="nav-item" style="cursor: default; opacity: 0.7;">
-                <span class="icon">📜</span>
-                <span class="label">History</span>
-            </div>
-            <div class="nav-submenu">
-                <a href="contribution-history.html" class="nav-item">
-                    <span class="icon">📋</span>
-                    <span class="label">Contributions History</span>
-                </a>
-                <a href="member-history.html" class="nav-item">
-                    <span class="icon">👤</span>
-                    <span class="label">Members History</span>
-                </a>
-            </div>
-            
-            <div class="nav-divider"></div>
-            
-            <!-- Analytics Section -->
-            <div class="nav-item" style="cursor: default; opacity: 0.7;">
-                <span class="icon">📈</span>
-                <span class="label">Analytics</span>
-            </div>
-            <div class="nav-submenu">
-                <a href="statistics.html" class="nav-item">
-                    <span class="icon">📊</span>
-                    <span class="label">Monthly Statistics</span>
-                </a>
-                <a href="reports.html" class="nav-item">
-                    <span class="icon">📋</span>
-                    <span class="label">Reports</span>
-                </a>
-            </div>
-            
-            <div class="nav-divider"></div>
-            
-            <a href="settings.html" class="nav-item">
-                <span class="icon">⚙️</span>
-                <span class="label">Settings</span>
-            </a>
+            <a href="reports.html" class="nav-item"><span class="icon">📋</span><span class="label">REPORTS</span></a>
+            <a href="settings.html" class="nav-item"><span class="icon">⚙️</span><span class="label">SETTINGS</span></a>
         </nav>
     </aside>
 
-    <!-- Main Content -->
     <main class="main-content">
         <div class="top-bar">
             <button class="menu-toggle" id="menuToggle">☰</button>
-            <div class="page-title">Dashboard</div>
+            <div class="page-title">DASHBOARD</div>
             <div class="user-info">
                 <span class="user-email" id="userEmail"></span>
-                <button id="logoutBtn" class="logout-btn">Logout</button>
+                <button id="logoutBtn" class="logout-btn">LOGOUT</button>
             </div>
         </div>
         <div id="app-root" class="container">
             <div style="text-align: center; padding: 1.5rem;">
                 <div class="loading-spinner"></div>
-                <p style="margin-top: 0.5rem; font-size: 0.8rem;">Loading dashboard...</p>
+                <p>Loading dashboard...</p>
             </div>
         </div>
-        <footer>✨ Smart Chama Management ·</footer>
+        <footer>✨ Smart Chama Management</footer>
     </main>
 </div>
 
 <script src="supabase-config.js"></script>
 <script>
-    // Sidebar functionality
     const menuToggle = document.getElementById('menuToggle');
     const sidebar = document.getElementById('sidebar');
     const sidebarClose = document.getElementById('sidebarClose');
     const sidebarOverlay = document.getElementById('sidebarOverlay');
-    const handPointer = document.getElementById('handPointer');
     
-    function openSidebar() {
-        sidebar.classList.add('open');
-        sidebarOverlay.classList.add('active');
-        // Hide hand pointer after first interaction
-        if (handPointer) {
-            handPointer.classList.add('hide');
-            localStorage.setItem('handPointerSeen', 'true');
-        }
-    }
+    function openSidebar() { sidebar.classList.add('open'); sidebarOverlay.classList.add('active'); }
+    function closeSidebar() { sidebar.classList.remove('open'); sidebarOverlay.classList.remove('active'); }
     
-    function closeSidebar() {
-        sidebar.classList.remove('open');
-        sidebarOverlay.classList.remove('active');
-    }
-    
-    if (menuToggle) {
-        menuToggle.addEventListener('click', openSidebar);
-    }
-    
-    if (sidebarClose) {
-        sidebarClose.addEventListener('click', closeSidebar);
-    }
-    
-    if (sidebarOverlay) {
-        sidebarOverlay.addEventListener('click', closeSidebar);
-    }
-    
-    // Hide hand pointer if already seen
-    if (localStorage.getItem('handPointerSeen') === 'true') {
-        if (handPointer) handPointer.style.display = 'none';
-    }
-    
-    // Auto-hide hand pointer after 10 seconds
-    setTimeout(() => {
-        if (handPointer && !localStorage.getItem('handPointerSeen')) {
-            handPointer.classList.add('hide');
-        }
-    }, 10000);
-    
-    // Close sidebar on window resize if screen becomes larger
-    window.addEventListener('resize', () => {
-        if (window.innerWidth > 768) {
-            closeSidebar();
-        }
-    });
+    if (menuToggle) menuToggle.addEventListener('click', openSidebar);
+    if (sidebarClose) sidebarClose.addEventListener('click', closeSidebar);
+    if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebar);
+    window.addEventListener('resize', () => { if (window.innerWidth > 768) closeSidebar(); });
 
-    // Check authentication and protect page
     (async function() {
         const isAuth = await protectPage();
         if (!isAuth) return;
-        
         const user = await getCurrentUser();
-        if (user) {
-            document.getElementById('userEmail').textContent = user.email || 'Admin';
-        }
-        
+        if (user) document.getElementById('userEmail').textContent = user.email || 'Admin';
         await loadDashboardData();
     })();
 
-    // Logout functionality
     document.getElementById('logoutBtn').addEventListener('click', async () => {
         await logoutUser();
         window.location.href = 'index.html';
     });
 
-    function formatNumber(num) {
-        return num.toLocaleString('en-KE');
-    }
+    function formatNumber(num) { return (num || 0).toLocaleString('en-KE'); }
 
     async function loadDashboardData() {
         const container = document.getElementById('app-root');
-        
         try {
-            // Fetch all members
-            const { data: members, error: membersError } = await supabaseClient
-                .from('members')
-                .select('*')
-                .order('name');
+            const { data: members } = await supabaseClient.from('members').select('*').order('name');
+            const { data: contributions } = await supabaseClient.from('contributions').select('*, members:member_id (name)').order('date', { ascending: false }).limit(10);
             
-            if (membersError) throw membersError;
-            
-            // Fetch all contributions with member names
-            const { data: contributions, error: contribError } = await supabaseClient
-                .from('contributions')
-                .select(`
-                    *,
-                    members:member_id (name)
-                `)
-                .order('date', { ascending: false })
-                .limit(10);
-            
-            if (contribError) throw contribError;
-            
-            // Calculate statistics
             const totalMembers = members?.length || 0;
             const totalCollected = members?.reduce((sum, m) => sum + (m.total_contributed || 0), 0) || 0;
             const paidMembers = members?.filter(m => (m.balance || 0) === 0).length || 0;
             const totalBalance = members?.reduce((sum, m) => sum + (m.balance || 0), 0) || 0;
+            const totalLoan = members?.reduce((sum, m) => sum + (m.loan_balance || 0), 0) || 0;
             
-            const statsHtml = `
+            const html = `
+                <div class="welcome-card card"><h1>📊 CHAMAEASE DASHBOARD</h1><p>Your digital Chama management system</p></div>
                 <div class="stats-grid">
-                    <div class="stat-card">
-                        <h4>👥 MEMBERS</h4>
-                        <div class="stat-number">${totalMembers}</div>
-                    </div>
-                    <div class="stat-card">
-                        <h4>💰 COLLECTED</h4>
-                        <div class="stat-number">KES ${(totalCollected/1000).toFixed(0)}k</div>
-                        <div class="stat-full">${formatNumber(totalCollected)}</div>
-                    </div>
-                    <div class="stat-card">
-                        <h4>✅ PAID</h4>
-                        <div class="stat-number">${paidMembers}</div>
-                        <div class="stat-full">of ${totalMembers}</div>
-                    </div>
-                    <div class="stat-card">
-                        <h4>⏳ BALANCE</h4>
-                        <div class="stat-number">KES ${(totalBalance/1000).toFixed(0)}k</div>
-                        <div class="stat-full">${formatNumber(totalBalance)}</div>
-                    </div>
+                    <div class="stat-card"><h4>👥 TOTAL MEMBERS</h4><div class="stat-number">${totalMembers}</div></div>
+                    <div class="stat-card"><h4>💰 TOTAL COLLECTED</h4><div class="stat-number">KES ${(totalCollected/1000).toFixed(0)}k</div><div class="stat-full">${formatNumber(totalCollected)}</div></div>
+                    <div class="stat-card"><h4>✅ PAID MEMBERS</h4><div class="stat-number">${paidMembers}</div><div class="stat-full">OF ${totalMembers}</div></div>
+                    <div class="stat-card"><h4>⏳ OUTSTANDING BALANCE</h4><div class="stat-number">KES ${(totalBalance/1000).toFixed(0)}k</div><div class="stat-full">${formatNumber(totalBalance)}</div></div>
+                    <div class="stat-card"><h4>🏦 TOTAL LOAN BALANCE</h4><div class="stat-number">KES ${(totalLoan/1000).toFixed(0)}k</div><div class="stat-full">${formatNumber(totalLoan)}</div></div>
+                    <div class="stat-card"><h4>📊 COLLECTION RATE</h4><div class="stat-number">${(totalCollected/(totalCollected+totalBalance)*100 || 0).toFixed(0)}%</div></div>
                 </div>
-            `;
-            
-            const recentHtml = `
                 <div class="card">
-                    <div class="flex-between">
-                        <h3>📋 Recent Contributions</h3>
-                        <a href="contributions.html" class="btn-sm btn-outline" style="text-decoration:none;">+ Record</a>
-                    </div>
-                    <div class="table-wrapper">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Member</th>
-                                    <th>Amount</th>
-                                    <th>Date</th>
-                                    <th>Method</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${contributions?.map(c => `
-                                    <tr>
-                                        <td>${c.members?.name || 'Unknown'}</td>
-                                        <td>KES ${formatNumber(c.amount || 0)}</span></td>
-                                        <td>${c.date || '-'}</span></td>
-                                        <td>${c.method || '-'}</span></td>
-                                    </tr>
-                                `).join('') || '<tr><td colspan="4">No contributions yet</td><tr'}
-                            </tbody>
-                        </table>
-                    </div>
+                    <div class="flex-between"><h3>📋 RECENT CONTRIBUTIONS</h3><a href="contributions.html" class="btn-sm btn-outline">+ RECORD</a></div>
+                    <div class="table-wrapper"><table><thead><tr><th>MEMBER</th><th>AMOUNT</th><th>DATE</th><th>METHOD</th></tr></thead><tbody>${contributions?.map(c => `<td><td>${c.members?.name || 'Unknown'}</td><td>KES ${formatNumber(c.amount)}</td><td>${c.date || '-'}</td><td>${c.method || '-'}</td></tr>`).join('') || '<tr><td colspan="4">No contributions yet</td></tr>'}</tbody></table></div>
                 </div>
+                <div class="flex-between"><a href="members.html" class="btn">📇 MANAGE MEMBERS</a><a href="contributions.html" class="btn-outline btn">💰 ADD CONTRIBUTION</a><a href="reports.html" class="btn-outline btn">📊 REPORTS</a></div>
             `;
-            
-            const buttonsHtml = `
-                <div class="flex-between">
-                    <a href="members.html" class="btn" style="text-decoration:none; flex:1; text-align:center;">📇 Members</a>
-                    <a href="contributions.html" class="btn-outline btn" style="text-decoration:none; flex:1; text-align:center;">💰 Add</a>
-                    <a href="statistics.html" class="btn-outline btn" style="text-decoration:none; flex:1; text-align:center;">📊 Stats</a>
-                </div>
-            `;
-            
-            container.innerHTML = `
-                <div class="welcome-card card">
-                    <h1>📊 ChamaEase</h1>
-                    <p>Your digital Chama management system</p>
-                </div>
-                ${statsHtml}
-                ${recentHtml}
-                ${buttonsHtml}
-            `;
-            
+            container.innerHTML = html;
         } catch (error) {
-            console.error("Error loading dashboard:", error);
-            container.innerHTML = `
-                <div class="card">
-                    <h3>⚠️ Error Loading Data</h3>
-                    <p style="font-size:0.8rem;">${error.message}</p>
-                    <button class="btn" onclick="location.reload()" style="margin-top:0.5rem;">Retry</button>
-                </div>
-            `;
+            container.innerHTML = `<div class="card"><h3>⚠️ ERROR</h3><p>${error.message}</p><button class="btn" onclick="location.reload()">RETRY</button></div>`;
         }
     }
 </script>
