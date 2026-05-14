@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-    <title>ChamaEase | Members Management</title>
+    <title>ChamaEase | Members</title>
     <style>
         * {
             margin: 0;
@@ -22,7 +22,6 @@
             --primary-light: #eaf5ef;
             --primary-dark: #1f5a3a;
             --danger: #dc4c4c;
-            --warning: #e6a017;
             --gray-border: #e2e8f0;
             --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.04);
             --radius-card: 16px;
@@ -73,7 +72,6 @@
             font-size: 1.3rem;
             cursor: pointer;
             color: #94a3b8;
-            transition: all 0.2s;
             display: none;
             width: 32px;
             height: 32px;
@@ -168,7 +166,6 @@
             color: var(--primary);
             padding: 6px;
             border-radius: 50%;
-            transition: all 0.2s;
         }
 
         .page-title {
@@ -202,7 +199,6 @@
             padding: 0.35rem 0.7rem;
             border-radius: 2rem;
             cursor: pointer;
-            transition: all 0.2s;
             font-size: 0.7rem;
         }
 
@@ -237,9 +233,6 @@
             font-weight: 600;
             cursor: pointer;
             font-size: 0.75rem;
-            transition: 0.2s;
-            text-decoration: none;
-            display: inline-block;
         }
 
         .btn-outline {
@@ -274,58 +267,6 @@
             border-collapse: collapse;
             font-size: 0.7rem;
         }
-        
-        @media (max-width: 768px) {
-            table, thead, tbody, th, td, tr {
-                display: block;
-            }
-            
-            thead {
-                display: none;
-            }
-            
-            tr {
-                margin-bottom: 1rem;
-                border: 1px solid var(--gray-border);
-                border-radius: 12px;
-                background: white;
-                padding: 0.5rem;
-            }
-            
-            td {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 0.6rem 0.4rem;
-                border-bottom: 1px solid var(--gray-border);
-                font-size: 0.75rem;
-            }
-            
-            td:last-child {
-                border-bottom: none;
-            }
-            
-            td::before {
-                content: attr(data-label);
-                font-weight: 600;
-                width: 40%;
-                color: #5b6e8c;
-            }
-            
-            .action-group {
-                justify-content: flex-end;
-                gap: 8px;
-            }
-        }
-        
-        @media (min-width: 769px) {
-            table {
-                min-width: 900px;
-            }
-            th, td {
-                padding: 0.6rem 0.4rem;
-            }
-        }
 
         th, td {
             text-align: left;
@@ -336,13 +277,6 @@
         th {
             background: #f8fafc;
             font-weight: 600;
-            font-size: 0.7rem;
-        }
-
-        @media (min-width: 1024px) {
-            th, td {
-                font-size: 0.8rem;
-            }
         }
 
         .badge-paid {
@@ -463,26 +397,6 @@
             font-size: 0.75rem;
         }
 
-        .error-message {
-            background: #fee2e2;
-            color: #dc2626;
-            padding: 0.4rem;
-            border-radius: 0.5rem;
-            margin-bottom: 0.5rem;
-            font-size: 0.7rem;
-            text-align: center;
-        }
-
-        .success-message {
-            background: #dff0e4;
-            color: #2c7a4d;
-            padding: 0.4rem;
-            border-radius: 0.5rem;
-            margin-bottom: 0.5rem;
-            font-size: 0.7rem;
-            text-align: center;
-        }
-
         .sidebar-overlay {
             display: none;
             position: fixed;
@@ -522,6 +436,40 @@
             .search-bar {
                 max-width: 100%;
             }
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+            thead {
+                display: none;
+            }
+            tr {
+                margin-bottom: 1rem;
+                border: 1px solid var(--gray-border);
+                border-radius: 12px;
+                background: white;
+                padding: 0.5rem;
+            }
+            td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.6rem 0.4rem;
+                border-bottom: 1px solid var(--gray-border);
+                font-size: 0.75rem;
+            }
+            td:last-child {
+                border-bottom: none;
+            }
+            td::before {
+                content: attr(data-label);
+                font-weight: 600;
+                width: 40%;
+                color: #5b6e8c;
+            }
+            .action-group {
+                justify-content: flex-end;
+                gap: 8px;
+            }
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -536,33 +484,22 @@
             <button class="sidebar-close" id="sidebarClose">✕</button>
         </div>
         <nav class="sidebar-nav">
-            <a href="dashboard.html" class="nav-item"><span class="icon">📊</span><span class="label">Dashboard</span></a>
-            <a href="members.html" class="nav-item active"><span class="icon">👥</span><span class="label">Members</span></a>
-            <a href="contributions.html" class="nav-item"><span class="icon">💰</span><span class="label">Contributions</span></a>
+            <a href="dashboard.html" class="nav-item"><span class="icon">📊</span><span class="label">DASHBOARD</span></a>
+            <a href="members.html" class="nav-item active"><span class="icon">👥</span><span class="label">MEMBERS</span></a>
+            <a href="contributions.html" class="nav-item"><span class="icon">💰</span><span class="label">CONTRIBUTIONS</span></a>
             <div class="nav-divider"></div>
-            <div class="nav-item" style="cursor: default; opacity: 0.7;"><span class="icon">📜</span><span class="label">History</span></div>
-            <div class="nav-submenu">
-                <a href="contribution-history.html" class="nav-item"><span class="icon">📋</span><span class="label">Contributions History</span></a>
-                <a href="member-history.html" class="nav-item"><span class="icon">👤</span><span class="label">Members History</span></a>
-            </div>
-            <div class="nav-divider"></div>
-            <div class="nav-item" style="cursor: default; opacity: 0.7;"><span class="icon">📈</span><span class="label">Analytics</span></div>
-            <div class="nav-submenu">
-                <a href="statistics.html" class="nav-item"><span class="icon">📊</span><span class="label">Monthly Statistics</span></a>
-                <a href="reports.html" class="nav-item"><span class="icon">📋</span><span class="label">Reports</span></a>
-            </div>
-            <div class="nav-divider"></div>
-            <a href="settings.html" class="nav-item"><span class="icon">⚙️</span><span class="label">Settings</span></a>
+            <a href="reports.html" class="nav-item"><span class="icon">📋</span><span class="label">REPORTS</span></a>
+            <a href="settings.html" class="nav-item"><span class="icon">⚙️</span><span class="label">SETTINGS</span></a>
         </nav>
     </aside>
 
     <main class="main-content">
         <div class="top-bar">
             <button class="menu-toggle" id="menuToggle">☰</button>
-            <div class="page-title">👥 MEMBERS</div>
+            <div class="page-title">MEMBERS</div>
             <div class="user-info">
                 <span class="user-email" id="userEmail"></span>
-                <button id="logoutBtn" class="logout-btn">Logout</button>
+                <button id="logoutBtn" class="logout-btn">LOGOUT</button>
             </div>
         </div>
         <div id="app-root" class="container">
@@ -606,10 +543,8 @@
     (async function() {
         const isAuth = await protectPage();
         if (!isAuth) return;
-        
         const user = await getCurrentUser();
         if (user) document.getElementById('userEmail').textContent = user.email || 'Admin';
-        
         await loadMembers();
     })();
 
@@ -624,19 +559,13 @@
 
     async function loadMembers() {
         const container = document.getElementById('app-root');
-        
         try {
-            const { data: members, error } = await supabaseClient
-                .from('members')
-                .select('*')
-                .order('name');
-            
+            const { data: members, error } = await supabaseClient.from('members').select('*').order('name');
             if (error) throw error;
             allMembers = members || [];
             renderMembersList();
         } catch (error) {
-            console.error("Error loading members:", error);
-            container.innerHTML = `<div class="card"><h3>⚠️ Error Loading Members</h3><p style="font-size:0.8rem;">${error.message}</p><button class="btn" onclick="location.reload()" style="margin-top:0.5rem;">Retry</button></div>`;
+            container.innerHTML = `<div class="card"><h3>⚠️ ERROR LOADING MEMBERS</h3><p>${error.message}</p><button class="btn" onclick="location.reload()">RETRY</button></div>`;
         }
     }
 
@@ -646,7 +575,7 @@
         
         const html = `
             <div class="flex-between">
-                <h2 style="font-size:1.2rem;">👥 MEMBERS MANAGEMENT</h2>
+                <h2>👥 MEMBERS</h2>
                 <button class="btn" id="addMemberBtn">+ ADD MEMBER</button>
             </div>
             <div class="flex-between">
@@ -685,7 +614,7 @@
                                     </td>
                                 </tr>
                             `).join('')}
-                            ${filtered.length === 0 ? '<tr><td colspan="8" style="text-align:center;">No members found</td></tr>' : ''}
+                            ${filtered.length === 0 ? '<tr><td colspan="8">No members found</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></td>'}
                         </tbody>
                     </table>
                 </div>
@@ -706,13 +635,13 @@
         modal.className = 'modal';
         modal.innerHTML = `
             <div class="modal-content">
-                <h3 style="margin-bottom:1rem;">➕ ADD NEW MEMBER</h3>
+                <h3>➕ ADD NEW MEMBER</h3>
                 <div id="modalMessage"></div>
                 <div class="form-group"><label>MEMBER NAME *</label><input type="text" id="memberName" placeholder="Enter full name"></div>
                 <div class="form-group"><label>PHONE NUMBER *</label><input type="tel" id="memberPhone" placeholder="0712345678"></div>
-                <div class="form-group"><label>EXPECTED CONTRIBUTION (KES)</label><input type="number" id="memberExpected" placeholder="0" value="0"></div>
-                <div class="form-group"><label>LOAN BALANCE (KES)</label><input type="number" id="memberLoan" placeholder="0" value="0"></div>
-                <div style="display:flex; gap:10px; margin-top:1rem;"><button id="confirmAddBtn" class="btn" style="flex:1;">ADD MEMBER</button><button id="cancelModalBtn" class="btn-outline btn" style="flex:1;">CANCEL</button></div>
+                <div class="form-group"><label>EXPECTED CONTRIBUTION (KES)</label><input type="number" id="memberExpected" value="0"></div>
+                <div class="form-group"><label>LOAN BALANCE (KES)</label><input type="number" id="memberLoan" value="0"></div>
+                <div style="display:flex; gap:10px; margin-top:1rem;"><button id="confirmAddBtn" class="btn">ADD MEMBER</button><button id="cancelModalBtn" class="btn-outline btn">CANCEL</button></div>
             </div>
         `;
         document.body.appendChild(modal);
@@ -722,12 +651,12 @@
             const phone = document.getElementById('memberPhone').value.trim();
             const expected = parseFloat(document.getElementById('memberExpected').value) || 0;
             const loanBalance = parseFloat(document.getElementById('memberLoan').value) || 0;
-            if (!name || !phone) { showModalMessage('Please fill in member name and phone number', 'error'); return; }
+            if (!name || !phone) { alert('Please fill in name and phone number'); return; }
             const { error } = await supabaseClient.from('members').insert([{ name, phone, expected_contribution: expected, total_contributed: 0, balance: expected, loan_balance: loanBalance, status: expected > 0 ? 'unpaid' : 'paid' }]);
-            if (error) { showModalMessage(error.message, 'error'); return; }
+            if (error) { alert(error.message); return; }
             modal.remove();
             await loadMembers();
-            showToast('✅ Member added successfully!', 'success');
+            alert('✅ Member added successfully!');
         };
         document.getElementById('cancelModalBtn').onclick = () => modal.remove();
     }
@@ -737,13 +666,13 @@
         modal.className = 'modal';
         modal.innerHTML = `
             <div class="modal-content">
-                <h3 style="margin-bottom:1rem;">✏️ EDIT MEMBER</h3>
+                <h3>✏️ EDIT MEMBER</h3>
                 <div id="modalMessage"></div>
                 <div class="form-group"><label>MEMBER NAME *</label><input type="text" id="memberName" value="${escapeHtml(name)}"></div>
                 <div class="form-group"><label>PHONE NUMBER *</label><input type="tel" id="memberPhone" value="${escapeHtml(phone)}"></div>
                 <div class="form-group"><label>EXPECTED CONTRIBUTION (KES)</label><input type="number" id="memberExpected" value="${expected}"></div>
                 <div class="form-group"><label>LOAN BALANCE (KES)</label><input type="number" id="memberLoan" value="${loan || 0}"></div>
-                <div style="display:flex; gap:10px; margin-top:1rem;"><button id="confirmEditBtn" class="btn" style="flex:1;">SAVE CHANGES</button><button id="cancelModalBtn" class="btn-outline btn" style="flex:1;">CANCEL</button></div>
+                <div style="display:flex; gap:10px; margin-top:1rem;"><button id="confirmEditBtn" class="btn">SAVE CHANGES</button><button id="cancelModalBtn" class="btn-outline btn">CANCEL</button></div>
             </div>
         `;
         document.body.appendChild(modal);
@@ -753,18 +682,18 @@
             const newPhone = document.getElementById('memberPhone').value.trim();
             const newExpected = parseFloat(document.getElementById('memberExpected').value) || 0;
             const newLoan = parseFloat(document.getElementById('memberLoan').value) || 0;
-            if (!newName || !newPhone) { showModalMessage('Please fill in member name and phone number', 'error'); return; }
+            if (!newName || !newPhone) { alert('Please fill in name and phone number'); return; }
             const { error } = await supabaseClient.from('members').update({ name: newName, phone: newPhone, expected_contribution: newExpected, loan_balance: newLoan }).eq('id', id);
-            if (error) { showModalMessage(error.message, 'error'); return; }
+            if (error) { alert(error.message); return; }
             modal.remove();
             await loadMembers();
-            showToast('✅ Member updated successfully!', 'success');
+            alert('✅ Member updated successfully!');
         };
         document.getElementById('cancelModalBtn').onclick = () => modal.remove();
     }
 
     function showSettleModal(memberId, currentBalance) {
-        if (currentBalance <= 0) { showToast('Balance is already zero', 'error'); return; }
+        if (currentBalance <= 0) { alert('Balance is already zero'); return; }
         const member = allMembers.find(m => m.id === memberId);
         const modal = document.createElement('div');
         modal.className = 'modal';
@@ -773,148 +702,58 @@
                 <h3>💰 SETTLE PAYMENT</h3>
                 <p><strong>${escapeHtml(member?.name || 'Unknown')}</strong></p>
                 <p>MONTHLY BALANCE: KES ${formatNumber(currentBalance)}</p>
-                <div class="form-group">
-                    <label>AMOUNT TO PAY (KES):</label>
-                    <input type="number" id="settleAmount" class="settle-amount" placeholder="Enter amount" value="${currentBalance}" step="100" min="1" max="${currentBalance}">
-                    <small style="color:#666; font-size:0.65rem;">MAX: KES ${formatNumber(currentBalance)}</small>
-                </div>
-                <div class="form-group">
-                    <label>PAYMENT METHOD:</label>
-                    <select id="settleMethodSelect">
-                        <option value="M-Pesa">M-PESA</option>
-                        <option value="Cash">CASH</option>
-                        <option value="Bank Transfer">BANK TRANSFER</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>DATE:</label>
-                    <input type="date" id="settleDate" value="${new Date().toISOString().slice(0,10)}">
-                </div>
-                <div style="display:flex; gap:10px; margin-top:1rem;">
-                    <button id="confirmSettleBtn" class="btn" style="flex:1;">CONFIRM PAYMENT</button>
-                    <button id="cancelSettleBtn" class="btn-outline btn" style="flex:1;">CANCEL</button>
-                </div>
+                <div class="form-group"><label>AMOUNT TO PAY (KES):</label><input type="number" id="settleAmount" value="${currentBalance}" min="1" max="${currentBalance}"></div>
+                <div class="form-group"><label>PAYMENT METHOD:</label><select id="settleMethodSelect"><option value="M-Pesa">M-PESA</option><option value="Cash">CASH</option><option value="Bank Transfer">BANK TRANSFER</option></select></div>
+                <div class="form-group"><label>DATE:</label><input type="date" id="settleDate" value="${new Date().toISOString().slice(0,10)}"></div>
+                <div style="display:flex; gap:10px; margin-top:1rem;"><button id="confirmSettleBtn" class="btn">CONFIRM</button><button id="cancelSettleBtn" class="btn-outline btn">CANCEL</button></div>
             </div>
         `;
         document.body.appendChild(modal);
-        
-        const amountInput = document.getElementById('settleAmount');
-        amountInput.addEventListener('change', function() {
-            let value = parseFloat(this.value);
-            if (isNaN(value)) value = 0;
-            if (value > currentBalance) {
-                this.value = currentBalance;
-                showToast(`Amount cannot exceed balance of KES ${formatNumber(currentBalance)}`, 'error');
-            } else if (value < 0) {
-                this.value = 0;
-            }
-        });
         
         document.getElementById('confirmSettleBtn').onclick = async () => {
             let amount = parseFloat(document.getElementById('settleAmount').value);
             const method = document.getElementById('settleMethodSelect').value;
             const date = document.getElementById('settleDate').value;
-            
-            if (isNaN(amount) || amount <= 0) {
-                showToast('Please enter a valid amount', 'error');
-                return;
-            }
-            if (amount > currentBalance) {
-                amount = currentBalance;
-            }
-            
+            if (isNaN(amount) || amount <= 0) { alert('Please enter a valid amount'); return; }
+            if (amount > currentBalance) amount = currentBalance;
             const user = await getCurrentUser();
-            const { error } = await supabaseClient.from('contributions').insert([{ 
-                member_id: memberId, 
-                amount: amount, 
-                month: date.slice(0,7), 
-                date, 
-                method, 
-                type: 'Payment', 
-                recorded_by: user?.id 
-            }]);
-            if (error) { showToast('Error: ' + error.message, 'error'); modal.remove(); return; }
+            const { error } = await supabaseClient.from('contributions').insert([{ member_id: memberId, amount: amount, month: date.slice(0,7), date, method, type: 'Payment', recorded_by: user?.id }]);
+            if (error) { alert('Error: ' + error.message); modal.remove(); return; }
             modal.remove();
-            const remainingBalance = currentBalance - amount;
-            if (remainingBalance > 0) {
-                showToast(`✅ Paid KES ${formatNumber(amount)}. Remaining balance: KES ${formatNumber(remainingBalance)}`, 'success');
-            } else {
-                showToast(`✅ Fully settled! Paid KES ${formatNumber(amount)}`, 'success');
-            }
+            alert(`✅ Paid KES ${formatNumber(amount)}`);
             await loadMembers();
         };
         document.getElementById('cancelSettleBtn').onclick = () => modal.remove();
     }
 
     function confirmDeleteMember(id, name) {
-        const modal = document.createElement('div');
-        modal.className = 'modal';
-        modal.innerHTML = `
-            <div class="modal-content">
-                <h3 style="margin-bottom:1rem;">⚠️ DELETE MEMBER</h3>
-                <p>Delete <strong>${escapeHtml(name)}</strong>?</p>
-                <p style="color:#dc2626; font-size:0.7rem; margin-top:0.5rem;">This will also delete all contribution records.</p>
-                <div style="display:flex; gap:10px; margin-top:1rem;">
-                    <button id="confirmDeleteBtn" class="btn btn-danger" style="flex:1;">DELETE</button>
-                    <button id="cancelModalBtn" class="btn-outline btn" style="flex:1;">CANCEL</button>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(modal);
-        
-        document.getElementById('confirmDeleteBtn').onclick = async () => {
+        if (!confirm(`Delete ${name}? This will also delete all contribution records.`)) return;
+        (async () => {
             const { error } = await supabaseClient.from('members').delete().eq('id', id);
-            if (error) { showToast('Error: ' + error.message, 'error'); modal.remove(); return; }
-            modal.remove();
+            if (error) { alert('Error: ' + error.message); return; }
             await loadMembers();
-            showToast('✅ Member deleted successfully!', 'success');
-        };
-        document.getElementById('cancelModalBtn').onclick = () => modal.remove();
+            alert('✅ Member deleted successfully!');
+        })();
     }
 
     async function showMemberDetails(memberId) {
         const member = allMembers.find(m => m.id === memberId);
         if (!member) return;
-        const { data: contributions, error } = await supabaseClient.from('contributions').select('*').eq('member_id', memberId).order('date', { ascending: false });
-        if (error) { showToast('Error loading contributions: ' + error.message, 'error'); return; }
+        const { data: contributions } = await supabaseClient.from('contributions').select('*').eq('member_id', memberId).order('date', { ascending: false });
         const totalPaid = contributions?.reduce((sum, c) => sum + c.amount, 0) || 0;
         const modal = document.createElement('div');
         modal.className = 'modal';
         modal.innerHTML = `
-            <div class="modal-content" style="max-width: 500px; max-height: 80vh; overflow-y: auto;">
-                <div class="flex-between" style="margin-bottom:1rem;">
-                    <h3>👤 ${escapeHtml(member.name)}</h3>
-                    <button id="closeModalBtn" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button>
-                </div>
+            <div class="modal-content" style="max-width:500px; max-height:80vh; overflow-y:auto;">
+                <div class="flex-between"><h3>👤 ${escapeHtml(member.name)}</h3><button id="closeModalBtn" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button></div>
                 <p><strong>📞 PHONE:</strong> ${escapeHtml(member.phone) || '-'}</p>
                 <p><strong>💰 EXPECTED:</strong> KES ${formatNumber(member.expected_contribution)}</p>
                 <p><strong>💵 TOTAL PAID:</strong> KES ${formatNumber(totalPaid)}</p>
                 <p><strong>⚖️ MONTHLY BALANCE:</strong> KES ${formatNumber(member.balance)}</p>
                 <p><strong>🏦 LOAN BALANCE:</strong> <span class="badge-loan">KES ${formatNumber(member.loan_balance || 0)}</span></p>
                 <p><strong>📊 STATUS:</strong> <span class="${(member.balance || 0) === 0 ? 'badge-paid' : 'badge-unpaid'}">${(member.balance || 0) === 0 ? 'PAID' : 'UNPAID'}</span></p>
-                <h4 style="margin-top:1rem;">📅 CONTRIBUTION HISTORY</h4>
-                <div class="table-wrapper">
-                    <table style="min-width:250px;">
-                        <thead>
-                            <tr>
-                                <th>DATE</th>
-                                <th>AMOUNT</th>
-                                <th>METHOD</th>
-                                <th>MONTH</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${contributions?.map(c => `
-                                <tr>
-                                    <td data-label="DATE">${c.date || '-'}</td>
-                                    <td data-label="AMOUNT">KES ${formatNumber(c.amount)}</span></td>
-                                    <td data-label="METHOD">${c.method || '-'}</td>
-                                    <td data-label="MONTH">${c.month || '-'}</td>
-                                </tr>
-                            `).join('') || '<tr><td colspan="4">No contributions yet</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></td>'}
-                        </tbody>
-                    </table>
-                </div>
+                <h4>📅 CONTRIBUTION HISTORY</h4>
+                <div class="table-wrapper"><table><thead><tr><th>DATE</th><th>AMOUNT</th><th>METHOD</th><th>MONTH</th></tr></thead><tbody>${contributions?.map(c => `<tr><td>${c.date || '-'}</td><td>KES ${formatNumber(c.amount)}</td><td>${c.method || '-'}</td><td>${c.month || '-'}</td></tr>`).join('') || '<tr><td colspan="4">No contributions yet</td></tr>'}</tbody></table></div>
             </div>
         `;
         document.body.appendChild(modal);
@@ -922,28 +761,9 @@
         modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
     }
 
-    function showModalMessage(message, type) {
-        const msgDiv = document.getElementById('modalMessage');
-        if (msgDiv) msgDiv.innerHTML = `<div class="${type === 'error' ? 'error-message' : 'success-message'}">${message}</div>`;
-        setTimeout(() => { if (msgDiv) msgDiv.innerHTML = ''; }, 3000);
-    }
-
-    function showToast(message, type) {
-        const toast = document.createElement('div');
-        toast.style.cssText = `position:fixed; bottom:20px; right:20px; background:${type === 'error' ? '#dc2626' : '#2c7a4d'}; color:white; padding:10px 16px; border-radius:40px; font-size:0.75rem; z-index:1002; box-shadow:0 4px 12px rgba(0,0,0,0.15);`;
-        toast.textContent = message;
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
-    }
-
     function escapeHtml(str) {
         if (!str) return '';
-        return String(str).replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        });
+        return String(str).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m] || m));
     }
 </script>
 </body>
