@@ -30,13 +30,11 @@
             --sidebar-width: 280px;
         }
 
-        /* Layout with Sidebar */
         .app-wrapper {
             display: flex;
             min-height: 100vh;
         }
 
-        /* Sidebar Styles */
         .sidebar {
             width: var(--sidebar-width);
             background: white;
@@ -142,7 +140,6 @@
             margin: 0.6rem 1rem;
         }
 
-        /* Main Content */
         .main-content {
             flex: 1;
             margin-left: var(--sidebar-width);
@@ -150,7 +147,6 @@
             width: calc(100% - var(--sidebar-width));
         }
 
-        /* Top Bar */
         .top-bar {
             background: white;
             padding: 0.7rem 1rem;
@@ -267,7 +263,7 @@
             width: 100%;
             border-collapse: collapse;
             font-size: 0.7rem;
-            min-width: 600px;
+            min-width: 700px;
         }
         
         @media (min-width: 640px) {
@@ -391,7 +387,6 @@
             gap: 8px;
         }
 
-        /* Sidebar Overlay */
         .sidebar-overlay {
             display: none;
             position: fixed;
@@ -407,7 +402,6 @@
             display: block;
         }
 
-        /* Mobile Sidebar */
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -452,69 +446,33 @@
             <button class="sidebar-close" id="sidebarClose">✕</button>
         </div>
         <nav class="sidebar-nav">
-            <a href="dashboard.html" class="nav-item">
-                <span class="icon">📊</span>
-                <span class="label">Dashboard</span>
-            </a>
-            <a href="members.html" class="nav-item">
-                <span class="icon">👥</span>
-                <span class="label">Members</span>
-            </a>
-            <a href="contributions.html" class="nav-item">
-                <span class="icon">💰</span>
-                <span class="label">Contributions</span>
-            </a>
-            
+            <a href="dashboard.html" class="nav-item"><span class="icon">📊</span><span class="label">DASHBOARD</span></a>
+            <a href="members.html" class="nav-item"><span class="icon">👥</span><span class="label">MEMBERS</span></a>
+            <a href="contributions.html" class="nav-item"><span class="icon">💰</span><span class="label">CONTRIBUTIONS</span></a>
             <div class="nav-divider"></div>
-            
-            <div class="nav-item" style="cursor: default; opacity: 0.7;">
-                <span class="icon">📜</span>
-                <span class="label">History</span>
-            </div>
+            <div class="nav-item" style="cursor: default; opacity: 0.7;"><span class="icon">📜</span><span class="label">HISTORY</span></div>
             <div class="nav-submenu">
-                <a href="contribution-history.html" class="nav-item active">
-                    <span class="icon">📋</span>
-                    <span class="label">Contributions History</span>
-                </a>
-                <a href="member-history.html" class="nav-item">
-                    <span class="icon">👤</span>
-                    <span class="label">Members History</span>
-                </a>
+                <a href="contribution-history.html" class="nav-item active"><span class="icon">📋</span><span class="label">CONTRIBUTIONS HISTORY</span></a>
+                <a href="member-history.html" class="nav-item"><span class="icon">👤</span><span class="label">MEMBERS HISTORY</span></a>
             </div>
-            
             <div class="nav-divider"></div>
-            
-            <div class="nav-item" style="cursor: default; opacity: 0.7;">
-                <span class="icon">📈</span>
-                <span class="label">Analytics</span>
-            </div>
+            <div class="nav-item" style="cursor: default; opacity: 0.7;"><span class="icon">📈</span><span class="label">ANALYTICS</span></div>
             <div class="nav-submenu">
-                <a href="statistics.html" class="nav-item">
-                    <span class="icon">📊</span>
-                    <span class="label">Monthly Statistics</span>
-                </a>
-                <a href="reports.html" class="nav-item">
-                    <span class="icon">📋</span>
-                    <span class="label">Reports</span>
-                </a>
+                <a href="statistics.html" class="nav-item"><span class="icon">📊</span><span class="label">MONTHLY STATISTICS</span></a>
+                <a href="reports.html" class="nav-item"><span class="icon">📋</span><span class="label">REPORTS</span></a>
             </div>
-            
             <div class="nav-divider"></div>
-            
-            <a href="settings.html" class="nav-item">
-                <span class="icon">⚙️</span>
-                <span class="label">Settings</span>
-            </a>
+            <a href="settings.html" class="nav-item"><span class="icon">⚙️</span><span class="label">SETTINGS</span></a>
         </nav>
     </aside>
 
     <main class="main-content">
         <div class="top-bar">
             <button class="menu-toggle" id="menuToggle">☰</button>
-            <div class="page-title">📜 Contribution History</div>
+            <div class="page-title">📜 CONTRIBUTION HISTORY</div>
             <div class="user-info">
                 <span class="user-email" id="userEmail"></span>
-                <button id="logoutBtn" class="logout-btn">Logout</button>
+                <button id="logoutBtn" class="logout-btn">LOGOUT</button>
             </div>
         </div>
         <div id="app-root" class="container">
@@ -538,7 +496,6 @@
         method: 'all'
     };
 
-    // Sidebar functionality
     const menuToggle = document.getElementById('menuToggle');
     const sidebar = document.getElementById('sidebar');
     const sidebarClose = document.getElementById('sidebarClose');
@@ -603,7 +560,7 @@
                 <div class="card">
                     <h3>⚠️ Error Loading Data</h3>
                     <p style="font-size:0.8rem;">${error.message}</p>
-                    <button class="btn" onclick="location.reload()" style="margin-top:0.5rem;">Retry</button>
+                    <button class="btn" onclick="location.reload()" style="margin-top:0.5rem;">RETRY</button>
                 </div>
             `;
         }
@@ -639,11 +596,11 @@
     function exportToCSV() {
         const filtered = getFilteredContributions();
         let csvRows = [
-            ['Contribution History Report'],
+            ['CONTRIBUTION HISTORY REPORT'],
             [`Generated: ${new Date().toLocaleString()}`],
             [`Filters: Month=${currentFilters.month}, Year=${currentFilters.year}, Member=${currentFilters.member}, Method=${currentFilters.method}`],
             [],
-            ['Date', 'Member Name', 'Phone', 'Amount (KES)', 'Month', 'Payment Method', 'Type']
+            ['DATE', 'MEMBER', 'PHONE', 'AMOUNT (KES)', 'MONTH', 'PAYMENT METHOD', 'TYPE']
         ];
         
         filtered.forEach(c => {
@@ -703,86 +660,90 @@
         const html = `
             <div class="card">
                 <div class="flex-between">
-                    <h2 style="font-size:1.2rem;">📜 Contribution History</h2>
+                    <h2 style="font-size:1.2rem;">📜 CONTRIBUTION HISTORY</h2>
                     <div class="report-actions">
-                        <button id="copyBtn" class="btn-sm btn-outline">📋 Copy</button>
+                        <button id="copyBtn" class="btn-sm btn-outline">📋 COPY</button>
                         <button id="exportCSVBtn" class="btn-sm btn-outline">📎 CSV</button>
                     </div>
                 </div>
                 
                 <div class="filter-bar">
                     <select id="monthFilter" class="filter-select">
-                        <option value="all" ${currentFilters.month === 'all' ? 'selected' : ''}>All Months</option>
+                        <option value="all" ${currentFilters.month === 'all' ? 'selected' : ''}>ALL MONTHS</option>
                         ${months.map(m => `<option value="${m}" ${currentFilters.month === m ? 'selected' : ''}>${m}</option>`).join('')}
                     </select>
                     
                     <select id="yearFilter" class="filter-select">
-                        <option value="all" ${currentFilters.year === 'all' ? 'selected' : ''}>All Years</option>
+                        <option value="all" ${currentFilters.year === 'all' ? 'selected' : ''}>ALL YEARS</option>
                         ${years.map(y => `<option value="${y}" ${currentFilters.year === y ? 'selected' : ''}>${y}</option>`).join('')}
                     </select>
                     
                     <select id="memberFilter" class="filter-select">
-                        <option value="all" ${currentFilters.member === 'all' ? 'selected' : ''}>All Members</option>
+                        <option value="all" ${currentFilters.member === 'all' ? 'selected' : ''}>ALL MEMBERS</option>
                         ${allMembers.map(m => `<option value="${m.id}" ${currentFilters.member === m.id ? 'selected' : ''}>${escapeHtml(m.name)}</option>`).join('')}
                     </select>
                     
                     <select id="methodFilter" class="filter-select">
-                        <option value="all" ${currentFilters.method === 'all' ? 'selected' : ''}>All Methods</option>
-                        <option value="M-Pesa" ${currentFilters.method === 'M-Pesa' ? 'selected' : ''}>M-Pesa</option>
-                        <option value="Cash" ${currentFilters.method === 'Cash' ? 'selected' : ''}>Cash</option>
-                        <option value="Bank Transfer" ${currentFilters.method === 'Bank Transfer' ? 'selected' : ''}>Bank Transfer</option>
+                        <option value="all" ${currentFilters.method === 'all' ? 'selected' : ''}>ALL METHODS</option>
+                        <option value="M-Pesa" ${currentFilters.method === 'M-Pesa' ? 'selected' : ''}>M-PESA</option>
+                        <option value="Cash" ${currentFilters.method === 'Cash' ? 'selected' : ''}>CASH</option>
+                        <option value="Bank Transfer" ${currentFilters.method === 'Bank Transfer' ? 'selected' : ''}>BANK TRANSFER</option>
                     </select>
                     
-                    <button id="resetFiltersBtn" class="btn-sm btn-outline">🔄 Reset</button>
+                    <button id="resetFiltersBtn" class="btn-sm btn-outline">🔄 RESET</button>
                 </div>
             </div>
             
             <div class="stats-summary">
                 <div class="stat-box">
-                    <h4>Total Records</h4>
+                    <h4>TOTAL RECORDS</h4>
                     <div class="value">${filtered.length}</div>
                 </div>
                 <div class="stat-box">
-                    <h4>Total Amount</h4>
+                    <h4>TOTAL AMOUNT</h4>
                     <div class="value">KES ${(totalAmount/1000).toFixed(0)}k</div>
                     <small>${formatNumber(totalAmount)}</small>
                 </div>
                 <div class="stat-box">
-                    <h4>Unique Members</h4>
+                    <h4>UNIQUE MEMBERS</h4>
                     <div class="value">${new Set(filtered.map(c => c.member_id)).size}</div>
                 </div>
                 <div class="stat-box">
-                    <h4>Payment Methods</h4>
+                    <h4>PAYMENT METHODS</h4>
                     <div class="value">${new Set(filtered.map(c => c.method)).size}</div>
                 </div>
             </div>
             
             <div class="card">
-                <h3 style="font-size:1rem;">📋 Contribution Records</h3>
+                <h3 style="font-size:1rem;">📋 CONTRIBUTION RECORDS</h3>
                 <div class="table-wrapper">
                     <table>
                         <thead>
                             <tr>
-                                <th>Date</th>
-                                <th>Member</th>
-                                <th>Phone</th>
-                                <th>Amount</th>
-                                <th>Month</th>
-                                <th>Method</th>
-                                <th>Type</th>
+                                <th>DATE</th>
+                                <th>MEMBER</th>
+                                <th>PHONE</th>
+                                <th>AMOUNT</th>
+                                <th>MONTH</th>
+                                <th>METHOD</th>
+                                <th>TYPE</th>
                             </tr>
                         </thead>
                         <tbody>
                             ${filtered.map(c => `
                                 <tr>
-                                    <td>${c.date || '-'}</span></td>
-                                    <td><strong>${escapeHtml(c.members?.name || 'Unknown')}</strong></span></td>
-                                    <td>${c.members?.phone || '-'}</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span>
-                                    <tr>
+                                    <td data-label="DATE">${c.date || '-'}</td>
+                                    <td data-label="MEMBER"><strong>${escapeHtml(c.members?.name || 'Unknown')}</strong></td>
+                                    <td data-label="PHONE">${c.members?.phone || '-'}</td>
+                                    <td data-label="AMOUNT"><span style="color:var(--primary); font-weight:600;">KES ${formatNumber(c.amount)}</span></td>
+                                    <td data-label="MONTH">${c.month || '-'}</td>
+                                    <td data-label="METHOD">${c.method || '-'}</td>
+                                    <td data-label="TYPE">${c.type || 'Monthly'}</td>
+                                </tr>
                             `).join('')}
-                            ${filtered.length === 0 ? '<tr><td colspan="7" style="text-align:center;">No contributions found</td></tr>' : ''}
+                            ${filtered.length === 0 ? '<tr><td colspan="7" style="text-align:center;">No contributions found</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></td>'}
                         </tbody>
-                    </div>
+                    </table>
                 </div>
             </div>
         `;
@@ -831,7 +792,12 @@
     
     function escapeHtml(str) {
         if (!str) return '';
-        return String(str).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m] || m));
+        return String(str).replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
     }
 </script>
 </body>
