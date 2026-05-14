@@ -171,10 +171,6 @@
             transition: all 0.2s;
         }
 
-        .menu-toggle:hover {
-            background: var(--primary-light);
-        }
-
         .page-title {
             font-size: 1.1rem;
             font-weight: 600;
@@ -324,25 +320,10 @@
         
         @media (min-width: 769px) {
             table {
-                min-width: 800px;
+                min-width: 900px;
             }
             th, td {
                 padding: 0.6rem 0.4rem;
-            }
-            th {
-                font-size: 0.7rem;
-            }
-            td {
-                font-size: 0.7rem;
-            }
-        }
-
-        @media (min-width: 1024px) {
-            th {
-                font-size: 0.8rem;
-            }
-            td {
-                font-size: 0.8rem;
             }
         }
 
@@ -355,6 +336,13 @@
         th {
             background: #f8fafc;
             font-weight: 600;
+            font-size: 0.7rem;
+        }
+
+        @media (min-width: 1024px) {
+            th, td {
+                font-size: 0.8rem;
+            }
         }
 
         .badge-paid {
@@ -534,9 +522,6 @@
             .search-bar {
                 max-width: 100%;
             }
-            .btn {
-                text-align: center;
-            }
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -574,7 +559,7 @@
     <main class="main-content">
         <div class="top-bar">
             <button class="menu-toggle" id="menuToggle">☰</button>
-            <div class="page-title">👥 Members</div>
+            <div class="page-title">👥 MEMBERS</div>
             <div class="user-info">
                 <span class="user-email" id="userEmail"></span>
                 <button id="logoutBtn" class="logout-btn">Logout</button>
@@ -661,11 +646,11 @@
         
         const html = `
             <div class="flex-between">
-                <h2 style="font-size:1.2rem;">👥 Members Management</h2>
-                <button class="btn" id="addMemberBtn">+ Add Member</button>
+                <h2 style="font-size:1.2rem;">👥 MEMBERS MANAGEMENT</h2>
+                <button class="btn" id="addMemberBtn">+ ADD MEMBER</button>
             </div>
             <div class="flex-between">
-                <input type="text" id="searchMemberInput" class="search-bar" placeholder="🔍 Search by name or phone..." value="${escapeHtml(searchTerm)}">
+                <input type="text" id="searchMemberInput" class="search-bar" placeholder="🔍 SEARCH BY NAME OR PHONE..." value="${escapeHtml(searchTerm)}">
             </div>
             <div class="card">
                 <div class="table-wrapper">
@@ -693,14 +678,14 @@
                                     <td data-label="LOAN BALANCE"><span class="badge-loan">KES ${formatNumber(m.loan_balance || 0)}</span></td>
                                     <td data-label="STATUS"><span class="${(m.balance || 0) === 0 ? 'badge-paid' : 'badge-unpaid'}">${(m.balance || 0) === 0 ? 'PAID' : 'UNPAID'}</span></td>
                                     <td data-label="ACTIONS" class="action-group">
-                                        <button class="btn-sm btn-outline view-detail" data-id="${m.id}">View</button>
-                                        <button class="btn-sm btn-outline edit-member" data-id="${m.id}" data-name="${escapeHtml(m.name)}" data-phone="${escapeHtml(m.phone)}" data-expected="${m.expected_contribution || 0}" data-loan="${m.loan_balance || 0}">Edit</button>
-                                        ${(m.balance || 0) > 0 ? `<button class="btn-sm btn-outline settle-balance" data-id="${m.id}" data-balance="${m.balance}">Settle</button>` : ''}
-                                        <button class="btn-sm btn-danger-outline delete-member" data-id="${m.id}" data-name="${escapeHtml(m.name)}">Del</button>
+                                        <button class="btn-sm btn-outline view-detail" data-id="${m.id}">VIEW</button>
+                                        <button class="btn-sm btn-outline edit-member" data-id="${m.id}" data-name="${escapeHtml(m.name)}" data-phone="${escapeHtml(m.phone)}" data-expected="${m.expected_contribution || 0}" data-loan="${m.loan_balance || 0}">EDIT</button>
+                                        ${(m.balance || 0) > 0 ? `<button class="btn-sm btn-outline settle-balance" data-id="${m.id}" data-balance="${m.balance}">SETTLE</button>` : ''}
+                                        <button class="btn-sm btn-danger-outline delete-member" data-id="${m.id}" data-name="${escapeHtml(m.name)}">DEL</button>
                                     </td>
                                 </tr>
                             `).join('')}
-                            ${filtered.length === 0 ? '<tr><td colspan="8" style="text-align:center;">No members found</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></td>'}
+                            ${filtered.length === 0 ? '<tr><td colspan="8" style="text-align:center;">No members found</td></tr>' : ''}
                         </tbody>
                     </table>
                 </div>
@@ -721,13 +706,13 @@
         modal.className = 'modal';
         modal.innerHTML = `
             <div class="modal-content">
-                <h3 style="margin-bottom:1rem;">➕ Add New Member</h3>
+                <h3 style="margin-bottom:1rem;">➕ ADD NEW MEMBER</h3>
                 <div id="modalMessage"></div>
                 <div class="form-group"><label>MEMBER NAME *</label><input type="text" id="memberName" placeholder="Enter full name"></div>
                 <div class="form-group"><label>PHONE NUMBER *</label><input type="tel" id="memberPhone" placeholder="0712345678"></div>
                 <div class="form-group"><label>EXPECTED CONTRIBUTION (KES)</label><input type="number" id="memberExpected" placeholder="0" value="0"></div>
                 <div class="form-group"><label>LOAN BALANCE (KES)</label><input type="number" id="memberLoan" placeholder="0" value="0"></div>
-                <div style="display:flex; gap:10px; margin-top:1rem;"><button id="confirmAddBtn" class="btn" style="flex:1;">Add Member</button><button id="cancelModalBtn" class="btn-outline btn" style="flex:1;">Cancel</button></div>
+                <div style="display:flex; gap:10px; margin-top:1rem;"><button id="confirmAddBtn" class="btn" style="flex:1;">ADD MEMBER</button><button id="cancelModalBtn" class="btn-outline btn" style="flex:1;">CANCEL</button></div>
             </div>
         `;
         document.body.appendChild(modal);
@@ -752,13 +737,13 @@
         modal.className = 'modal';
         modal.innerHTML = `
             <div class="modal-content">
-                <h3 style="margin-bottom:1rem;">✏️ Edit Member</h3>
+                <h3 style="margin-bottom:1rem;">✏️ EDIT MEMBER</h3>
                 <div id="modalMessage"></div>
                 <div class="form-group"><label>MEMBER NAME *</label><input type="text" id="memberName" value="${escapeHtml(name)}"></div>
                 <div class="form-group"><label>PHONE NUMBER *</label><input type="tel" id="memberPhone" value="${escapeHtml(phone)}"></div>
                 <div class="form-group"><label>EXPECTED CONTRIBUTION (KES)</label><input type="number" id="memberExpected" value="${expected}"></div>
                 <div class="form-group"><label>LOAN BALANCE (KES)</label><input type="number" id="memberLoan" value="${loan || 0}"></div>
-                <div style="display:flex; gap:10px; margin-top:1rem;"><button id="confirmEditBtn" class="btn" style="flex:1;">Save Changes</button><button id="cancelModalBtn" class="btn-outline btn" style="flex:1;">Cancel</button></div>
+                <div style="display:flex; gap:10px; margin-top:1rem;"><button id="confirmEditBtn" class="btn" style="flex:1;">SAVE CHANGES</button><button id="cancelModalBtn" class="btn-outline btn" style="flex:1;">CANCEL</button></div>
             </div>
         `;
         document.body.appendChild(modal);
@@ -785,29 +770,29 @@
         modal.className = 'modal';
         modal.innerHTML = `
             <div class="modal-content">
-                <h3>Settle Payment</h3>
+                <h3>💰 SETTLE PAYMENT</h3>
                 <p><strong>${escapeHtml(member?.name || 'Unknown')}</strong></p>
                 <p>MONTHLY BALANCE: KES ${formatNumber(currentBalance)}</p>
                 <div class="form-group">
-                    <label>Amount to Pay (KES):</label>
+                    <label>AMOUNT TO PAY (KES):</label>
                     <input type="number" id="settleAmount" class="settle-amount" placeholder="Enter amount" value="${currentBalance}" step="100" min="1" max="${currentBalance}">
-                    <small style="color:#666; font-size:0.65rem;">Max: KES ${formatNumber(currentBalance)}</small>
+                    <small style="color:#666; font-size:0.65rem;">MAX: KES ${formatNumber(currentBalance)}</small>
                 </div>
                 <div class="form-group">
-                    <label>Payment Method:</label>
+                    <label>PAYMENT METHOD:</label>
                     <select id="settleMethodSelect">
-                        <option value="M-Pesa">M-Pesa</option>
-                        <option value="Cash">Cash</option>
-                        <option value="Bank Transfer">Bank Transfer</option>
+                        <option value="M-Pesa">M-PESA</option>
+                        <option value="Cash">CASH</option>
+                        <option value="Bank Transfer">BANK TRANSFER</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Date:</label>
+                    <label>DATE:</label>
                     <input type="date" id="settleDate" value="${new Date().toISOString().slice(0,10)}">
                 </div>
                 <div style="display:flex; gap:10px; margin-top:1rem;">
-                    <button id="confirmSettleBtn" class="btn" style="flex:1;">Confirm Payment</button>
-                    <button id="cancelSettleBtn" class="btn-outline btn" style="flex:1;">Cancel</button>
+                    <button id="confirmSettleBtn" class="btn" style="flex:1;">CONFIRM PAYMENT</button>
+                    <button id="cancelSettleBtn" class="btn-outline btn" style="flex:1;">CANCEL</button>
                 </div>
             </div>
         `;
@@ -866,10 +851,13 @@
         modal.className = 'modal';
         modal.innerHTML = `
             <div class="modal-content">
-                <h3 style="margin-bottom:1rem;">⚠️ Delete Member</h3>
+                <h3 style="margin-bottom:1rem;">⚠️ DELETE MEMBER</h3>
                 <p>Delete <strong>${escapeHtml(name)}</strong>?</p>
-                <p style="color:#dc2626; font-size:0.7rem; margin-top:0.5rem;">This also deletes all contribution records.</p>
-                <div style="display:flex; gap:10px; margin-top:1rem;"><button id="confirmDeleteBtn" class="btn btn-danger" style="flex:1;">Delete</button><button id="cancelModalBtn" class="btn-outline btn" style="flex:1;">Cancel</button></div>
+                <p style="color:#dc2626; font-size:0.7rem; margin-top:0.5rem;">This will also delete all contribution records.</p>
+                <div style="display:flex; gap:10px; margin-top:1rem;">
+                    <button id="confirmDeleteBtn" class="btn btn-danger" style="flex:1;">DELETE</button>
+                    <button id="cancelModalBtn" class="btn-outline btn" style="flex:1;">CANCEL</button>
+                </div>
             </div>
         `;
         document.body.appendChild(modal);
@@ -894,15 +882,39 @@
         modal.className = 'modal';
         modal.innerHTML = `
             <div class="modal-content" style="max-width: 500px; max-height: 80vh; overflow-y: auto;">
-                <div class="flex-between" style="margin-bottom:1rem;"><h3>👤 ${escapeHtml(member.name)}</h3><button id="closeModalBtn" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button></div>
+                <div class="flex-between" style="margin-bottom:1rem;">
+                    <h3>👤 ${escapeHtml(member.name)}</h3>
+                    <button id="closeModalBtn" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+                </div>
                 <p><strong>📞 PHONE:</strong> ${escapeHtml(member.phone) || '-'}</p>
                 <p><strong>💰 EXPECTED:</strong> KES ${formatNumber(member.expected_contribution)}</p>
                 <p><strong>💵 TOTAL PAID:</strong> KES ${formatNumber(totalPaid)}</p>
                 <p><strong>⚖️ MONTHLY BALANCE:</strong> KES ${formatNumber(member.balance)}</p>
                 <p><strong>🏦 LOAN BALANCE:</strong> <span class="badge-loan">KES ${formatNumber(member.loan_balance || 0)}</span></p>
                 <p><strong>📊 STATUS:</strong> <span class="${(member.balance || 0) === 0 ? 'badge-paid' : 'badge-unpaid'}">${(member.balance || 0) === 0 ? 'PAID' : 'UNPAID'}</span></p>
-                <h4 style="margin-top:1rem;">📅 Contribution History</h4>
-                <div class="table-wrapper"><table style="min-width:250px;"><thead><tr><th>Date</th><th>Amount</th><th>Method</th><th>Month</th></tr></thead><tbody>${contributions?.map(c => `<tr><td data-label="Date">${c.date || '-'}</td><td data-label="Amount">KES ${formatNumber(c.amount)}</span></td><td data-label="Method">${c.method || '-'}</td><td data-label="Month">${c.month || '-'}</td></tr>`).join('') || '<tr><td colspan="4">No contributions yet</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></td>}</tbody></table></div>
+                <h4 style="margin-top:1rem;">📅 CONTRIBUTION HISTORY</h4>
+                <div class="table-wrapper">
+                    <table style="min-width:250px;">
+                        <thead>
+                            <tr>
+                                <th>DATE</th>
+                                <th>AMOUNT</th>
+                                <th>METHOD</th>
+                                <th>MONTH</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${contributions?.map(c => `
+                                <tr>
+                                    <td data-label="DATE">${c.date || '-'}</td>
+                                    <td data-label="AMOUNT">KES ${formatNumber(c.amount)}</span></td>
+                                    <td data-label="METHOD">${c.method || '-'}</td>
+                                    <td data-label="MONTH">${c.month || '-'}</td>
+                                </tr>
+                            `).join('') || '<tr><td colspan="4">No contributions yet</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></td>'}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         `;
         document.body.appendChild(modal);
@@ -926,7 +938,12 @@
 
     function escapeHtml(str) {
         if (!str) return '';
-        return String(str).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m] || m));
+        return String(str).replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
     }
 </script>
 </body>
