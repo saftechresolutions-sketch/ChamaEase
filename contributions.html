@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-    <title>ChamaEase | Contributions Management</title>
+    <title>ChamaEase | Contributions</title>
     <style>
         * {
             margin: 0;
@@ -22,7 +22,6 @@
             --primary-light: #eaf5ef;
             --primary-dark: #1f5a3a;
             --danger: #dc4c4c;
-            --warning: #e6a017;
             --gray-border: #e2e8f0;
             --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.04);
             --radius-card: 16px;
@@ -30,492 +29,65 @@
             --sidebar-width: 280px;
         }
 
-        .app-wrapper {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        .sidebar {
-            width: var(--sidebar-width);
-            background: white;
-            border-right: 1px solid var(--gray-border);
-            position: fixed;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            overflow-y: auto;
-            transition: transform 0.3s ease;
-            z-index: 1000;
-            box-shadow: var(--shadow-sm);
-            transform: translateX(0);
-        }
-
-        .sidebar-header {
-            padding: 1rem;
-            border-bottom: 1px solid var(--gray-border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .sidebar-logo {
-            font-weight: 800;
-            font-size: 1.2rem;
-            background: linear-gradient(135deg, var(--primary), #3b9b62);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        .sidebar-close {
-            background: none;
-            border: none;
-            font-size: 1.3rem;
-            cursor: pointer;
-            color: #94a3b8;
-            transition: all 0.2s;
-            display: none;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .sidebar-close:hover {
-            background: #fee2e2;
-            color: var(--danger);
-        }
-
-        .sidebar-nav {
-            padding: 0.8rem 0;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 0.7rem 1rem;
-            margin: 0.2rem 0.8rem;
-            border-radius: 12px;
-            text-decoration: none;
-            color: #4a5568;
-            transition: all 0.2s;
-            cursor: pointer;
-        }
-
-        .nav-item:hover {
-            background: var(--primary-light);
-            color: var(--primary);
-        }
-
-        .nav-item.active {
-            background: var(--primary);
-            color: white;
-        }
-
-        .nav-item .icon {
-            font-size: 1.1rem;
-            width: 26px;
-            text-align: center;
-        }
-
-        .nav-item .label {
-            font-weight: 500;
-            font-size: 0.85rem;
-        }
-
-        .nav-submenu {
-            padding-left: 2.8rem;
-        }
-
-        .nav-submenu .nav-item {
-            padding: 0.5rem 1rem;
-            font-size: 0.8rem;
-        }
-
-        .nav-divider {
-            height: 1px;
-            background: var(--gray-border);
-            margin: 0.6rem 1rem;
-        }
-
-        .main-content {
-            flex: 1;
-            margin-left: var(--sidebar-width);
-            transition: margin-left 0.3s ease;
-            width: calc(100% - var(--sidebar-width));
-        }
-
-        .top-bar {
-            background: white;
-            padding: 0.7rem 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--gray-border);
-            box-shadow: var(--shadow-sm);
-            position: sticky;
-            top: 0;
-            z-index: 99;
-        }
-
-        .menu-toggle {
-            background: none;
-            border: none;
-            font-size: 1.3rem;
-            cursor: pointer;
-            color: var(--primary);
-            padding: 6px;
-            border-radius: 50%;
-            transition: all 0.2s;
-        }
-
-        .page-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #1e2a3e;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-        }
-
-        .user-email {
-            font-size: 0.7rem;
-            color: #5b6e8c;
-            display: none;
-        }
-
-        @media (min-width: 480px) {
-            .user-email {
-                display: inline;
-            }
-        }
-
-        .logout-btn {
-            background: transparent;
-            border: 1px solid #dc2626;
-            color: #dc2626;
-            padding: 0.35rem 0.7rem;
-            border-radius: 2rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.7rem;
-        }
-
-        .logout-btn:hover {
-            background: #dc2626;
-            color: white;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 1rem;
-            width: 100%;
-            min-height: 70vh;
-        }
-
-        .card {
-            background: white;
-            border-radius: var(--radius-card);
-            box-shadow: var(--shadow-sm);
-            padding: 1rem;
-            margin-bottom: 1rem;
-            border: 1px solid var(--gray-border);
-        }
-
-        .btn {
-            border: none;
-            background: var(--primary);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: var(--radius-btn);
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 0.75rem;
-            transition: 0.2s;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--primary);
-            color: var(--primary);
-        }
-
-        .btn-sm {
-            padding: 0.25rem 0.6rem;
-            font-size: 0.65rem;
-        }
-
-        .btn-danger {
-            background: var(--danger);
-        }
-
-        .btn-danger-outline {
-            background: transparent;
-            border: 1px solid var(--danger);
-            color: var(--danger);
-        }
-
-        .table-wrapper {
-            width: 100%;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.7rem;
-        }
-        
-        @media (max-width: 768px) {
-            table, thead, tbody, th, td, tr {
-                display: block;
-            }
-            thead {
-                display: none;
-            }
-            tr {
-                margin-bottom: 1rem;
-                border: 1px solid var(--gray-border);
-                border-radius: 12px;
-                background: white;
-                padding: 0.5rem;
-            }
-            td {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 0.6rem 0.4rem;
-                border-bottom: 1px solid var(--gray-border);
-                font-size: 0.75rem;
-                flex-wrap: wrap;
-            }
-            td:last-child {
-                border-bottom: none;
-            }
-            td::before {
-                content: attr(data-label);
-                font-weight: 600;
-                width: 40%;
-                color: #5b6e8c;
-            }
-        }
-        
-        @media (min-width: 769px) {
-            table {
-                min-width: 700px;
-            }
-            th, td {
-                padding: 0.6rem 0.4rem;
-            }
-            th {
-                font-size: 0.7rem;
-            }
-            td {
-                font-size: 0.7rem;
-            }
-        }
-
-        th, td {
-            text-align: left;
-            padding: 0.6rem 0.4rem;
-            border-bottom: 1px solid var(--gray-border);
-        }
-
-        th {
-            background: #f8fafc;
-            font-weight: 600;
-        }
-
-        .badge-paid {
-            background: #dff0e4;
-            color: #1f5a3a;
-            padding: 0.15rem 0.5rem;
-            border-radius: 30px;
-            font-weight: 600;
-            font-size: 0.65rem;
-            display: inline-block;
-        }
-
-        .badge-unpaid {
-            background: #ffe6e5;
-            color: #b91c1c;
-            padding: 0.15rem 0.5rem;
-            border-radius: 30px;
-            font-weight: 600;
-            font-size: 0.65rem;
-            display: inline-block;
-        }
-
-        .flex-between {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 0.6rem;
-            margin-bottom: 1rem;
-        }
-
-        .filter-select {
-            padding: 0.4rem 0.8rem;
-            border-radius: 40px;
-            border: 1px solid var(--gray-border);
-            background: white;
-            font-size: 0.75rem;
-        }
-
-        input, select {
-            padding: 0.5rem;
-            border-radius: 1rem;
-            border: 1px solid #cbd5e1;
-            width: 100%;
-            font-size: 0.75rem;
-        }
-
-        footer {
-            text-align: center;
-            padding: 0.8rem;
-            font-size: 0.65rem;
-            color: #6c757d;
-            border-top: 1px solid var(--gray-border);
-            margin-top: 1rem;
-        }
-
-        .loading-spinner {
-            display: inline-block;
-            width: 30px;
-            height: 30px;
-            border: 3px solid #e2e8f0;
-            border-radius: 50%;
-            border-top-color: var(--primary);
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1001;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 1rem;
-            padding: 1.2rem;
-            max-width: 90%;
-            width: 400px;
-        }
-
-        .form-group {
-            margin-bottom: 0.8rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.2rem;
-            font-weight: 600;
-            font-size: 0.75rem;
-        }
-
-        .history-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            margin-bottom: 0.8rem;
-            gap: 0.6rem;
-        }
-
-        .history-header h2 {
-            font-size: 1.2rem;
-        }
-
-        .form-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.6rem;
-            align-items: flex-end;
-        }
-
-        .form-row > * {
-            flex: 1;
-            min-width: 130px;
-        }
-
-        @media (max-width: 640px) {
-            .form-row {
-                flex-direction: column;
-            }
-            .form-row > * {
-                width: 100%;
-            }
-            .filter-select {
-                max-width: 100%;
-            }
-            .flex-between {
-                flex-direction: column;
-                align-items: stretch;
-            }
-        }
-
-        .sidebar-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 999;
-        }
-
-        .sidebar-overlay.active {
-            display: block;
-        }
-
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-            .sidebar.open {
-                transform: translateX(0);
-            }
-            .main-content {
-                margin-left: 0;
-                width: 100%;
-            }
-            .sidebar-close {
-                display: flex;
-            }
-            .container {
-                padding: 0.8rem;
-            }
-        }
+        .app-wrapper { display: flex; min-height: 100vh; }
+        .sidebar { width: var(--sidebar-width); background: white; border-right: 1px solid var(--gray-border); position: fixed; left: 0; top: 0; bottom: 0; overflow-y: auto; transition: transform 0.3s ease; z-index: 1000; box-shadow: var(--shadow-sm); transform: translateX(0); }
+        .sidebar-header { padding: 1rem; border-bottom: 1px solid var(--gray-border); display: flex; justify-content: space-between; align-items: center; }
+        .sidebar-logo { font-weight: 800; font-size: 1.2rem; background: linear-gradient(135deg, var(--primary), #3b9b62); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .sidebar-close { background: none; border: none; font-size: 1.3rem; cursor: pointer; color: #94a3b8; display: none; width: 32px; height: 32px; border-radius: 50%; align-items: center; justify-content: center; }
+        .sidebar-close:hover { background: #fee2e2; color: var(--danger); }
+        .sidebar-nav { padding: 0.8rem 0; }
+        .nav-item { display: flex; align-items: center; gap: 10px; padding: 0.7rem 1rem; margin: 0.2rem 0.8rem; border-radius: 12px; text-decoration: none; color: #4a5568; transition: all 0.2s; cursor: pointer; }
+        .nav-item:hover { background: var(--primary-light); color: var(--primary); }
+        .nav-item.active { background: var(--primary); color: white; }
+        .nav-item .icon { font-size: 1.1rem; width: 26px; text-align: center; }
+        .nav-item .label { font-weight: 500; font-size: 0.85rem; }
+        .nav-submenu { padding-left: 2.8rem; }
+        .nav-submenu .nav-item { padding: 0.5rem 1rem; font-size: 0.8rem; }
+        .nav-divider { height: 1px; background: var(--gray-border); margin: 0.6rem 1rem; }
+        .main-content { flex: 1; margin-left: var(--sidebar-width); transition: margin-left 0.3s ease; width: calc(100% - var(--sidebar-width)); }
+        .top-bar { background: white; padding: 0.7rem 1rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--gray-border); box-shadow: var(--shadow-sm); position: sticky; top: 0; z-index: 99; }
+        .menu-toggle { background: none; border: none; font-size: 1.3rem; cursor: pointer; color: var(--primary); padding: 6px; border-radius: 50%; }
+        .page-title { font-size: 1.1rem; font-weight: 600; color: #1e2a3e; }
+        .user-info { display: flex; align-items: center; gap: 0.6rem; }
+        .user-email { font-size: 0.7rem; color: #5b6e8c; display: none; }
+        @media (min-width: 480px) { .user-email { display: inline; } }
+        .logout-btn { background: transparent; border: 1px solid #dc2626; color: #dc2626; padding: 0.35rem 0.7rem; border-radius: 2rem; cursor: pointer; font-size: 0.7rem; }
+        .logout-btn:hover { background: #dc2626; color: white; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 1rem; width: 100%; min-height: 70vh; }
+        .card { background: white; border-radius: var(--radius-card); box-shadow: var(--shadow-sm); padding: 1rem; margin-bottom: 1rem; border: 1px solid var(--gray-border); }
+        .btn { border: none; background: var(--primary); color: white; padding: 0.5rem 1rem; border-radius: var(--radius-btn); font-weight: 600; cursor: pointer; font-size: 0.75rem; }
+        .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
+        .btn-sm { padding: 0.25rem 0.6rem; font-size: 0.65rem; }
+        .btn-danger { background: var(--danger); }
+        .table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.7rem; }
+        th, td { text-align: left; padding: 0.6rem 0.4rem; border-bottom: 1px solid var(--gray-border); }
+        th { background: #f8fafc; font-weight: 600; }
+        .badge-paid { background: #dff0e4; color: #1f5a3a; padding: 0.15rem 0.5rem; border-radius: 30px; font-weight: 600; font-size: 0.65rem; display: inline-block; }
+        .badge-unpaid { background: #ffe6e5; color: #b91c1c; padding: 0.15rem 0.5rem; border-radius: 30px; font-weight: 600; font-size: 0.65rem; display: inline-block; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 1rem; }
+        .filter-select { padding: 0.4rem 0.8rem; border-radius: 40px; border: 1px solid var(--gray-border); background: white; font-size: 0.75rem; }
+        input, select { padding: 0.5rem; border-radius: 1rem; border: 1px solid #cbd5e1; width: 100%; font-size: 0.75rem; }
+        footer { text-align: center; padding: 0.8rem; font-size: 0.65rem; color: #6c757d; border-top: 1px solid var(--gray-border); margin-top: 1rem; }
+        .loading-spinner { display: inline-block; width: 30px; height: 30px; border: 3px solid #e2e8f0; border-radius: 50%; border-top-color: var(--primary); animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1001; }
+        .modal-content { background: white; border-radius: 1rem; padding: 1.2rem; max-width: 90%; width: 400px; }
+        .form-group { margin-bottom: 0.8rem; }
+        .form-group label { display: block; margin-bottom: 0.2rem; font-weight: 600; font-size: 0.75rem; }
+        .history-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 0.8rem; gap: 0.6rem; }
+        .form-row { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: flex-end; }
+        .form-row > * { flex: 1; min-width: 130px; }
+        @media (max-width: 640px) { .form-row { flex-direction: column; } .form-row > * { width: 100%; } }
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 999; }
+        .sidebar-overlay.active { display: block; }
+        @media (max-width: 768px) { .sidebar { transform: translateX(-100%); } .sidebar.open { transform: translateX(0); } .main-content { margin-left: 0; width: 100%; } .sidebar-close { display: flex; } .container { padding: 0.8rem; } }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 <div class="app-wrapper">
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
-    
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">🌿 ChamaEase</div>
@@ -526,18 +98,7 @@
             <a href="members.html" class="nav-item"><span class="icon">👥</span><span class="label">MEMBERS</span></a>
             <a href="contributions.html" class="nav-item active"><span class="icon">💰</span><span class="label">CONTRIBUTIONS</span></a>
             <div class="nav-divider"></div>
-            <div class="nav-item" style="cursor: default; opacity: 0.7;"><span class="icon">📜</span><span class="label">HISTORY</span></div>
-            <div class="nav-submenu">
-                <a href="contribution-history.html" class="nav-item"><span class="icon">📋</span><span class="label">CONTRIBUTIONS HISTORY</span></a>
-                <a href="member-history.html" class="nav-item"><span class="icon">👤</span><span class="label">MEMBERS HISTORY</span></a>
-            </div>
-            <div class="nav-divider"></div>
-            <div class="nav-item" style="cursor: default; opacity: 0.7;"><span class="icon">📈</span><span class="label">ANALYTICS</span></div>
-            <div class="nav-submenu">
-                <a href="statistics.html" class="nav-item"><span class="icon">📊</span><span class="label">MONTHLY STATISTICS</span></a>
-                <a href="reports.html" class="nav-item"><span class="icon">📋</span><span class="label">REPORTS</span></a>
-            </div>
-            <div class="nav-divider"></div>
+            <a href="reports.html" class="nav-item"><span class="icon">📋</span><span class="label">REPORTS</span></a>
             <a href="settings.html" class="nav-item"><span class="icon">⚙️</span><span class="label">SETTINGS</span></a>
         </nav>
     </aside>
@@ -545,7 +106,7 @@
     <main class="main-content">
         <div class="top-bar">
             <button class="menu-toggle" id="menuToggle">☰</button>
-            <div class="page-title">💰 CONTRIBUTIONS</div>
+            <div class="page-title">CONTRIBUTIONS</div>
             <div class="user-info">
                 <span class="user-email" id="userEmail"></span>
                 <button id="logoutBtn" class="logout-btn">LOGOUT</button>
@@ -554,10 +115,10 @@
         <div id="app-root" class="container">
             <div style="text-align: center; padding: 2rem;">
                 <div class="loading-spinner"></div>
-                <p style="margin-top: 0.5rem; font-size: 0.8rem;">Loading contributions...</p>
+                <p style="margin-top: 0.5rem;">Loading contributions...</p>
             </div>
         </div>
-        <footer>✨ Smart Chama Management · Tap ☰ for menu</footer>
+        <footer>✨ Smart Chama Management</footer>
     </main>
 </div>
 
@@ -574,7 +135,6 @@
     
     function openSidebar() { sidebar.classList.add('open'); sidebarOverlay.classList.add('active'); }
     function closeSidebar() { sidebar.classList.remove('open'); sidebarOverlay.classList.remove('active'); }
-    
     if (menuToggle) menuToggle.addEventListener('click', openSidebar);
     if (sidebarClose) sidebarClose.addEventListener('click', closeSidebar);
     if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebar);
@@ -588,22 +148,22 @@
         await loadData();
     })();
 
-    document.getElementById('logoutBtn').addEventListener('click', async () => { await logoutUser(); window.location.href = 'index.html'; });
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+        await logoutUser();
+        window.location.href = 'index.html';
+    });
 
     function formatNumber(num) { return (num || 0).toLocaleString('en-KE'); }
 
     async function loadData() {
         try {
-            const { data: members, error: membersError } = await supabaseClient.from('members').select('*').order('name');
-            if (membersError) throw membersError;
+            const { data: members } = await supabaseClient.from('members').select('*').order('name');
+            const { data: contributions } = await supabaseClient.from('contributions').select('*, members:member_id (name)').order('date', { ascending: false });
             allMembers = members || [];
-            const { data: contributions, error: contribError } = await supabaseClient.from('contributions').select(`*, members:member_id (name)`).order('date', { ascending: false });
-            if (contribError) throw contribError;
             allContributions = contributions || [];
             renderContributionsPage();
         } catch (error) {
-            console.error("Error loading data:", error);
-            document.getElementById('app-root').innerHTML = `<div class="card"><h3>⚠️ Error Loading Data</h3><p style="font-size:0.8rem;">${error.message}</p><button class="btn" onclick="location.reload()" style="margin-top:0.5rem;">RETRY</button></div>`;
+            document.getElementById('app-root').innerHTML = `<div class="card"><h3>⚠️ ERROR</h3><p>${error.message}</p><button class="btn" onclick="location.reload()">RETRY</button></div>`;
         }
     }
 
@@ -620,122 +180,25 @@
     function renderContributionsPage() {
         const container = document.getElementById('app-root');
         const months = getUniqueMonths();
-        const filteredContribs = getFilteredContributions();
-        const totalCollected = filteredContribs.reduce((sum, c) => sum + (c.amount || 0), 0);
+        const filtered = getFilteredContributions();
+        const total = filtered.reduce((sum, c) => sum + (c.amount || 0), 0);
         const paidMembers = allMembers.filter(m => (m.balance || 0) === 0);
         const unpaidMembers = allMembers.filter(m => (m.balance || 0) > 0);
         
         const html = `
-            <div class="history-header">
-                <h2>💰 CONTRIBUTIONS</h2>
-                <button class="btn-sm btn-outline" id="refreshBtn">🔄 REFRESH</button>
-            </div>
-            <div class="card">
-                <h3>➕ RECORD NEW CONTRIBUTION</h3>
-                <div class="form-row">
-                    <select id="memberSelect">
-                        <option value="">-- SELECT MEMBER --</option>
-                        ${allMembers.map(m => `<option value="${m.id}">${escapeHtml(m.name)}</option>`).join('')}
-                    </select>
-                    <input type="number" id="contributionAmount" placeholder="AMOUNT (KES)">
-                    <input type="month" id="contributionMonth" value="${new Date().toISOString().slice(0,7)}">
-                    <input type="date" id="contributionDate" value="${new Date().toISOString().slice(0,10)}">
-                    <select id="paymentMethod">
-                        <option value="M-Pesa">M-PESA</option>
-                        <option value="Cash">CASH</option>
-                        <option value="Bank Transfer">BANK TRANSFER</option>
-                    </select>
-                    <button id="saveContributionBtn" class="btn">💾 SAVE</button>
-                </div>
-            </div>
-            <div class="card">
-                <div class="flex-between">
-                    <h3>🔍 FILTER</h3>
-                    <select id="monthFilterSelect" class="filter-select">
-                        <option value="all" ${currentMonthFilter === 'all' ? 'selected' : ''}>ALL RECORDS</option>
-                        ${months.map(m => `<option value="${m}" ${currentMonthFilter === m ? 'selected' : ''}>${m}</option>`).join('')}
-                    </select>
-                </div>
-            </div>
-            <div class="card">
-                <h3>✅ PAID MEMBERS</h3>
-                <div class="table-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>MEMBER</th>
-                                <th>TOTAL PAID</th>
-                                <th>STATUS</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${paidMembers.map(m => `
-                                <tr>
-                                    <td data-label="MEMBER"><strong>${escapeHtml(m.name)}</strong></td>
-                                    <td data-label="TOTAL PAID">KES ${formatNumber(m.total_contributed)}</span></td>
-                                    <td data-label="STATUS"><span class="badge-paid">PAID</span></td>
-                                </tr>
-                            `).join('')}
-                            ${paidMembers.length === 0 ? '<tr><td colspan="3">No paid members yet</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></td>'}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="card">
-                <h3>⚠️ UNPAID MEMBERS</h3>
-                <div class="table-wrapper">
-                    </table>
-                        <thead>
-                            <tr>
-                                <th>MEMBER</th>
-                                <th>MONTHLY BALANCE</th>
-                                <th>ACTION</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${unpaidMembers.map(m => `
-                                <tr>
-                                    <td data-label="MEMBER"><strong>${escapeHtml(m.name)}</strong></td>
-                                    <td data-label="MONTHLY BALANCE">KES ${formatNumber(m.balance)}</span></td>
-                                    <td data-label="ACTION"><button class="btn-sm btn-outline settle-balance" data-id="${m.id}" data-balance="${m.balance || 0}">SETTLE</button></td>
-                                </tr>
-                            `).join('')}
-                            ${unpaidMembers.length === 0 ? '<tr><td colspan="3">🎉 Everyone is up to date!</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></tr>'}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="card">
-                <h3>📜 CONTRIBUTION HISTORY ${currentMonthFilter !== 'all' ? `- ${currentMonthFilter}` : ''}</h3>
-                <p><strong>TOTAL: KES ${formatNumber(totalCollected)}</strong></p>
-                <div class="table-wrapper">
-                    </table>
-                        <thead>
-                            <tr>
-                                <th>MEMBER</th>
-                                <th>AMOUNT</th>
-                                <th>DATE</th>
-                                <th>MONTH</th>
-                                <th>METHOD</th>
-                                <th>ACTION</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${filteredContribs.map(c => `
-                                <tr>
-                                    <td data-label="MEMBER">${escapeHtml(c.members?.name || 'Unknown')}</span></td>
-                                    <td data-label="AMOUNT">KES ${formatNumber(c.amount)}</span></td>
-                                    <td data-label="DATE">${c.date || '-'}</span></td>
-                                    <td data-label="MONTH">${c.month || '-'}</span></td>
-                                    <td data-label="METHOD">${c.method || '-'}</span></td>
-                                    <td data-label="ACTION"><button class="btn-sm btn-danger-outline delete-contribution" data-id="${c.id}" data-member="${escapeHtml(c.members?.name || 'Unknown')}" data-amount="${c.amount}">DELETE</button></td>
-                                </tr>
-                            `).join('')}
-                            ${filteredContribs.length === 0 ? '<tr><td colspan="6">No contributions found</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><tr>'}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            <div class="history-header"><h2>💰 CONTRIBUTIONS</h2><button class="btn-sm btn-outline" id="refreshBtn">🔄 REFRESH</button></div>
+            <div class="card"><h3>➕ RECORD NEW CONTRIBUTION</h3><div class="form-row">
+                <select id="memberSelect"><option value="">-- SELECT MEMBER --</option>${allMembers.map(m => `<option value="${m.id}">${escapeHtml(m.name)}</option>`).join('')}</select>
+                <input type="number" id="contributionAmount" placeholder="AMOUNT (KES)">
+                <input type="month" id="contributionMonth" value="${new Date().toISOString().slice(0,7)}">
+                <input type="date" id="contributionDate" value="${new Date().toISOString().slice(0,10)}">
+                <select id="paymentMethod"><option value="M-Pesa">M-PESA</option><option value="Cash">CASH</option><option value="Bank Transfer">BANK TRANSFER</option></select>
+                <button id="saveContributionBtn" class="btn">💾 SAVE</button>
+            </div></div>
+            <div class="card"><div class="flex-between"><h3>🔍 FILTER</h3><select id="monthFilterSelect" class="filter-select"><option value="all" ${currentMonthFilter === 'all' ? 'selected' : ''}>ALL RECORDS</option>${months.map(m => `<option value="${m}" ${currentMonthFilter === m ? 'selected' : ''}>${m}</option>`).join('')}</select></div></div>
+            <div class="card"><h3>✅ PAID MEMBERS</h3><div class="table-wrapper"><tr><thead><tr><th>MEMBER</th><th>TOTAL PAID</th><th>STATUS</th></tr></thead><tbody>${paidMembers.map(m => `<tr><td><strong>${escapeHtml(m.name)}</strong></td><td>KES ${formatNumber(m.total_contributed)}</td><td><span class="badge-paid">PAID</span></td></tr>`).join('') || '<tr><td colspan="3">No paid members yet</td></tr>'}</tbody>}</div></div>
+            <div class="card"><h3>⚠️ UNPAID MEMBERS</h3><div class="table-wrapper"><tr><thead><tr><th>MEMBER</th><th>MONTHLY BALANCE</th><th>ACTION</th></tr></thead><tbody>${unpaidMembers.map(m => `<tr><td><strong>${escapeHtml(m.name)}</strong></td><td>KES ${formatNumber(m.balance)}</td><td><button class="btn-sm btn-outline settle-balance" data-id="${m.id}" data-balance="${m.balance}">SETTLE</button></td></tr>`).join('') || '<tr><td colspan="3">🎉 Everyone is up to date!</td></tr>'}</tbody>}</div></div>
+            <div class="card"><h3>📜 CONTRIBUTION HISTORY ${currentMonthFilter !== 'all' ? `- ${currentMonthFilter}` : ''}</h3><p><strong>TOTAL: KES ${formatNumber(total)}</strong></p><div class="table-wrapper"><table><thead><tr><th>MEMBER</th><th>AMOUNT</th><th>DATE</th><th>MONTH</th><th>METHOD</th><th>ACTION</th></tr></thead><tbody>${filtered.map(c => `<tr><td>${escapeHtml(c.members?.name || 'Unknown')}</td><td>KES ${formatNumber(c.amount)}</td><td>${c.date || '-'}</td><td>${c.month || '-'}</td><td>${c.method || '-'}</td><td><button class="btn-sm btn-danger-outline delete-contribution" data-id="${c.id}" data-member="${escapeHtml(c.members?.name || 'Unknown')}" data-amount="${c.amount}">DEL</button></td></tr>`).join('') || '<tr><td colspan="6">No contributions found</td></tr>'}</tbody>}</div></div>
         `;
         container.innerHTML = html;
         
@@ -752,143 +215,61 @@
         const month = document.getElementById('contributionMonth').value;
         const date = document.getElementById('contributionDate').value;
         const method = document.getElementById('paymentMethod').value;
-        if (!memberId) { showToast('Please select a member', 'error'); return; }
-        if (isNaN(amount) || amount <= 0) { showToast('Please enter a valid amount', 'error'); return; }
-        if (!date) { showToast('Please select a date', 'error'); return; }
+        if (!memberId) { alert('Please select a member'); return; }
+        if (isNaN(amount) || amount <= 0) { alert('Please enter a valid amount'); return; }
         const user = await getCurrentUser();
         const { error } = await supabaseClient.from('contributions').insert([{ member_id: memberId, amount, month, date, method, type: 'Monthly', recorded_by: user?.id }]);
-        if (error) { showToast('Error: ' + error.message, 'error'); return; }
-        showToast('✅ Contribution saved!', 'success');
+        if (error) { alert('Error: ' + error.message); return; }
+        alert('✅ Contribution saved!');
         document.getElementById('memberSelect').value = '';
         document.getElementById('contributionAmount').value = '';
         await loadData();
     }
     
     function showSettleModal(memberId, currentBalance) {
-        if (currentBalance <= 0) { showToast('Balance is zero', 'error'); return; }
+        if (currentBalance <= 0) { alert('Balance is zero'); return; }
         const member = allMembers.find(m => m.id === memberId);
         const modal = document.createElement('div');
         modal.className = 'modal';
         modal.innerHTML = `
             <div class="modal-content">
                 <h3>💰 SETTLE PAYMENT</h3>
-                <p><strong>${escapeHtml(member?.name || 'Unknown')}</strong></p>
+                <p><strong>${escapeHtml(member?.name)}</strong></p>
                 <p>MONTHLY BALANCE: KES ${formatNumber(currentBalance)}</p>
-                <div class="form-group">
-                    <label>AMOUNT TO PAY (KES):</label>
-                    <input type="number" id="settleAmount" class="settle-amount" placeholder="Enter amount" value="${currentBalance}" step="100" min="1" max="${currentBalance}">
-                    <small style="color:#666; font-size:0.65rem;">MAX: KES ${formatNumber(currentBalance)}</small>
-                </div>
-                <div class="form-group">
-                    <label>PAYMENT METHOD:</label>
-                    <select id="settleMethodSelect">
-                        <option value="M-Pesa">M-PESA</option>
-                        <option value="Cash">CASH</option>
-                        <option value="Bank Transfer">BANK TRANSFER</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>DATE:</label>
-                    <input type="date" id="settleDate" value="${new Date().toISOString().slice(0,10)}">
-                </div>
-                <div style="display:flex; gap:10px; margin-top:1rem;">
-                    <button id="confirmSettleBtn" class="btn" style="flex:1;">CONFIRM PAYMENT</button>
-                    <button id="cancelSettleBtn" class="btn-outline btn" style="flex:1;">CANCEL</button>
-                </div>
+                <div class="form-group"><label>AMOUNT TO PAY:</label><input type="number" id="settleAmount" value="${currentBalance}" min="1" max="${currentBalance}"></div>
+                <div class="form-group"><label>PAYMENT METHOD:</label><select id="settleMethodSelect"><option value="M-Pesa">M-PESA</option><option value="Cash">CASH</option><option value="Bank Transfer">BANK TRANSFER</option></select></div>
+                <div class="form-group"><label>DATE:</label><input type="date" id="settleDate" value="${new Date().toISOString().slice(0,10)}"></div>
+                <div style="display:flex; gap:10px;"><button id="confirmSettleBtn" class="btn">CONFIRM</button><button id="cancelSettleBtn" class="btn-outline btn">CANCEL</button></div>
             </div>
         `;
         document.body.appendChild(modal);
-        
-        const amountInput = document.getElementById('settleAmount');
-        if (amountInput) {
-            amountInput.addEventListener('change', function() {
-                let value = parseFloat(this.value);
-                if (isNaN(value)) value = 0;
-                if (value > currentBalance) {
-                    this.value = currentBalance;
-                    showToast(`Amount cannot exceed balance of KES ${formatNumber(currentBalance)}`, 'error');
-                } else if (value < 0) {
-                    this.value = 0;
-                }
-            });
-        }
         
         document.getElementById('confirmSettleBtn').onclick = async () => {
             let amount = parseFloat(document.getElementById('settleAmount').value);
             const method = document.getElementById('settleMethodSelect').value;
             const date = document.getElementById('settleDate').value;
-            
-            if (isNaN(amount) || amount <= 0) {
-                showToast('Please enter a valid amount', 'error');
-                return;
-            }
-            if (amount > currentBalance) {
-                amount = currentBalance;
-            }
-            
+            if (isNaN(amount) || amount <= 0) { alert('Enter valid amount'); return; }
             const user = await getCurrentUser();
-            const { error } = await supabaseClient.from('contributions').insert([{ 
-                member_id: memberId, 
-                amount: amount, 
-                month: date.slice(0,7), 
-                date, 
-                method, 
-                type: 'Payment', 
-                recorded_by: user?.id 
-            }]);
-            if (error) { showToast('Error: ' + error.message, 'error'); modal.remove(); return; }
+            const { error } = await supabaseClient.from('contributions').insert([{ member_id: memberId, amount, month: date.slice(0,7), date, method, type: 'Payment', recorded_by: user?.id }]);
+            if (error) { alert('Error: ' + error.message); modal.remove(); return; }
             modal.remove();
-            const remainingBalance = currentBalance - amount;
-            if (remainingBalance > 0) {
-                showToast(`✅ Paid KES ${formatNumber(amount)}. Remaining: KES ${formatNumber(remainingBalance)}`, 'success');
-            } else {
-                showToast(`✅ Fully settled! Paid KES ${formatNumber(amount)}`, 'success');
-            }
+            alert(`✅ Paid KES ${formatNumber(amount)}`);
             await loadData();
         };
         document.getElementById('cancelSettleBtn').onclick = () => modal.remove();
     }
     
     async function confirmDeleteContribution(id, memberName, amount) {
-        const modal = document.createElement('div');
-        modal.className = 'modal';
-        modal.innerHTML = `
-            <div class="modal-content">
-                <h3>⚠️ DELETE CONTRIBUTION</h3>
-                <p>Delete ${memberName} - KES ${formatNumber(amount)}?</p>
-                <div style="display:flex; gap:10px; margin-top:1rem;">
-                    <button id="confirmDeleteBtn" class="btn btn-danger" style="flex:1;">DELETE</button>
-                    <button id="cancelModalBtn" class="btn-outline btn" style="flex:1;">CANCEL</button>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(modal);
-        document.getElementById('confirmDeleteBtn').onclick = async () => {
-            const { error } = await supabaseClient.from('contributions').delete().eq('id', id);
-            if (error) { showToast('Error: ' + error.message, 'error'); modal.remove(); return; }
-            modal.remove();
-            showToast('✅ Contribution deleted!', 'success');
-            await loadData();
-        };
-        document.getElementById('cancelModalBtn').onclick = () => modal.remove();
-    }
-    
-    function showToast(message, type) {
-        const toast = document.createElement('div');
-        toast.style.cssText = `position:fixed; bottom:20px; right:20px; background:${type === 'error' ? '#dc2626' : '#2c7a4d'}; color:white; padding:10px 16px; border-radius:40px; font-size:0.75rem; z-index:1002; box-shadow:0 4px 12px rgba(0,0,0,0.15);`;
-        toast.textContent = message;
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
+        if (!confirm(`Delete ${memberName} - KES ${formatNumber(amount)}?`)) return;
+        const { error } = await supabaseClient.from('contributions').delete().eq('id', id);
+        if (error) { alert('Error: ' + error.message); return; }
+        alert('✅ Contribution deleted!');
+        await loadData();
     }
     
     function escapeHtml(str) {
         if (!str) return '';
-        return String(str).replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        });
+        return String(str).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m] || m));
     }
 </script>
 </body>
