@@ -233,6 +233,7 @@
             font-weight: 600;
             cursor: pointer;
             font-size: 0.75rem;
+            text-decoration: none;
         }
 
         .btn-outline {
@@ -436,6 +437,9 @@
             .search-bar {
                 max-width: 100%;
             }
+            .btn {
+                text-align: center;
+            }
             table, thead, tbody, th, td, tr {
                 display: block;
             }
@@ -505,7 +509,7 @@
         <div id="app-root" class="container">
             <div style="text-align: center; padding: 2rem;">
                 <div class="loading-spinner"></div>
-                <p style="margin-top: 0.5rem; font-size: 0.8rem;">Loading members...</p>
+                <p style="margin-top: 0.5rem;">Loading members...</p>
             </div>
         </div>
         <footer>✨ Smart Chama Management · Tap ☰ for menu</footer>
@@ -554,7 +558,8 @@
     });
 
     function formatNumber(num) {
-        return (num || 0).toLocaleString('en-KE');
+        if (num === null || num === undefined) return '0';
+        return num.toLocaleString('en-KE');
     }
 
     async function loadMembers() {
@@ -565,15 +570,52 @@
             allMembers = members || [];
             renderMembersList();
         } catch (error) {
-            container.innerHTML = `<div class="card"><h3>⚠️ ERROR LOADING MEMBERS</h3><p>${error.message}</p><button class="btn" onclick="location.reload()">RETRY</button></div>`;
+            console.error("Error:", error);
+            container.innerHTML = '<div class="card"><h3>⚠️ ERROR LOADING MEMBERS</h3><p>' + error.message + '</p><button class="btn" onclick="location.reload()">RETRY</button></div>';
         }
     }
 
     function renderMembersList() {
         const container = document.getElementById('app-root');
-        let filtered = searchTerm ? allMembers.filter(m => m.name.toLowerCase().includes(searchTerm.toLowerCase()) || (m.phone && m.phone.includes(searchTerm))) : allMembers;
+        let filtered = allMembers;
+        if (searchTerm) {
+            filtered = allMembers.filter(function(m) {
+                return m.name.toLowerCase().includes(searchTerm.toLowerCase()) || (m.phone && m.phone.includes(searchTerm));
+            });
+        }
         
-        const html = `
+        let tableRows = '';
+        for (var i = 0; i < filtered.length; i++) {
+            var m = filtered[i];
+            var balance = m.balance || 0;
+            var balanceColor = balance > 0 ? '#dc2626' : '#2c7a4d';
+            var statusClass = balance === 0 ? 'badge-paid' : 'badge-unpaid';
+            var statusText = balance === 0 ? 'PAID' : 'UNPAID';
+            var loanBalance = m.loan_balance || 0;
+            
+            tableRows += '<tr>';
+            tableRows += '<td data-label="MEMBER"><strong>' + escapeHtml(m.name) + '</strong></td>';
+            tableRows += '<td data-label="PHONE">' + escapeHtml(m.phone || '-') + '</td>';
+            tableRows += '<td data-label="EXPECTED">KES ' + formatNumber(m.expected_contribution) + '</td>';
+            tableRows += '<td data-label="PAID">KES ' + formatNumber(m.total_contributed) + '</td>';
+            tableRows += '<td data-label="MONTHLY BALANCE"><span style="color:' + balanceColor + '; font-weight:600;">KES ' + formatNumber(balance) + '</span></td>';
+            tableRows += '<td data-label="LOAN BALANCE"><span class="badge-loan">KES ' + formatNumber(loanBalance) + '</span></td>';
+            tableRows += '<td data-label="STATUS"><span class="' + statusClass + '">' + statusText + '</span></td>';
+            tableRows += '<td data-label="ACTIONS" class="action-group">';
+            tableRows += '<button class="btn-sm btn-outline view-detail" data-id="' + m.id + '">VIEW</button>';
+            tableRows += '<button class="btn-sm btn-outline edit-member" data-id="' + m.id + '" data-name="' + escapeHtml(m.name) + '" data-phone="' + escapeHtml(m.phone) + '" data-expected="' + (m.expected_contribution || 0) + '" data-loan="' + loanBalance + '">EDIT</button>';
+            if (balance > 0) {
+                tableRows += '<button class="btn-sm btn-outline settle-balance" data-id="' + m.id + '" data-balance="' + balance + '">SETTLE</button>';
+            }
+            tableRows += '<button class="btn-sm btn-danger-outline delete-member" data-id="' + m.id + '" data-name="' + escapeHtml(m.name) + '">DEL</button>';
+            tableRows += '</td></tr>';
+        }
+        
+        if (filtered.length === 0) {
+            tableRows = '<tr><td colspan="8" style="text-align:center;">No members found</td></tr>';
+        }
+        
+        var html = `
             <div class="flex-between">
                 <h2>👥 MEMBERS</h2>
                 <button class="btn" id="addMemberBtn">+ ADD MEMBER</button>
@@ -597,41 +639,53 @@
                             </tr>
                         </thead>
                         <tbody>
-                            ${filtered.map(m => `
-                                <tr>
-                                    <td data-label="MEMBER"><strong>${escapeHtml(m.name)}</strong></td>
-                                    <td data-label="PHONE">${escapeHtml(m.phone) || '-'}</td>
-                                    <td data-label="EXPECTED">KES ${formatNumber(m.expected_contribution)}</span></td>
-                                    <td data-label="PAID">KES ${formatNumber(m.total_contributed)}</span></td>
-                                    <td data-label="MONTHLY BALANCE"><span style="color:${(m.balance || 0) > 0 ? '#dc2626' : '#2c7a4d'}; font-weight:600;">KES ${formatNumber(m.balance)}</span></td>
-                                    <td data-label="LOAN BALANCE"><span class="badge-loan">KES ${formatNumber(m.loan_balance || 0)}</span></td>
-                                    <td data-label="STATUS"><span class="${(m.balance || 0) === 0 ? 'badge-paid' : 'badge-unpaid'}">${(m.balance || 0) === 0 ? 'PAID' : 'UNPAID'}</span></td>
-                                    <td data-label="ACTIONS" class="action-group">
-                                        <button class="btn-sm btn-outline view-detail" data-id="${m.id}">VIEW</button>
-                                        <button class="btn-sm btn-outline edit-member" data-id="${m.id}" data-name="${escapeHtml(m.name)}" data-phone="${escapeHtml(m.phone)}" data-expected="${m.expected_contribution || 0}" data-loan="${m.loan_balance || 0}">EDIT</button>
-                                        ${(m.balance || 0) > 0 ? `<button class="btn-sm btn-outline settle-balance" data-id="${m.id}" data-balance="${m.balance}">SETTLE</button>` : ''}
-                                        <button class="btn-sm btn-danger-outline delete-member" data-id="${m.id}" data-name="${escapeHtml(m.name)}">DEL</button>
-                                    </td>
-                                </tr>
-                            `).join('')}
-                            ${filtered.length === 0 ? '<tr><td colspan="8">No members found</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></td>'}
+                            ${tableRows}
                         </tbody>
                     </table>
                 </div>
             </div>
         `;
+        
         container.innerHTML = html;
         
-        document.getElementById('searchMemberInput')?.addEventListener('input', (e) => { searchTerm = e.target.value; renderMembersList(); });
+        document.getElementById('searchMemberInput')?.addEventListener('input', function(e) {
+            searchTerm = e.target.value;
+            renderMembersList();
+        });
+        
         document.getElementById('addMemberBtn')?.addEventListener('click', showAddMemberModal);
-        document.querySelectorAll('.view-detail').forEach(btn => btn.addEventListener('click', () => showMemberDetails(btn.dataset.id)));
-        document.querySelectorAll('.edit-member').forEach(btn => btn.addEventListener('click', () => showEditMemberModal(btn.dataset.id, btn.dataset.name, btn.dataset.phone, btn.dataset.expected, btn.dataset.loan)));
-        document.querySelectorAll('.settle-balance').forEach(btn => btn.addEventListener('click', () => showSettleModal(btn.dataset.id, parseFloat(btn.dataset.balance))));
-        document.querySelectorAll('.delete-member').forEach(btn => btn.addEventListener('click', () => confirmDeleteMember(btn.dataset.id, btn.dataset.name)));
+        
+        var viewBtns = document.querySelectorAll('.view-detail');
+        for (var i = 0; i < viewBtns.length; i++) {
+            viewBtns[i].addEventListener('click', function() {
+                showMemberDetails(this.dataset.id);
+            });
+        }
+        
+        var editBtns = document.querySelectorAll('.edit-member');
+        for (var i = 0; i < editBtns.length; i++) {
+            editBtns[i].addEventListener('click', function() {
+                showEditMemberModal(this.dataset.id, this.dataset.name, this.dataset.phone, this.dataset.expected, this.dataset.loan);
+            });
+        }
+        
+        var settleBtns = document.querySelectorAll('.settle-balance');
+        for (var i = 0; i < settleBtns.length; i++) {
+            settleBtns[i].addEventListener('click', function() {
+                showSettleModal(this.dataset.id, parseFloat(this.dataset.balance));
+            });
+        }
+        
+        var deleteBtns = document.querySelectorAll('.delete-member');
+        for (var i = 0; i < deleteBtns.length; i++) {
+            deleteBtns[i].addEventListener('click', function() {
+                confirmDeleteMember(this.dataset.id, this.dataset.name);
+            });
+        }
     }
 
     function showAddMemberModal() {
-        const modal = document.createElement('div');
+        var modal = document.createElement('div');
         modal.className = 'modal';
         modal.innerHTML = `
             <div class="modal-content">
@@ -646,23 +700,23 @@
         `;
         document.body.appendChild(modal);
         
-        document.getElementById('confirmAddBtn').onclick = async () => {
-            const name = document.getElementById('memberName').value.trim();
-            const phone = document.getElementById('memberPhone').value.trim();
-            const expected = parseFloat(document.getElementById('memberExpected').value) || 0;
-            const loanBalance = parseFloat(document.getElementById('memberLoan').value) || 0;
+        document.getElementById('confirmAddBtn').onclick = async function() {
+            var name = document.getElementById('memberName').value.trim();
+            var phone = document.getElementById('memberPhone').value.trim();
+            var expected = parseFloat(document.getElementById('memberExpected').value) || 0;
+            var loanBalance = parseFloat(document.getElementById('memberLoan').value) || 0;
             if (!name || !phone) { alert('Please fill in name and phone number'); return; }
-            const { error } = await supabaseClient.from('members').insert([{ name, phone, expected_contribution: expected, total_contributed: 0, balance: expected, loan_balance: loanBalance, status: expected > 0 ? 'unpaid' : 'paid' }]);
+            var { error } = await supabaseClient.from('members').insert([{ name: name, phone: phone, expected_contribution: expected, total_contributed: 0, balance: expected, loan_balance: loanBalance, status: expected > 0 ? 'unpaid' : 'paid' }]);
             if (error) { alert(error.message); return; }
             modal.remove();
             await loadMembers();
             alert('✅ Member added successfully!');
         };
-        document.getElementById('cancelModalBtn').onclick = () => modal.remove();
+        document.getElementById('cancelModalBtn').onclick = function() { modal.remove(); };
     }
 
     function showEditMemberModal(id, name, phone, expected, loan) {
-        const modal = document.createElement('div');
+        var modal = document.createElement('div');
         modal.className = 'modal';
         modal.innerHTML = `
             <div class="modal-content">
@@ -677,30 +731,30 @@
         `;
         document.body.appendChild(modal);
         
-        document.getElementById('confirmEditBtn').onclick = async () => {
-            const newName = document.getElementById('memberName').value.trim();
-            const newPhone = document.getElementById('memberPhone').value.trim();
-            const newExpected = parseFloat(document.getElementById('memberExpected').value) || 0;
-            const newLoan = parseFloat(document.getElementById('memberLoan').value) || 0;
+        document.getElementById('confirmEditBtn').onclick = async function() {
+            var newName = document.getElementById('memberName').value.trim();
+            var newPhone = document.getElementById('memberPhone').value.trim();
+            var newExpected = parseFloat(document.getElementById('memberExpected').value) || 0;
+            var newLoan = parseFloat(document.getElementById('memberLoan').value) || 0;
             if (!newName || !newPhone) { alert('Please fill in name and phone number'); return; }
-            const { error } = await supabaseClient.from('members').update({ name: newName, phone: newPhone, expected_contribution: newExpected, loan_balance: newLoan }).eq('id', id);
+            var { error } = await supabaseClient.from('members').update({ name: newName, phone: newPhone, expected_contribution: newExpected, loan_balance: newLoan }).eq('id', id);
             if (error) { alert(error.message); return; }
             modal.remove();
             await loadMembers();
             alert('✅ Member updated successfully!');
         };
-        document.getElementById('cancelModalBtn').onclick = () => modal.remove();
+        document.getElementById('cancelModalBtn').onclick = function() { modal.remove(); };
     }
 
     function showSettleModal(memberId, currentBalance) {
         if (currentBalance <= 0) { alert('Balance is already zero'); return; }
-        const member = allMembers.find(m => m.id === memberId);
-        const modal = document.createElement('div');
+        var member = allMembers.find(function(m) { return m.id === memberId; });
+        var modal = document.createElement('div');
         modal.className = 'modal';
         modal.innerHTML = `
             <div class="modal-content">
                 <h3>💰 SETTLE PAYMENT</h3>
-                <p><strong>${escapeHtml(member?.name || 'Unknown')}</strong></p>
+                <p><strong>${escapeHtml(member ? member.name : 'Unknown')}</strong></p>
                 <p>MONTHLY BALANCE: KES ${formatNumber(currentBalance)}</p>
                 <div class="form-group"><label>AMOUNT TO PAY (KES):</label><input type="number" id="settleAmount" value="${currentBalance}" min="1" max="${currentBalance}"></div>
                 <div class="form-group"><label>PAYMENT METHOD:</label><select id="settleMethodSelect"><option value="M-Pesa">M-PESA</option><option value="Cash">CASH</option><option value="Bank Transfer">BANK TRANSFER</option></select></div>
@@ -710,26 +764,26 @@
         `;
         document.body.appendChild(modal);
         
-        document.getElementById('confirmSettleBtn').onclick = async () => {
-            let amount = parseFloat(document.getElementById('settleAmount').value);
-            const method = document.getElementById('settleMethodSelect').value;
-            const date = document.getElementById('settleDate').value;
+        document.getElementById('confirmSettleBtn').onclick = async function() {
+            var amount = parseFloat(document.getElementById('settleAmount').value);
+            var method = document.getElementById('settleMethodSelect').value;
+            var date = document.getElementById('settleDate').value;
             if (isNaN(amount) || amount <= 0) { alert('Please enter a valid amount'); return; }
             if (amount > currentBalance) amount = currentBalance;
-            const user = await getCurrentUser();
-            const { error } = await supabaseClient.from('contributions').insert([{ member_id: memberId, amount: amount, month: date.slice(0,7), date, method, type: 'Payment', recorded_by: user?.id }]);
+            var user = await getCurrentUser();
+            var { error } = await supabaseClient.from('contributions').insert([{ member_id: memberId, amount: amount, month: date.slice(0,7), date: date, method: method, type: 'Payment', recorded_by: user ? user.id : null }]);
             if (error) { alert('Error: ' + error.message); modal.remove(); return; }
             modal.remove();
-            alert(`✅ Paid KES ${formatNumber(amount)}`);
+            alert('✅ Paid KES ' + formatNumber(amount));
             await loadMembers();
         };
-        document.getElementById('cancelSettleBtn').onclick = () => modal.remove();
+        document.getElementById('cancelSettleBtn').onclick = function() { modal.remove(); };
     }
 
     function confirmDeleteMember(id, name) {
-        if (!confirm(`Delete ${name}? This will also delete all contribution records.`)) return;
-        (async () => {
-            const { error } = await supabaseClient.from('members').delete().eq('id', id);
+        if (!confirm('Delete ' + name + '? This will also delete all contribution records.')) return;
+        (async function() {
+            var { error } = await supabaseClient.from('members').delete().eq('id', id);
             if (error) { alert('Error: ' + error.message); return; }
             await loadMembers();
             alert('✅ Member deleted successfully!');
@@ -737,12 +791,28 @@
     }
 
     async function showMemberDetails(memberId) {
-        const member = allMembers.find(m => m.id === memberId);
+        var member = allMembers.find(function(m) { return m.id === memberId; });
         if (!member) return;
-        const { data: contributions } = await supabaseClient.from('contributions').select('*').eq('member_id', memberId).order('date', { ascending: false });
-        const totalPaid = contributions?.reduce((sum, c) => sum + c.amount, 0) || 0;
-        const modal = document.createElement('div');
+        var { data: contributions } = await supabaseClient.from('contributions').select('*').eq('member_id', memberId).order('date', { ascending: false });
+        var totalPaid = 0;
+        if (contributions) {
+            for (var i = 0; i < contributions.length; i++) {
+                totalPaid += contributions[i].amount;
+            }
+        }
+        var modal = document.createElement('div');
         modal.className = 'modal';
+        
+        var contribRows = '';
+        if (contributions && contributions.length > 0) {
+            for (var i = 0; i < contributions.length; i++) {
+                var c = contributions[i];
+                contribRows += '<tr><td data-label="DATE">' + (c.date || '-') + '</td><td data-label="AMOUNT">KES ' + formatNumber(c.amount) + '</td><td data-label="METHOD">' + (c.method || '-') + '</td><td data-label="MONTH">' + (c.month || '-') + '</td></tr>';
+            }
+        } else {
+            contribRows = '<tr><td colspan="4">No contributions yet</td></tr>';
+        }
+        
         modal.innerHTML = `
             <div class="modal-content" style="max-width:500px; max-height:80vh; overflow-y:auto;">
                 <div class="flex-between"><h3>👤 ${escapeHtml(member.name)}</h3><button id="closeModalBtn" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button></div>
@@ -753,17 +823,22 @@
                 <p><strong>🏦 LOAN BALANCE:</strong> <span class="badge-loan">KES ${formatNumber(member.loan_balance || 0)}</span></p>
                 <p><strong>📊 STATUS:</strong> <span class="${(member.balance || 0) === 0 ? 'badge-paid' : 'badge-unpaid'}">${(member.balance || 0) === 0 ? 'PAID' : 'UNPAID'}</span></p>
                 <h4>📅 CONTRIBUTION HISTORY</h4>
-                <div class="table-wrapper"><table><thead><tr><th>DATE</th><th>AMOUNT</th><th>METHOD</th><th>MONTH</th></tr></thead><tbody>${contributions?.map(c => `<tr><td>${c.date || '-'}</td><td>KES ${formatNumber(c.amount)}</td><td>${c.method || '-'}</td><td>${c.month || '-'}</td></tr>`).join('') || '<tr><td colspan="4">No contributions yet</td></tr>'}</tbody></table></div>
+                <div class="table-wrapper"><table><thead><tr><th>DATE</th><th>AMOUNT</th><th>METHOD</th><th>MONTH</th></tr></thead><tbody>${contribRows}</tbody></table></div>
             </div>
         `;
         document.body.appendChild(modal);
-        modal.querySelector('#closeModalBtn').onclick = () => modal.remove();
-        modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+        modal.querySelector('#closeModalBtn').onclick = function() { modal.remove(); };
+        modal.onclick = function(e) { if (e.target === modal) modal.remove(); };
     }
 
     function escapeHtml(str) {
         if (!str) return '';
-        return String(str).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m] || m));
+        return String(str).replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
     }
 </script>
 </body>
