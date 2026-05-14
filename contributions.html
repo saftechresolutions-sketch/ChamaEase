@@ -296,6 +296,7 @@
                 padding: 0.6rem 0.4rem;
                 border-bottom: 1px solid var(--gray-border);
                 font-size: 0.75rem;
+                flex-wrap: wrap;
             }
             td:last-child {
                 border-bottom: none;
@@ -310,7 +311,7 @@
         
         @media (min-width: 769px) {
             table {
-                min-width: 500px;
+                min-width: 700px;
             }
             th, td {
                 padding: 0.6rem 0.4rem;
@@ -521,33 +522,33 @@
             <button class="sidebar-close" id="sidebarClose">✕</button>
         </div>
         <nav class="sidebar-nav">
-            <a href="dashboard.html" class="nav-item"><span class="icon">📊</span><span class="label">Dashboard</span></a>
-            <a href="members.html" class="nav-item"><span class="icon">👥</span><span class="label">Members</span></a>
-            <a href="contributions.html" class="nav-item active"><span class="icon">💰</span><span class="label">Contributions</span></a>
+            <a href="dashboard.html" class="nav-item"><span class="icon">📊</span><span class="label">DASHBOARD</span></a>
+            <a href="members.html" class="nav-item"><span class="icon">👥</span><span class="label">MEMBERS</span></a>
+            <a href="contributions.html" class="nav-item active"><span class="icon">💰</span><span class="label">CONTRIBUTIONS</span></a>
             <div class="nav-divider"></div>
-            <div class="nav-item" style="cursor: default; opacity: 0.7;"><span class="icon">📜</span><span class="label">History</span></div>
+            <div class="nav-item" style="cursor: default; opacity: 0.7;"><span class="icon">📜</span><span class="label">HISTORY</span></div>
             <div class="nav-submenu">
-                <a href="contribution-history.html" class="nav-item"><span class="icon">📋</span><span class="label">Contributions History</span></a>
-                <a href="member-history.html" class="nav-item"><span class="icon">👤</span><span class="label">Members History</span></a>
+                <a href="contribution-history.html" class="nav-item"><span class="icon">📋</span><span class="label">CONTRIBUTIONS HISTORY</span></a>
+                <a href="member-history.html" class="nav-item"><span class="icon">👤</span><span class="label">MEMBERS HISTORY</span></a>
             </div>
             <div class="nav-divider"></div>
-            <div class="nav-item" style="cursor: default; opacity: 0.7;"><span class="icon">📈</span><span class="label">Analytics</span></div>
+            <div class="nav-item" style="cursor: default; opacity: 0.7;"><span class="icon">📈</span><span class="label">ANALYTICS</span></div>
             <div class="nav-submenu">
-                <a href="statistics.html" class="nav-item"><span class="icon">📊</span><span class="label">Monthly Statistics</span></a>
-                <a href="reports.html" class="nav-item"><span class="icon">📋</span><span class="label">Reports</span></a>
+                <a href="statistics.html" class="nav-item"><span class="icon">📊</span><span class="label">MONTHLY STATISTICS</span></a>
+                <a href="reports.html" class="nav-item"><span class="icon">📋</span><span class="label">REPORTS</span></a>
             </div>
             <div class="nav-divider"></div>
-            <a href="settings.html" class="nav-item"><span class="icon">⚙️</span><span class="label">Settings</span></a>
+            <a href="settings.html" class="nav-item"><span class="icon">⚙️</span><span class="label">SETTINGS</span></a>
         </nav>
     </aside>
 
     <main class="main-content">
         <div class="top-bar">
             <button class="menu-toggle" id="menuToggle">☰</button>
-            <div class="page-title">💰 Contributions</div>
+            <div class="page-title">💰 CONTRIBUTIONS</div>
             <div class="user-info">
                 <span class="user-email" id="userEmail"></span>
-                <button id="logoutBtn" class="logout-btn">Logout</button>
+                <button id="logoutBtn" class="logout-btn">LOGOUT</button>
             </div>
         </div>
         <div id="app-root" class="container">
@@ -602,7 +603,7 @@
             renderContributionsPage();
         } catch (error) {
             console.error("Error loading data:", error);
-            document.getElementById('app-root').innerHTML = `<div class="card"><h3>⚠️ Error Loading Data</h3><p style="font-size:0.8rem;">${error.message}</p><button class="btn" onclick="location.reload()" style="margin-top:0.5rem;">Retry</button></div>`;
+            document.getElementById('app-root').innerHTML = `<div class="card"><h3>⚠️ Error Loading Data</h3><p style="font-size:0.8rem;">${error.message}</p><button class="btn" onclick="location.reload()" style="margin-top:0.5rem;">RETRY</button></div>`;
         }
     }
 
@@ -617,118 +618,133 @@
     }
 
     function renderContributionsPage() {
-    const container = document.getElementById('app-root');
-    const months = getUniqueMonths();
-    const filteredContribs = getFilteredContributions();
-    const totalCollected = filteredContribs.reduce((sum, c) => sum + (c.amount || 0), 0);
-    const paidMembers = allMembers.filter(m => (m.balance || 0) === 0);
-    const unpaidMembers = allMembers.filter(m => (m.balance || 0) > 0);
-    
-    const html = `
-        <div class="history-header">
-            <h2>💰 Contributions</h2>
-            <button class="btn-sm btn-outline" id="refreshBtn">🔄 Refresh</button>
-        </div>
-        <div class="card">
-            <h3>➕ Record New Contribution</h3>
-            <div class="form-row">
-                <select id="memberSelect">
-                    <option value="">-- Select Member --</option>
-                    ${allMembers.map(m => `<option value="${m.id}">${escapeHtml(m.name)}</option>`).join('')}
-                </select>
-                <input type="number" id="contributionAmount" placeholder="Amount (KES)">
-                <input type="month" id="contributionMonth" value="${new Date().toISOString().slice(0,7)}">
-                <input type="date" id="contributionDate" value="${new Date().toISOString().slice(0,10)}">
-                <select id="paymentMethod">
-                    <option value="M-Pesa">M-Pesa</option>
-                    <option value="Cash">Cash</option>
-                    <option value="Bank Transfer">Bank Transfer</option>
-                </select>
-                <button id="saveContributionBtn" class="btn">💾 Save</button>
+        const container = document.getElementById('app-root');
+        const months = getUniqueMonths();
+        const filteredContribs = getFilteredContributions();
+        const totalCollected = filteredContribs.reduce((sum, c) => sum + (c.amount || 0), 0);
+        const paidMembers = allMembers.filter(m => (m.balance || 0) === 0);
+        const unpaidMembers = allMembers.filter(m => (m.balance || 0) > 0);
+        
+        const html = `
+            <div class="history-header">
+                <h2>💰 CONTRIBUTIONS</h2>
+                <button class="btn-sm btn-outline" id="refreshBtn">🔄 REFRESH</button>
             </div>
-        </div>
-        <div class="card">
-            <div class="flex-between">
-                <h3>🔍 Filter</h3>
-                <select id="monthFilterSelect" class="filter-select">
-                    <option value="all" ${currentMonthFilter === 'all' ? 'selected' : ''}>All Records</option>
-                    ${months.map(m => `<option value="${m}" ${currentMonthFilter === m ? 'selected' : ''}>${m}</option>`).join('')}
-                </select>
+            <div class="card">
+                <h3>➕ RECORD NEW CONTRIBUTION</h3>
+                <div class="form-row">
+                    <select id="memberSelect">
+                        <option value="">-- SELECT MEMBER --</option>
+                        ${allMembers.map(m => `<option value="${m.id}">${escapeHtml(m.name)}</option>`).join('')}
+                    </select>
+                    <input type="number" id="contributionAmount" placeholder="AMOUNT (KES)">
+                    <input type="month" id="contributionMonth" value="${new Date().toISOString().slice(0,7)}">
+                    <input type="date" id="contributionDate" value="${new Date().toISOString().slice(0,10)}">
+                    <select id="paymentMethod">
+                        <option value="M-Pesa">M-PESA</option>
+                        <option value="Cash">CASH</option>
+                        <option value="Bank Transfer">BANK TRANSFER</option>
+                    </select>
+                    <button id="saveContributionBtn" class="btn">💾 SAVE</button>
+                </div>
             </div>
-        </div>
-        <div class="card">
-            <h3>✅ Paid Members</h3>
-            <div class="table-wrapper">
-                <table>
-                    <thead>
-                        <tr><th>Name</th><th>Total Paid</th><th>Status</th></tr>
-                    </thead>
-                    <tbody>
-                        ${paidMembers.map(m => `
+            <div class="card">
+                <div class="flex-between">
+                    <h3>🔍 FILTER</h3>
+                    <select id="monthFilterSelect" class="filter-select">
+                        <option value="all" ${currentMonthFilter === 'all' ? 'selected' : ''}>ALL RECORDS</option>
+                        ${months.map(m => `<option value="${m}" ${currentMonthFilter === m ? 'selected' : ''}>${m}</option>`).join('')}
+                    </select>
+                </div>
+            </div>
+            <div class="card">
+                <h3>✅ PAID MEMBERS</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
                             <tr>
-                                <td data-label="Name"><strong>${escapeHtml(m.name)}</strong></td>
-                                <td data-label="Total Paid">KES ${formatNumber(m.total_contributed)}</td>
-                                <td data-label="Status"><span class="badge-paid">Paid</span></td>
+                                <th>MEMBER</th>
+                                <th>TOTAL PAID</th>
+                                <th>STATUS</th>
                             </tr>
-                        `).join('')}
-                        ${paidMembers.length === 0 ? '<tr><td colspan="3">No paid members yet</td></tr>' : ''}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            ${paidMembers.map(m => `
+                                <tr>
+                                    <td data-label="MEMBER"><strong>${escapeHtml(m.name)}</strong></td>
+                                    <td data-label="TOTAL PAID">KES ${formatNumber(m.total_contributed)}</span></td>
+                                    <td data-label="STATUS"><span class="badge-paid">PAID</span></td>
+                                </tr>
+                            `).join('')}
+                            ${paidMembers.length === 0 ? '<tr><td colspan="3">No paid members yet</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></td>'}
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
-        <div class="card">
-            <h3>⚠️ Unpaid Members</h3>
-            <div class="table-wrapper">
-                <table>
-                    <thead>
-                        <tr><th>Name</th><th>Balance</th><th>Action</th></tr>
-                    </thead>
-                    <tbody>
-                        ${unpaidMembers.map(m => `
+            <div class="card">
+                <h3>⚠️ UNPAID MEMBERS</h3>
+                <div class="table-wrapper">
+                    </table>
+                        <thead>
                             <tr>
-                                <td data-label="Name"><strong>${escapeHtml(m.name)}</strong></td>
-                                <td data-label="Balance">KES ${formatNumber(m.balance)}</td>
-                                <td data-label="Action"><button class="btn-sm btn-outline settle-balance" data-id="${m.id}" data-balance="${m.balance || 0}">Settle</button></td>
+                                <th>MEMBER</th>
+                                <th>MONTHLY BALANCE</th>
+                                <th>ACTION</th>
                             </tr>
-                        `).join('')}
-                        ${unpaidMembers.length === 0 ? '<tr><td colspan="3">🎉 Everyone is up to date!</td></tr>' : ''}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            ${unpaidMembers.map(m => `
+                                <tr>
+                                    <td data-label="MEMBER"><strong>${escapeHtml(m.name)}</strong></td>
+                                    <td data-label="MONTHLY BALANCE">KES ${formatNumber(m.balance)}</span></td>
+                                    <td data-label="ACTION"><button class="btn-sm btn-outline settle-balance" data-id="${m.id}" data-balance="${m.balance || 0}">SETTLE</button></td>
+                                </tr>
+                            `).join('')}
+                            ${unpaidMembers.length === 0 ? '<tr><td colspan="3">🎉 Everyone is up to date!</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></tr>'}
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
-        <div class="card">
-            <h3>📜 Contribution History ${currentMonthFilter !== 'all' ? `- ${currentMonthFilter}` : ''}</h3>
-            <p><strong>Total: KES ${formatNumber(totalCollected)}</strong></p>
-            <div class="table-wrapper">
-                <table>
-                    <thead>
-                        <tr><th>Member</th><th>Amount</th><th>Date</th><th>Month</th><th>Method</th><th>Action</th></tr>
-                    </thead>
-                    <tbody>
-                        ${filteredContribs.map(c => `
+            <div class="card">
+                <h3>📜 CONTRIBUTION HISTORY ${currentMonthFilter !== 'all' ? `- ${currentMonthFilter}` : ''}</h3>
+                <p><strong>TOTAL: KES ${formatNumber(totalCollected)}</strong></p>
+                <div class="table-wrapper">
+                    </table>
+                        <thead>
                             <tr>
-                                <td data-label="Member">${escapeHtml(c.members?.name || 'Unknown')}</td>
-                                <td data-label="Amount">KES ${formatNumber(c.amount)}</td>
-                                <td data-label="Date">${c.date || '-'}</td>
-                                <td data-label="Month">${c.month || '-'}</td>
-                                <td data-label="Method">${c.method || '-'}</td>
-                                <td data-label="Action"><button class="btn-sm btn-danger-outline delete-contribution" data-id="${c.id}" data-member="${escapeHtml(c.members?.name || 'Unknown')}" data-amount="${c.amount}">Del</button></td>
+                                <th>MEMBER</th>
+                                <th>AMOUNT</th>
+                                <th>DATE</th>
+                                <th>MONTH</th>
+                                <th>METHOD</th>
+                                <th>ACTION</th>
                             </tr>
-                        `).join('')}
-                        ${filteredContribs.length === 0 ? '<tr><td colspan="6">No contributions found</td></tr>' : ''}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            ${filteredContribs.map(c => `
+                                <tr>
+                                    <td data-label="MEMBER">${escapeHtml(c.members?.name || 'Unknown')}</span></td>
+                                    <td data-label="AMOUNT">KES ${formatNumber(c.amount)}</span></td>
+                                    <td data-label="DATE">${c.date || '-'}</span></td>
+                                    <td data-label="MONTH">${c.month || '-'}</span></td>
+                                    <td data-label="METHOD">${c.method || '-'}</span></td>
+                                    <td data-label="ACTION"><button class="btn-sm btn-danger-outline delete-contribution" data-id="${c.id}" data-member="${escapeHtml(c.members?.name || 'Unknown')}" data-amount="${c.amount}">DELETE</button></td>
+                                </tr>
+                            `).join('')}
+                            ${filteredContribs.length === 0 ? '<tr><td colspan="6">No contributions found</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><tr>'}
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
-    `;
-    container.innerHTML = html;
-    
-    document.getElementById('saveContributionBtn')?.addEventListener('click', saveContribution);
-    document.getElementById('monthFilterSelect')?.addEventListener('change', (e) => { currentMonthFilter = e.target.value; renderContributionsPage(); });
-    document.getElementById('refreshBtn')?.addEventListener('click', () => loadData());
-    document.querySelectorAll('.settle-balance').forEach(btn => btn.addEventListener('click', () => showSettleModal(btn.dataset.id, parseFloat(btn.dataset.balance))));
-    document.querySelectorAll('.delete-contribution').forEach(btn => btn.addEventListener('click', () => confirmDeleteContribution(btn.dataset.id, btn.dataset.member, btn.dataset.amount)));
-}
+        `;
+        container.innerHTML = html;
+        
+        document.getElementById('saveContributionBtn')?.addEventListener('click', saveContribution);
+        document.getElementById('monthFilterSelect')?.addEventListener('change', (e) => { currentMonthFilter = e.target.value; renderContributionsPage(); });
+        document.getElementById('refreshBtn')?.addEventListener('click', () => loadData());
+        document.querySelectorAll('.settle-balance').forEach(btn => btn.addEventListener('click', () => showSettleModal(btn.dataset.id, parseFloat(btn.dataset.balance))));
+        document.querySelectorAll('.delete-contribution').forEach(btn => btn.addEventListener('click', () => confirmDeleteContribution(btn.dataset.id, btn.dataset.member, btn.dataset.amount)));
+    }
     
     async function saveContribution() {
         const memberId = document.getElementById('memberSelect').value;
@@ -755,29 +771,29 @@
         modal.className = 'modal';
         modal.innerHTML = `
             <div class="modal-content">
-                <h3>Settle Payment</h3>
+                <h3>💰 SETTLE PAYMENT</h3>
                 <p><strong>${escapeHtml(member?.name || 'Unknown')}</strong></p>
-                <p>Outstanding Balance: KES ${formatNumber(currentBalance)}</p>
+                <p>MONTHLY BALANCE: KES ${formatNumber(currentBalance)}</p>
                 <div class="form-group">
-                    <label>Amount to Pay (KES):</label>
+                    <label>AMOUNT TO PAY (KES):</label>
                     <input type="number" id="settleAmount" class="settle-amount" placeholder="Enter amount" value="${currentBalance}" step="100" min="1" max="${currentBalance}">
-                    <small style="color:#666; font-size:0.65rem;">Max: KES ${formatNumber(currentBalance)}</small>
+                    <small style="color:#666; font-size:0.65rem;">MAX: KES ${formatNumber(currentBalance)}</small>
                 </div>
                 <div class="form-group">
-                    <label>Payment Method:</label>
+                    <label>PAYMENT METHOD:</label>
                     <select id="settleMethodSelect">
-                        <option value="M-Pesa">M-Pesa</option>
-                        <option value="Cash">Cash</option>
-                        <option value="Bank Transfer">Bank Transfer</option>
+                        <option value="M-Pesa">M-PESA</option>
+                        <option value="Cash">CASH</option>
+                        <option value="Bank Transfer">BANK TRANSFER</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Date:</label>
+                    <label>DATE:</label>
                     <input type="date" id="settleDate" value="${new Date().toISOString().slice(0,10)}">
                 </div>
                 <div style="display:flex; gap:10px; margin-top:1rem;">
-                    <button id="confirmSettleBtn" class="btn" style="flex:1;">Confirm Payment</button>
-                    <button id="cancelSettleBtn" class="btn-outline btn" style="flex:1;">Cancel</button>
+                    <button id="confirmSettleBtn" class="btn" style="flex:1;">CONFIRM PAYMENT</button>
+                    <button id="cancelSettleBtn" class="btn-outline btn" style="flex:1;">CANCEL</button>
                 </div>
             </div>
         `;
@@ -838,11 +854,11 @@
         modal.className = 'modal';
         modal.innerHTML = `
             <div class="modal-content">
-                <h3>⚠️ Delete Contribution</h3>
+                <h3>⚠️ DELETE CONTRIBUTION</h3>
                 <p>Delete ${memberName} - KES ${formatNumber(amount)}?</p>
                 <div style="display:flex; gap:10px; margin-top:1rem;">
-                    <button id="confirmDeleteBtn" class="btn btn-danger" style="flex:1;">Delete</button>
-                    <button id="cancelModalBtn" class="btn-outline btn" style="flex:1;">Cancel</button>
+                    <button id="confirmDeleteBtn" class="btn btn-danger" style="flex:1;">DELETE</button>
+                    <button id="cancelModalBtn" class="btn-outline btn" style="flex:1;">CANCEL</button>
                 </div>
             </div>
         `;
