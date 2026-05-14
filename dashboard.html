@@ -475,7 +475,7 @@
     
     <!-- Animated Hand Pointer -->
     <div class="hand-pointer" id="handPointer">
-        <span>👆👆</span> CLICK HERE FOR MENU
+        <span>👆👆</span> Click here for menu
     </div>
     
     <!-- Sidebar Navigation -->
@@ -485,17 +485,17 @@
             <button class="sidebar-close" id="sidebarClose">✕</button>
         </div>
         <nav class="sidebar-nav">
-            <a href="dashboard.html" class="nav-item active">
+            <a href="index.html" class="nav-item active">
                 <span class="icon">📊</span>
-                <span class="label">DASHBOARD</span>
+                <span class="label">Dashboard</span>
             </a>
             <a href="members.html" class="nav-item">
                 <span class="icon">👥</span>
-                <span class="label">MEMBERS</span>
+                <span class="label">Members</span>
             </a>
             <a href="contributions.html" class="nav-item">
                 <span class="icon">💰</span>
-                <span class="label">CONTRIBUTIONS</span>
+                <span class="label">Contributions</span>
             </a>
             
             <div class="nav-divider"></div>
@@ -503,16 +503,16 @@
             <!-- History Section -->
             <div class="nav-item" style="cursor: default; opacity: 0.7;">
                 <span class="icon">📜</span>
-                <span class="label">HISTORY</span>
+                <span class="label">History</span>
             </div>
             <div class="nav-submenu">
                 <a href="contribution-history.html" class="nav-item">
                     <span class="icon">📋</span>
-                    <span class="label">CONTRIBUTIONS HISTORY</span>
+                    <span class="label">Contributions History</span>
                 </a>
                 <a href="member-history.html" class="nav-item">
                     <span class="icon">👤</span>
-                    <span class="label">MEMBERS HISTORY</span>
+                    <span class="label">Members History</span>
                 </a>
             </div>
             
@@ -521,16 +521,16 @@
             <!-- Analytics Section -->
             <div class="nav-item" style="cursor: default; opacity: 0.7;">
                 <span class="icon">📈</span>
-                <span class="label">ANALYTICS</span>
+                <span class="label">Analytics</span>
             </div>
             <div class="nav-submenu">
                 <a href="statistics.html" class="nav-item">
                     <span class="icon">📊</span>
-                    <span class="label">MONTHLY STATISTICS</span>
+                    <span class="label">Monthly Statistics</span>
                 </a>
                 <a href="reports.html" class="nav-item">
                     <span class="icon">📋</span>
-                    <span class="label">REPORTS</span>
+                    <span class="label">Reports</span>
                 </a>
             </div>
             
@@ -538,7 +538,7 @@
             
             <a href="settings.html" class="nav-item">
                 <span class="icon">⚙️</span>
-                <span class="label">SETTINGS</span>
+                <span class="label">Settings</span>
             </a>
         </nav>
     </aside>
@@ -547,10 +547,10 @@
     <main class="main-content">
         <div class="top-bar">
             <button class="menu-toggle" id="menuToggle">☰</button>
-            <div class="page-title">DASHBOARD</div>
+            <div class="page-title">Dashboard</div>
             <div class="user-info">
                 <span class="user-email" id="userEmail"></span>
-                <button id="logoutBtn" class="logout-btn">LOGOUT</button>
+                <button id="logoutBtn" class="logout-btn">Logout</button>
             </div>
         </div>
         <div id="app-root" class="container">
@@ -559,7 +559,7 @@
                 <p style="margin-top: 0.5rem; font-size: 0.8rem;">Loading dashboard...</p>
             </div>
         </div>
-        <footer>✨ Smart Chama Management · DASHBOARD OVERVIEW</footer>
+        <footer>✨ Smart Chama Management ·</footer>
     </main>
 </div>
 
@@ -638,7 +638,7 @@
     });
 
     function formatNumber(num) {
-        return (num || 0).toLocaleString('en-KE');
+        return num.toLocaleString('en-KE');
     }
 
     async function loadDashboardData() {
@@ -670,40 +670,27 @@
             const totalCollected = members?.reduce((sum, m) => sum + (m.total_contributed || 0), 0) || 0;
             const paidMembers = members?.filter(m => (m.balance || 0) === 0).length || 0;
             const totalBalance = members?.reduce((sum, m) => sum + (m.balance || 0), 0) || 0;
-            const totalLoan = members?.reduce((sum, m) => sum + (m.loan_balance || 0), 0) || 0;
             
             const statsHtml = `
                 <div class="stats-grid">
                     <div class="stat-card">
-                        <h4>👥 TOTAL MEMBERS</h4>
+                        <h4>👥 MEMBERS</h4>
                         <div class="stat-number">${totalMembers}</div>
                     </div>
                     <div class="stat-card">
-                        <h4>💰 TOTAL COLLECTED</h4>
+                        <h4>💰 COLLECTED</h4>
                         <div class="stat-number">KES ${(totalCollected/1000).toFixed(0)}k</div>
                         <div class="stat-full">${formatNumber(totalCollected)}</div>
                     </div>
                     <div class="stat-card">
-                        <h4>✅ PAID MEMBERS</h4>
+                        <h4>✅ PAID</h4>
                         <div class="stat-number">${paidMembers}</div>
-                        <div class="stat-full">OF ${totalMembers}</div>
+                        <div class="stat-full">of ${totalMembers}</div>
                     </div>
                     <div class="stat-card">
-                        <h4>⏳ OUTSTANDING BALANCE</h4>
+                        <h4>⏳ BALANCE</h4>
                         <div class="stat-number">KES ${(totalBalance/1000).toFixed(0)}k</div>
                         <div class="stat-full">${formatNumber(totalBalance)}</div>
-                    </div>
-                </div>
-                <div class="stats-grid" style="margin-top:0;">
-                    <div class="stat-card">
-                        <h4>🏦 TOTAL LOAN BALANCE</h4>
-                        <div class="stat-number">KES ${(totalLoan/1000).toFixed(0)}k</div>
-                        <div class="stat-full">${formatNumber(totalLoan)}</div>
-                    </div>
-                    <div class="stat-card">
-                        <h4>📊 COLLECTION RATE</h4>
-                        <div class="stat-number">${totalCollected > 0 ? ((totalCollected/(totalCollected+totalBalance))*100).toFixed(0) : 0}%</div>
-                        <div class="stat-full">OF TOTAL EXPECTED</div>
                     </div>
                 </div>
             `;
@@ -711,28 +698,28 @@
             const recentHtml = `
                 <div class="card">
                     <div class="flex-between">
-                        <h3>📋 RECENT CONTRIBUTIONS</h3>
-                        <a href="contributions.html" class="btn-sm btn-outline" style="text-decoration:none;">+ RECORD</a>
+                        <h3>📋 Recent Contributions</h3>
+                        <a href="contributions.html" class="btn-sm btn-outline" style="text-decoration:none;">+ Record</a>
                     </div>
                     <div class="table-wrapper">
                         <table>
                             <thead>
                                 <tr>
-                                    <th>MEMBER</th>
-                                    <th>AMOUNT</th>
-                                    <th>DATE</th>
-                                    <th>METHOD</th>
+                                    <th>Member</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                    <th>Method</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 ${contributions?.map(c => `
                                     <tr>
-                                        <td>${c.members?.name || 'Unknown'}</span></td>
+                                        <td>${c.members?.name || 'Unknown'}</td>
                                         <td>KES ${formatNumber(c.amount || 0)}</span></td>
                                         <td>${c.date || '-'}</span></td>
                                         <td>${c.method || '-'}</span></td>
                                     </tr>
-                                `).join('') || '<tr><td colspan="4">No contributions yet</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></td>'}
+                                `).join('') || '<tr><td colspan="4">No contributions yet</td><tr'}
                             </tbody>
                         </table>
                     </div>
@@ -741,16 +728,16 @@
             
             const buttonsHtml = `
                 <div class="flex-between">
-                    <a href="members.html" class="btn" style="text-decoration:none; flex:1; text-align:center;">📇 MANAGE MEMBERS</a>
-                    <a href="contributions.html" class="btn-outline btn" style="text-decoration:none; flex:1; text-align:center;">💰 ADD CONTRIBUTION</a>
-                    <a href="statistics.html" class="btn-outline btn" style="text-decoration:none; flex:1; text-align:center;">📊 VIEW STATISTICS</a>
+                    <a href="members.html" class="btn" style="text-decoration:none; flex:1; text-align:center;">📇 Members</a>
+                    <a href="contributions.html" class="btn-outline btn" style="text-decoration:none; flex:1; text-align:center;">💰 Add</a>
+                    <a href="statistics.html" class="btn-outline btn" style="text-decoration:none; flex:1; text-align:center;">📊 Stats</a>
                 </div>
             `;
             
             container.innerHTML = `
                 <div class="welcome-card card">
-                    <h1>📊 CHAMAEASE DASHBOARD</h1>
-                    <p>Your digital Chama management system - replace spreadsheets with smart tracking</p>
+                    <h1>📊 ChamaEase</h1>
+                    <p>Your digital Chama management system</p>
                 </div>
                 ${statsHtml}
                 ${recentHtml}
@@ -763,7 +750,7 @@
                 <div class="card">
                     <h3>⚠️ Error Loading Data</h3>
                     <p style="font-size:0.8rem;">${error.message}</p>
-                    <button class="btn" onclick="location.reload()" style="margin-top:0.5rem;">RETRY</button>
+                    <button class="btn" onclick="location.reload()" style="margin-top:0.5rem;">Retry</button>
                 </div>
             `;
         }
