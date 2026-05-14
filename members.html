@@ -324,7 +324,7 @@
         
         @media (min-width: 769px) {
             table {
-                min-width: 600px;
+                min-width: 750px;
             }
             th, td {
                 padding: 0.6rem 0.4rem;
@@ -370,6 +370,16 @@
         .badge-unpaid {
             background: #ffe6e5;
             color: #b91c1c;
+            padding: 0.15rem 0.5rem;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.65rem;
+            display: inline-block;
+        }
+
+        .badge-loan {
+            background: #fef3c7;
+            color: #d97706;
             padding: 0.15rem 0.5rem;
             border-radius: 30px;
             font-weight: 600;
@@ -647,7 +657,7 @@
 
     function renderMembersList() {
         const container = document.getElementById('app-root');
-        let filtered = searchTerm ? allMembers.filter(m => m.name.toLowerCase().includes(searchTerm.toLowerCase()) || m.phone.includes(searchTerm)) : allMembers;
+        let filtered = searchTerm ? allMembers.filter(m => m.name.toLowerCase().includes(searchTerm.toLowerCase()) || (m.phone && m.phone.includes(searchTerm))) : allMembers;
         
         const html = `
             <div class="flex-between">
@@ -661,26 +671,36 @@
                 <div class="table-wrapper">
                     <table>
                         <thead>
-                            <tr><th>Name</th><th>Phone</th><th>Expected</th><th>Paid</th><th>Balance</th><th>Status</th><th>Actions</th></tr>
+                            <tr>
+                                <th>Name</th>
+                                <th>Phone</th>
+                                <th>Expected</th>
+                                <th>Paid</th>
+                                <th>Balance</th>
+                                <th>Loan Balance</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
                         </thead>
                         <tbody>
                             ${filtered.map(m => `
                                 <tr>
                                     <td data-label="Name"><strong>${escapeHtml(m.name)}</strong></td>
                                     <td data-label="Phone">${escapeHtml(m.phone) || '-'}</td>
-                                    <td data-label="Expected">KES ${formatNumber(m.expected_contribution)}</td>
-                                    <td data-label="Paid">KES ${formatNumber(m.total_contributed)}</td>
+                                    <td data-label="Expected">KES ${formatNumber(m.expected_contribution)}</span></td>
+                                    <td data-label="Paid">KES ${formatNumber(m.total_contributed)}</span></td>
                                     <td data-label="Balance"><span style="color:${(m.balance || 0) > 0 ? '#dc2626' : '#2c7a4d'}; font-weight:600;">KES ${formatNumber(m.balance)}</span></td>
+                                    <td data-label="Loan Balance"><span class="badge-loan">KES ${formatNumber(m.loan_balance || 0)}</span></td>
                                     <td data-label="Status"><span class="${(m.balance || 0) === 0 ? 'badge-paid' : 'badge-unpaid'}">${(m.balance || 0) === 0 ? 'Paid' : 'Unpaid'}</span></td>
                                     <td data-label="Actions" class="action-group">
                                         <button class="btn-sm btn-outline view-detail" data-id="${m.id}">View</button>
-                                        <button class="btn-sm btn-outline edit-member" data-id="${m.id}" data-name="${escapeHtml(m.name)}" data-phone="${escapeHtml(m.phone)}" data-expected="${m.expected_contribution || 0}">Edit</button>
+                                        <button class="btn-sm btn-outline edit-member" data-id="${m.id}" data-name="${escapeHtml(m.name)}" data-phone="${escapeHtml(m.phone)}" data-expected="${m.expected_contribution || 0}" data-loan="${m.loan_balance || 0}">Edit</button>
                                         ${(m.balance || 0) > 0 ? `<button class="btn-sm btn-outline settle-balance" data-id="${m.id}" data-balance="${m.balance}">Settle</button>` : ''}
                                         <button class="btn-sm btn-danger-outline delete-member" data-id="${m.id}" data-name="${escapeHtml(m.name)}">Del</button>
                                     </td>
                                 </tr>
                             `).join('')}
-                            ${filtered.length === 0 ? '<tr><td colspan="7" style="text-align:center;">No members found</td></td>' : ''}
+                            ${filtered.length === 0 ? '<tr><td colspan="8" style="text-align:center;">No members found</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></td>'}
                         </tbody>
                     </table>
                 </div>
@@ -691,7 +711,7 @@
         document.getElementById('searchMemberInput')?.addEventListener('input', (e) => { searchTerm = e.target.value; renderMembersList(); });
         document.getElementById('addMemberBtn')?.addEventListener('click', showAddMemberModal);
         document.querySelectorAll('.view-detail').forEach(btn => btn.addEventListener('click', () => showMemberDetails(btn.dataset.id)));
-        document.querySelectorAll('.edit-member').forEach(btn => btn.addEventListener('click', () => showEditMemberModal(btn.dataset.id, btn.dataset.name, btn.dataset.phone, btn.dataset.expected)));
+        document.querySelectorAll('.edit-member').forEach(btn => btn.addEventListener('click', () => showEditMemberModal(btn.dataset.id, btn.dataset.name, btn.dataset.phone, btn.dataset.expected, btn.dataset.loan)));
         document.querySelectorAll('.settle-balance').forEach(btn => btn.addEventListener('click', () => showSettleModal(btn.dataset.id, parseFloat(btn.dataset.balance))));
         document.querySelectorAll('.delete-member').forEach(btn => btn.addEventListener('click', () => confirmDeleteMember(btn.dataset.id, btn.dataset.name)));
     }
@@ -706,6 +726,7 @@
                 <div class="form-group"><label>Full Name *</label><input type="text" id="memberName" placeholder="Enter full name"></div>
                 <div class="form-group"><label>Phone Number *</label><input type="tel" id="memberPhone" placeholder="0712345678"></div>
                 <div class="form-group"><label>Expected Monthly Contribution (KES)</label><input type="number" id="memberExpected" placeholder="0" value="0"></div>
+                <div class="form-group"><label>Loan Balance (KES)</label><input type="number" id="memberLoan" placeholder="0" value="0"></div>
                 <div style="display:flex; gap:10px; margin-top:1rem;"><button id="confirmAddBtn" class="btn" style="flex:1;">Add Member</button><button id="cancelModalBtn" class="btn-outline btn" style="flex:1;">Cancel</button></div>
             </div>
         `;
@@ -715,8 +736,9 @@
             const name = document.getElementById('memberName').value.trim();
             const phone = document.getElementById('memberPhone').value.trim();
             const expected = parseFloat(document.getElementById('memberExpected').value) || 0;
+            const loanBalance = parseFloat(document.getElementById('memberLoan').value) || 0;
             if (!name || !phone) { showModalMessage('Please fill in name and phone number', 'error'); return; }
-            const { error } = await supabaseClient.from('members').insert([{ name, phone, expected_contribution: expected, total_contributed: 0, balance: expected, status: expected > 0 ? 'unpaid' : 'paid' }]);
+            const { error } = await supabaseClient.from('members').insert([{ name, phone, expected_contribution: expected, total_contributed: 0, balance: expected, loan_balance: loanBalance, status: expected > 0 ? 'unpaid' : 'paid' }]);
             if (error) { showModalMessage(error.message, 'error'); return; }
             modal.remove();
             await loadMembers();
@@ -725,7 +747,7 @@
         document.getElementById('cancelModalBtn').onclick = () => modal.remove();
     }
 
-    function showEditMemberModal(id, name, phone, expected) {
+    function showEditMemberModal(id, name, phone, expected, loan) {
         const modal = document.createElement('div');
         modal.className = 'modal';
         modal.innerHTML = `
@@ -735,6 +757,7 @@
                 <div class="form-group"><label>Full Name *</label><input type="text" id="memberName" value="${escapeHtml(name)}"></div>
                 <div class="form-group"><label>Phone Number *</label><input type="tel" id="memberPhone" value="${escapeHtml(phone)}"></div>
                 <div class="form-group"><label>Expected Monthly Contribution (KES)</label><input type="number" id="memberExpected" value="${expected}"></div>
+                <div class="form-group"><label>Loan Balance (KES)</label><input type="number" id="memberLoan" value="${loan || 0}"></div>
                 <div style="display:flex; gap:10px; margin-top:1rem;"><button id="confirmEditBtn" class="btn" style="flex:1;">Save Changes</button><button id="cancelModalBtn" class="btn-outline btn" style="flex:1;">Cancel</button></div>
             </div>
         `;
@@ -744,8 +767,9 @@
             const newName = document.getElementById('memberName').value.trim();
             const newPhone = document.getElementById('memberPhone').value.trim();
             const newExpected = parseFloat(document.getElementById('memberExpected').value) || 0;
+            const newLoan = parseFloat(document.getElementById('memberLoan').value) || 0;
             if (!newName || !newPhone) { showModalMessage('Please fill in name and phone number', 'error'); return; }
-            const { error } = await supabaseClient.from('members').update({ name: newName, phone: newPhone, expected_contribution: newExpected }).eq('id', id);
+            const { error } = await supabaseClient.from('members').update({ name: newName, phone: newPhone, expected_contribution: newExpected, loan_balance: newLoan }).eq('id', id);
             if (error) { showModalMessage(error.message, 'error'); return; }
             modal.remove();
             await loadMembers();
@@ -754,7 +778,6 @@
         document.getElementById('cancelModalBtn').onclick = () => modal.remove();
     }
 
-    // Updated showSettleModal with custom amount input
     function showSettleModal(memberId, currentBalance) {
         if (currentBalance <= 0) { showToast('Balance is already zero', 'error'); return; }
         const member = allMembers.find(m => m.id === memberId);
@@ -790,7 +813,6 @@
         `;
         document.body.appendChild(modal);
         
-        // Add validation for amount input
         const amountInput = document.getElementById('settleAmount');
         amountInput.addEventListener('change', function() {
             let value = parseFloat(this.value);
@@ -877,9 +899,10 @@
                 <p><strong>💰 Expected:</strong> KES ${formatNumber(member.expected_contribution)}</p>
                 <p><strong>💵 Total Paid:</strong> KES ${formatNumber(totalPaid)}</p>
                 <p><strong>⚖️ Balance:</strong> KES ${formatNumber(member.balance)}</p>
+                <p><strong>🏦 Loan Balance:</strong> <span class="badge-loan">KES ${formatNumber(member.loan_balance || 0)}</span></p>
                 <p><strong>📊 Status:</strong> <span class="${(member.balance || 0) === 0 ? 'badge-paid' : 'badge-unpaid'}">${(member.balance || 0) === 0 ? 'Paid' : 'Unpaid'}</span></p>
                 <h4 style="margin-top:1rem;">📅 Contribution History</h4>
-                <div class="table-wrapper"><table style="min-width:250px;"><thead><tr><th>Date</th><th>Amount</th><th>Method</th><th>Month</th></tr></thead><tbody>${contributions?.map(c => `<tr><td data-label="Date">${c.date || '-'}</td><td data-label="Amount">KES ${formatNumber(c.amount)}</span></td><td data-label="Method">${c.method || '-'}</td><td data-label="Month">${c.month || '-'}</td></tr>`).join('') || '<tr><td colspan="4">No contributions yet</td></tr>'}</tbody></table></div>
+                <div class="table-wrapper"><table style="min-width:250px;"><thead><tr><th>Date</th><th>Amount</th><th>Method</th><th>Month</th></tr></thead><tbody>${contributions?.map(c => `<tr><td data-label="Date">${c.date || '-'}</td><td data-label="Amount">KES ${formatNumber(c.amount)}</span></td><td data-label="Method">${c.method || '-'}</td><td data-label="Month">${c.month || '-'}</td></tr>`).join('') || '<tr><td colspan="4">No contributions yet</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></table>}</tbody></table></div>
             </div>
         `;
         document.body.appendChild(modal);
