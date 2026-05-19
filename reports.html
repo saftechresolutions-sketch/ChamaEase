@@ -10,40 +10,246 @@
     <script src="supabase-config.js"></script>
     <style>
         /* Reports Page Styles */
-        .hero-report {
+        .report-header {
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             border-radius: 20px;
             padding: 1.5rem;
             margin-bottom: 1.5rem;
             color: white;
+            text-align: center;
         }
         
-        .hero-title {
-            font-size: 1.3rem;
-            font-weight: 700;
+        .report-header h1 {
+            font-size: 1.5rem;
             margin-bottom: 0.25rem;
         }
         
-        .hero-subtitle {
+        .report-header p {
             font-size: 0.75rem;
             opacity: 0.9;
         }
         
-        /* Chart Containers */
-        .charts-grid {
+        /* Stats Grid - Clean and Clear */
+        .stats-container {
+            background: white;
+            border-radius: 20px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--gray-border);
+        }
+        
+        .stats-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary);
+            display: inline-block;
+        }
+        
+        .stats-grid-clean {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        
+        @media (min-width: 640px) {
+            .stats-grid-clean {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 0.8rem;
+            background: #f8fafc;
+            border-radius: 16px;
+        }
+        
+        .stat-value-large {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+        
+        .stat-label-clean {
+            font-size: 0.7rem;
+            color: #6c757d;
+            margin-top: 0.25rem;
+        }
+        
+        .stat-sub {
+            font-size: 0.6rem;
+            color: #94a3b8;
+            margin-top: 0.2rem;
+        }
+        
+        /* Action Buttons */
+        .action-buttons-container {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn-clean {
+            padding: 12px 24px;
+            border-radius: 40px;
+            border: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        
+        .btn-whatsapp {
+            background: #25D366;
+            color: white;
+        }
+        
+        .btn-whatsapp:hover {
+            background: #128C7E;
+            transform: translateY(-2px);
+        }
+        
+        .btn-excel {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-excel:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+        
+        .btn-print {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .btn-print:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+        
+        /* Member Rankings Table - Clean Design */
+        .rankings-container {
+            background: white;
+            border-radius: 20px;
+            border: 1px solid var(--gray-border);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+        
+        .rankings-header {
+            background: #f8fafc;
+            padding: 1rem;
+            border-bottom: 1px solid var(--gray-border);
+        }
+        
+        .rankings-header h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .rankings-table-wrapper {
+            overflow-x: auto;
+        }
+        
+        .rankings-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .rankings-table th,
+        .rankings-table td {
+            padding: 12px 10px;
+            text-align: left;
+            border-bottom: 1px solid var(--gray-border);
+        }
+        
+        .rankings-table th {
+            background: #fafbfc;
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: #1e2a3e;
+        }
+        
+        .rankings-table tr:hover {
+            background: var(--primary-light);
+        }
+        
+        .rank-number {
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            background: #e2e8f0;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 28px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #475569;
+        }
+        
+        .rank-1 { background: #fbbf24; color: #92400e; }
+        .rank-2 { background: #e5e7eb; color: #374151; }
+        .rank-3 { background: #fdba74; color: #9a3412; }
+        
+        .member-name {
+            font-weight: 600;
+            color: #1e2a3e;
+        }
+        
+        .amount {
+            font-weight: 500;
+            color: var(--primary);
+        }
+        
+        /* Charts Section - At Bottom */
+        .charts-section {
+            background: white;
+            border-radius: 20px;
+            border: 1px solid var(--gray-border);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+        
+        .charts-header {
+            background: #f8fafc;
+            padding: 1rem;
+            border-bottom: 1px solid var(--gray-border);
+        }
+        
+        .charts-header h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .charts-grid-bottom {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
+            gap: 1.5rem;
+            padding: 1.5rem;
         }
         
         @media (min-width: 768px) {
-            .charts-grid {
+            .charts-grid-bottom {
                 grid-template-columns: repeat(2, 1fr);
             }
         }
         
-        .chart-card {
+        .chart-box {
             background: white;
             border-radius: 16px;
             padding: 1rem;
@@ -54,128 +260,27 @@
             font-size: 0.85rem;
             font-weight: 600;
             margin-bottom: 1rem;
+            text-align: center;
             color: #1e2a3e;
         }
         
-        .chart-container {
+        .chart-canvas {
             position: relative;
-            height: 220px;
+            height: 250px;
         }
         
-        /* Action Buttons */
-        .report-actions {
-            display: flex;
-            gap: 0.8rem;
-            flex-wrap: wrap;
-            margin-bottom: 1.5rem;
-            justify-content: center;
-        }
-        
-        .action-btn {
-            padding: 10px 20px;
-            border-radius: 40px;
-            border: none;
-            font-size: 0.8rem;
-            font-weight: 500;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.2s;
-        }
-        
-        .action-btn-wa {
-            background: #25D366;
-            color: white;
-        }
-        
-        .action-btn-wa:hover {
-            background: #128C7E;
-            transform: translateY(-1px);
-        }
-        
-        .action-btn-excel {
-            background: #10b981;
-            color: white;
-        }
-        
-        .action-btn-excel:hover {
-            background: #059669;
-            transform: translateY(-1px);
-        }
-        
-        .action-btn-pdf {
-            background: #dc2626;
-            color: white;
-        }
-        
-        .action-btn-pdf:hover {
-            background: #b91c1c;
-            transform: translateY(-1px);
-        }
-        
-        /* Member Table */
-        .member-table-wrapper {
-            overflow-x: auto;
-        }
-        
-        .member-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.75rem;
-        }
-        
-        .member-table th,
-        .member-table td {
-            padding: 10px 8px;
-            text-align: left;
-            border-bottom: 1px solid var(--gray-border);
-        }
-        
-        .member-table th {
-            background: #f8fafc;
-            font-weight: 600;
-            position: sticky;
-            top: 0;
-        }
-        
-        .member-table tr:hover {
-            background: var(--primary-light);
-        }
-        
-        .rank-badge {
-            display: inline-block;
-            width: 24px;
-            height: 24px;
-            background: var(--primary-light);
-            color: var(--primary);
-            border-radius: 50%;
+        /* Footer Note */
+        .report-footer {
             text-align: center;
-            line-height: 24px;
-            font-size: 0.7rem;
-            font-weight: 700;
+            padding: 1rem;
+            font-size: 0.65rem;
+            color: #94a3b8;
+            border-top: 1px solid var(--gray-border);
+            margin-top: 1rem;
         }
         
-        .rank-1 { background: #fbbf24; color: #92400e; }
-        .rank-2 { background: #e5e7eb; color: #374151; }
-        .rank-3 { background: #fdba74; color: #9a3412; }
-        
-        @media (max-width: 768px) {
-            .report-actions {
-                flex-direction: column;
-            }
-            .action-btn {
-                justify-content: center;
-            }
-            .member-table th,
-            .member-table td {
-                padding: 6px 4px;
-                font-size: 0.65rem;
-            }
-        }
-        
-        /* Toast */
-        .toast-msg {
+        /* Toast Message */
+        .toast-success {
             position: fixed;
             bottom: 20px;
             left: 50%;
@@ -197,6 +302,32 @@
             to {
                 transform: translateX(-50%) translateY(0);
                 opacity: 1;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .action-buttons-container {
+                flex-direction: column;
+            }
+            .action-btn-clean {
+                justify-content: center;
+            }
+            .rankings-table th,
+            .rankings-table td {
+                padding: 8px 6px;
+                font-size: 0.7rem;
+            }
+        }
+        
+        @media print {
+            .action-buttons-container,
+            .sidebar,
+            .top-bar,
+            footer {
+                display: none;
+            }
+            .main-content {
+                margin-left: 0;
             }
         }
     </style>
@@ -243,7 +374,8 @@
 // Using supabaseClient from supabase-config.js
 let allMembers = [];
 let allRecords = [];
-let contributionChart = null;
+let trendsChart = null;
+let topMembersChart = null;
 
 // Sidebar functions
 function openSidebar() {
@@ -264,11 +396,10 @@ document.getElementById("logoutBtn").addEventListener("click", async function() 
     window.location.href = "index.html";
 });
 
-function showMessage(message, isError = false) {
+function showToast(message) {
     const toast = document.createElement('div');
-    toast.className = 'toast-msg';
-    toast.style.background = isError ? '#dc2626' : '#2c7a4d';
-    toast.textContent = isError ? '⚠️ ' + message : '✓ ' + message;
+    toast.className = 'toast-success';
+    toast.textContent = '✓ ' + message;
     document.body.appendChild(toast);
     setTimeout(() => {
         toast.style.opacity = '0';
@@ -334,12 +465,11 @@ function getSummaryStats() {
         totalLoan: totalLoan,
         totalLoanBalance: totalLoanBalance,
         totalContributions: totalContributions,
-        totalPenalties: totalPenalties,
-        totalCollected: totalContributions + (totalLoan - totalLoanBalance)
+        totalPenalties: totalPenalties
     };
 }
 
-function getMonthlyData() {
+function getMonthlyTrends() {
     var monthlyMap = {};
     var monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
     
@@ -356,44 +486,33 @@ function getMonthlyData() {
     }
     
     var sortedKeys = Object.keys(monthlyMap).sort();
-    var result = {
-        labels: [],
-        contributions: [],
-        loans: []
+    return {
+        labels: sortedKeys.map(k => monthlyMap[k].label),
+        contributions: sortedKeys.map(k => monthlyMap[k].contributions),
+        loans: sortedKeys.map(k => monthlyMap[k].loans)
     };
-    
-    for (var i = 0; i < sortedKeys.length; i++) {
-        var data = monthlyMap[sortedKeys[i]];
-        result.labels.push(data.label);
-        result.contributions.push(data.contributions);
-        result.loans.push(data.loans);
-    }
-    
-    return result;
 }
 
 function getMemberRankings() {
-    var memberData = {};
+    var memberMap = {};
     
     for (var i = 0; i < allRecords.length; i++) {
         var record = allRecords[i];
-        if (!memberData[record.member_id]) {
-            memberData[record.member_id] = { contributions: 0, loans: 0, months: 0 };
+        if (!memberMap[record.member_id]) {
+            memberMap[record.member_id] = { contributions: 0, loans: 0 };
         }
-        memberData[record.member_id].contributions += safeValue(record.monthly_contribution);
-        memberData[record.member_id].loans += safeValue(record.loan);
-        memberData[record.member_id].months++;
+        memberMap[record.member_id].contributions += safeValue(record.monthly_contribution);
+        memberMap[record.member_id].loans += safeValue(record.loan);
     }
     
     var rankings = [];
-    for (var id in memberData) {
+    for (var id in memberMap) {
         var member = allMembers.find(m => m.id === id);
         if (member) {
             rankings.push({
                 name: member.name,
-                contributions: memberData[id].contributions,
-                loans: memberData[id].loans,
-                months: memberData[id].months
+                contributions: memberMap[id].contributions,
+                loans: memberMap[id].loans
             });
         }
     }
@@ -402,38 +521,56 @@ function getMemberRankings() {
     return rankings;
 }
 
-function createChart() {
-    var monthlyData = getMonthlyData();
+function getTopContributors() {
+    var rankings = getMemberRankings();
+    var top5 = rankings.slice(0, 5);
     
-    if (contributionChart) contributionChart.destroy();
+    return {
+        names: top5.map(m => m.name.length > 12 ? m.name.substring(0, 10) + '...' : m.name),
+        amounts: top5.map(m => m.contributions)
+    };
+}
+
+function createCharts() {
+    var trends = getMonthlyTrends();
+    var topContributors = getTopContributors();
     
-    var ctx = document.getElementById('trendsChart').getContext('2d');
-    contributionChart = new Chart(ctx, {
+    // Destroy existing charts
+    if (trendsChart) trendsChart.destroy();
+    if (topMembersChart) topMembersChart.destroy();
+    
+    // Trends Chart
+    var ctx1 = document.getElementById('trendsChart').getContext('2d');
+    trendsChart = new Chart(ctx1, {
         type: 'line',
         data: {
-            labels: monthlyData.labels,
+            labels: trends.labels,
             datasets: [
                 {
-                    label: 'Contributions (KES)',
-                    data: monthlyData.contributions,
+                    label: 'Monthly Contributions',
+                    data: trends.contributions,
                     borderColor: '#2c7a4d',
                     backgroundColor: 'rgba(44, 122, 77, 0.1)',
+                    borderWidth: 2,
                     tension: 0.3,
                     fill: true,
                     pointBackgroundColor: '#2c7a4d',
                     pointBorderColor: 'white',
-                    pointRadius: 4
+                    pointRadius: 4,
+                    pointHoverRadius: 6
                 },
                 {
-                    label: 'Loans (KES)',
-                    data: monthlyData.loans,
+                    label: 'Loans Given',
+                    data: trends.loans,
                     borderColor: '#f59e0b',
                     backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                    borderWidth: 2,
                     tension: 0.3,
                     fill: true,
                     pointBackgroundColor: '#f59e0b',
                     pointBorderColor: 'white',
-                    pointRadius: 4
+                    pointRadius: 4,
+                    pointHoverRadius: 6
                 }
             ]
         },
@@ -442,103 +579,115 @@ function createChart() {
             maintainAspectRatio: false,
             plugins: {
                 legend: { position: 'bottom', labels: { font: { size: 10 } } },
-                tooltip: { callbacks: { label: function(context) { return 'KES ' + context.raw.toLocaleString(); } } }
+                tooltip: { 
+                    callbacks: { 
+                        label: function(context) { 
+                            return context.dataset.label + ': KES ' + context.raw.toLocaleString(); 
+                        } 
+                    } 
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { callback: function(value) { return 'KES ' + (value/1000).toFixed(0) + 'k'; } }
+                }
+            }
+        }
+    });
+    
+    // Top Contributors Bar Chart
+    var ctx2 = document.getElementById('topMembersChart').getContext('2d');
+    topMembersChart = new Chart(ctx2, {
+        type: 'bar',
+        data: {
+            labels: topContributors.names,
+            datasets: [{
+                label: 'Total Contributions (KES)',
+                data: topContributors.amounts,
+                backgroundColor: '#2c7a4d',
+                borderRadius: 8,
+                barPercentage: 0.7
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom', labels: { font: { size: 10 } } },
+                tooltip: { 
+                    callbacks: { 
+                        label: function(context) { 
+                            return 'KES ' + context.raw.toLocaleString(); 
+                        } 
+                    } 
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { callback: function(value) { return 'KES ' + (value/1000).toFixed(0) + 'k'; } }
+                }
             }
         }
     });
 }
 
-function renderStatsCards() {
+function shareToWhatsApp() {
     var stats = getSummaryStats();
-    
-    return `
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-number">${stats.totalMembers}</div>
-                <div class="stat-label">Total Members</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">KES ${(stats.totalContributions/1000).toFixed(0)}k</div>
-                <div class="stat-label">Contributions</div>
-                <div class="stat-full">KES ${formatNumber(stats.totalContributions)}</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">KES ${(stats.totalLoan/1000).toFixed(0)}k</div>
-                <div class="stat-label">Loans Given</div>
-                <div class="stat-full">KES ${formatNumber(stats.totalLoan)}</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">KES ${(stats.totalLoanBalance/1000).toFixed(0)}k</div>
-                <div class="stat-label">Outstanding</div>
-                <div class="stat-full">KES ${formatNumber(stats.totalLoanBalance)}</div>
-            </div>
-        </div>
-    `;
-}
-
-function renderMemberTable() {
     var rankings = getMemberRankings();
     
-    if (rankings.length === 0) {
-        return '<div style="text-align:center; padding:2rem;">No member records found</div>';
-    }
+    var message = "🏦 *CHAMA FINANCIAL REPORT*\n";
+    message += "📅 *Date:* " + new Date().toLocaleDateString() + "\n";
+    message += "━━━━━━━━━━━━━━━━━━━━━\n\n";
     
-    var tableRows = '';
-    for (var i = 0; i < rankings.length; i++) {
+    message += "📊 *SUMMARY STATISTICS*\n";
+    message += "👥 Total Members: *" + stats.totalMembers + "*\n";
+    message += "💰 Total Contributions: *KES " + formatNumber(stats.totalContributions) + "*\n";
+    message += "🏦 Total Loans Given: *KES " + formatNumber(stats.totalLoan) + "*\n";
+    message += "⚖️ Outstanding Balance: *KES " + formatNumber(stats.totalLoanBalance) + "*\n";
+    message += "⚠️ Total Penalties: *KES " + formatNumber(stats.totalPenalties) + "*\n\n";
+    
+    message += "━━━━━━━━━━━━━━━━━━━━━\n\n";
+    message += "🏆 *TOP CONTRIBUTORS*\n";
+    
+    for (var i = 0; i < Math.min(10, rankings.length); i++) {
         var m = rankings[i];
-        var rankClass = '';
-        if (i === 0) rankClass = 'rank-1';
-        else if (i === 1) rankClass = 'rank-2';
-        else if (i === 2) rankClass = 'rank-3';
-        
-        tableRows += `<tr>
-            <td style="text-align:center; width:50px;"><span class="rank-badge ${rankClass}">${i + 1}</span></td>
-            <td><strong>${escapeHtml(m.name)}</strong></td>
-            <td>KES ${formatNumber(m.contributions)}</td>
-            <td>KES ${formatNumber(m.loans)}</td>
-            <td>${m.months}</td>
-        </tr>`;
+        var medal = i === 0 ? "🥇" : (i === 1 ? "🥈" : (i === 2 ? "🥉" : "📌"));
+        message += medal + " *" + m.name + "*\n";
+        message += "   └─ KES " + formatNumber(m.contributions) + "\n";
     }
     
-    return `
-        <div class="member-table-wrapper">
-            <table class="member-table">
-                <thead>
-                    <tr>
-                        <th style="width:50px;">#</th>
-                        <th>Member</th>
-                        <th>Contributions</th>
-                        <th>Loans</th>
-                        <th>Months</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${tableRows}
-                </tbody>
-            </table>
-        </div>
-    `;
+    message += "\n━━━━━━━━━━━━━━━━━━━━━\n";
+    message += "📊 Generated by ChamaEase";
+    
+    var encodedMessage = encodeURIComponent(message);
+    // Opens WhatsApp directly
+    window.open("https://wa.me/?text=" + encodedMessage, "_blank");
+    showToast("Opening WhatsApp...");
 }
 
 function exportToExcel() {
-    var rankings = getMemberRankings();
     var stats = getSummaryStats();
+    var rankings = getMemberRankings();
     
     var csvRows = [];
-    csvRows.push(["CHAMA REPORT - " + new Date().toLocaleString()]);
+    csvRows.push(["CHAMA FINANCIAL REPORT"]);
+    csvRows.push(["Generated:", new Date().toLocaleString()]);
     csvRows.push([]);
-    csvRows.push(["SUMMARY"]);
+    csvRows.push(["SUMMARY STATISTICS"]);
     csvRows.push(["Total Members", stats.totalMembers]);
     csvRows.push(["Total Contributions", "KES " + formatNumber(stats.totalContributions)]);
-    csvRows.push(["Total Loans", "KES " + formatNumber(stats.totalLoan)]);
+    csvRows.push(["Total Loans Given", "KES " + formatNumber(stats.totalLoan)]);
     csvRows.push(["Outstanding Balance", "KES " + formatNumber(stats.totalLoanBalance)]);
+    csvRows.push(["Total Penalties", "KES " + formatNumber(stats.totalPenalties)]);
     csvRows.push([]);
     csvRows.push(["MEMBER RANKINGS"]);
-    csvRows.push(["RANK", "MEMBER", "CONTRIBUTIONS", "LOANS", "ACTIVE MONTHS"]);
+    csvRows.push(["RANK", "MEMBER NAME", "TOTAL CONTRIBUTIONS", "TOTAL LOANS"]);
     
     for (var i = 0; i < rankings.length; i++) {
         var m = rankings[i];
-        csvRows.push([i + 1, m.name, "KES " + formatNumber(m.contributions), "KES " + formatNumber(m.loans), m.months]);
+        csvRows.push([i + 1, m.name, "KES " + formatNumber(m.contributions), "KES " + formatNumber(m.loans)]);
     }
     
     var csv = "";
@@ -555,30 +704,7 @@ function exportToExcel() {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-    showMessage("Report exported as Excel!");
-}
-
-function shareToWhatsApp() {
-    var stats = getSummaryStats();
-    var rankings = getMemberRankings();
-    
-    var message = "🏦 *CHAMA REPORT*\n";
-    message += "📅 " + new Date().toLocaleDateString() + "\n\n";
-    message += "📊 *SUMMARY*\n";
-    message += "👥 Members: " + stats.totalMembers + "\n";
-    message += "💰 Total Contributions: KES " + formatNumber(stats.totalContributions) + "\n";
-    message += "🏦 Total Loans: KES " + formatNumber(stats.totalLoan) + "\n";
-    message += "⚖️ Outstanding: KES " + formatNumber(stats.totalLoanBalance) + "\n\n";
-    
-    message += "🏆 *TOP MEMBERS*\n";
-    for (var i = 0; i < Math.min(5, rankings.length); i++) {
-        var m = rankings[i];
-        message += (i + 1) + ". " + m.name + " - KES " + formatNumber(m.contributions) + "\n";
-    }
-    
-    var encodedMessage = encodeURIComponent(message);
-    window.open("https://web.whatsapp.com/send?text=" + encodedMessage, "_blank");
-    showMessage("Opening WhatsApp...");
+    showToast("Report exported to Excel!");
 }
 
 function printReport() {
@@ -587,41 +713,127 @@ function printReport() {
 
 function renderReports() {
     var container = document.getElementById("app-root");
+    var stats = getSummaryStats();
+    var rankings = getMemberRankings();
+    
+    // Build rankings table rows
+    var tableRows = '';
+    for (var i = 0; i < rankings.length; i++) {
+        var m = rankings[i];
+        var rankClass = '';
+        if (i === 0) rankClass = 'rank-1';
+        else if (i === 1) rankClass = 'rank-2';
+        else if (i === 2) rankClass = 'rank-3';
+        
+        tableRows += `<tr>
+            <td style="width: 60px; text-align: center;">
+                <span class="rank-number ${rankClass}">${i + 1}</span>
+            </td>
+            <td class="member-name">${escapeHtml(m.name)}</td>
+            <td class="amount">KES ${formatNumber(m.contributions)}</td>
+            <td>KES ${formatNumber(m.loans)}</td>
+        </tr>`;
+    }
     
     var html = `
-        <div class="hero-report">
-            <div class="hero-title">📊 Chama Reports</div>
-            <div class="hero-subtitle">View your chama's financial performance</div>
+        <div class="report-header">
+            <h1>📊 Chama Financial Report</h1>
+            <p>Generated on ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}</p>
         </div>
         
-        ${renderStatsCards()}
-        
-        <div class="report-actions">
-            <button class="action-btn action-btn-wa" id="shareWABtn">📱 Share on WhatsApp</button>
-            <button class="action-btn action-btn-excel" id="exportExcelBtn">📊 Export to Excel</button>
-            <button class="action-btn action-btn-pdf" id="printBtn">🖨️ Print Report</button>
-        </div>
-        
-        <div class="chart-card">
-            <div class="chart-title">📈 Monthly Trends (Contributions vs Loans)</div>
-            <div class="chart-container">
-                <canvas id="trendsChart"></canvas>
+        <!-- Statistics Section -->
+        <div class="stats-container">
+            <div class="stats-title">📈 Key Statistics</div>
+            <div class="stats-grid-clean">
+                <div class="stat-item">
+                    <div class="stat-value-large">${stats.totalMembers}</div>
+                    <div class="stat-label-clean">Total Members</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value-large">KES ${(stats.totalContributions/1000).toFixed(1)}k</div>
+                    <div class="stat-label-clean">Total Contributions</div>
+                    <div class="stat-sub">KES ${formatNumber(stats.totalContributions)}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value-large">KES ${(stats.totalLoan/1000).toFixed(1)}k</div>
+                    <div class="stat-label-clean">Total Loans Given</div>
+                    <div class="stat-sub">KES ${formatNumber(stats.totalLoan)}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value-large">KES ${(stats.totalLoanBalance/1000).toFixed(1)}k</div>
+                    <div class="stat-label-clean">Outstanding Balance</div>
+                    <div class="stat-sub">KES ${formatNumber(stats.totalLoanBalance)}</div>
+                </div>
             </div>
         </div>
         
-        <div class="card">
-            <div class="flex-between">
+        <!-- Action Buttons -->
+        <div class="action-buttons-container">
+            <button class="action-btn-clean btn-whatsapp" id="shareWABtn">
+                📱 Share on WhatsApp
+            </button>
+            <button class="action-btn-clean btn-excel" id="exportExcelBtn">
+                📊 Export to Excel
+            </button>
+            <button class="action-btn-clean btn-print" id="printBtn">
+                🖨️ Print Report
+            </button>
+        </div>
+        
+        <!-- Member Rankings Table -->
+        <div class="rankings-container">
+            <div class="rankings-header">
                 <h3>🏆 Member Rankings</h3>
-                <span style="font-size:0.7rem; color:#6c757d;">Sorted by contributions</span>
             </div>
-            ${renderMemberTable()}
+            <div class="rankings-table-wrapper">
+                <table class="rankings-table">
+                    <thead>
+                        <tr>
+                            <th style="width:60px;">Rank</th>
+                            <th>Member Name</th>
+                            <th>Total Contributions</th>
+                            <th>Total Loans</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${tableRows || '<tr><td colspan="4" style="text-align:center; padding:2rem;">No member records found<td</tr>'}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Charts Section at Bottom -->
+        <div class="charts-section">
+            <div class="charts-header">
+                <h3>📊 Financial Charts</h3>
+            </div>
+            <div class="charts-grid-bottom">
+                <div class="chart-box">
+                    <div class="chart-title">Monthly Trends (Contributions vs Loans)</div>
+                    <div class="chart-canvas">
+                        <canvas id="trendsChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-box">
+                    <div class="chart-title">Top 5 Contributors</div>
+                    <div class="chart-canvas">
+                        <canvas id="topMembersChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="report-footer">
+            Report generated by ChamaEase · All amounts are in Kenyan Shillings (KES)
         </div>
     `;
     
     container.innerHTML = html;
     
-    createChart();
+    // Create charts
+    createCharts();
     
+    // Bind events
     document.getElementById("shareWABtn").addEventListener("click", shareToWhatsApp);
     document.getElementById("exportExcelBtn").addEventListener("click", exportToExcel);
     document.getElementById("printBtn").addEventListener("click", printReport);
