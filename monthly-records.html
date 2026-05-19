@@ -372,6 +372,7 @@
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
 </head>
 <body>
 <div class="app-wrapper">
@@ -383,17 +384,17 @@
             <button class="sidebar-close" id="sidebarClose">X</button>
         </div>
         <nav class="sidebar-nav">
-            <a href="dashboard.html" class="nav-item"><span class="icon">DASH</span><span class="label">DASHBOARD</span></a>
-            <a href="members.html" class="nav-item"><span class="icon">MEM</span><span class="label">MEMBERS</span></a>
-            <a href="monthly-records.html" class="nav-item active"><span class="icon">REC</span><span class="label">MONTHLY RECORDS</span></a>
-            <a href="reports.html" class="nav-item"><span class="icon">RPT</span><span class="label">REPORTS</span></a>
-            <a href="settings.html" class="nav-item"><span class="icon">SET</span><span class="label">SETTINGS</span></a>
+            <a href="dashboard.html" class="nav-item"><span class="icon">📊</span><span class="label">DASHBOARD</span></a>
+            <a href="members.html" class="nav-item"><span class="icon">👥</span><span class="label">MEMBERS</span></a>
+            <a href="monthly-records.html" class="nav-item active"><span class="icon">📅</span><span class="label">MONTHLY RECORDS</span></a>
+            <a href="reports.html" class="nav-item"><span class="icon">📈</span><span class="label">REPORTS</span></a>
+            <a href="settings.html" class="nav-item"><span class="icon">⚙️</span><span class="label">SETTINGS</span></a>
         </nav>
     </aside>
 
     <main class="main-content">
         <div class="top-bar">
-            <button class="menu-toggle" id="menuToggle">MENU</button>
+            <button class="menu-toggle" id="menuToggle">☰</button>
             <div class="page-title">MONTHLY RECORDS</div>
             <div class="user-info">
                 <span class="user-email" id="userEmail"></span>
@@ -411,35 +412,13 @@
 </div>
 
 <script>
-// Supabase Configuration - REPLACE WITH YOUR ACTUAL CREDENTIALS
-const SUPABASE_URL = 'https://qfihebqomluleywpgufv.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFmaWhlYnFvbWx1bGV5d3BndWZ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxOTM5NDEsImV4cCI6MjA5Mzc2OTk0MX0.yKFXsCDYReshZKL9oosvm5ZwHh4GUZy1SYwFyqhDv9I';
-
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
+// Using supabaseClient from supabase-config.js
 let allMembers = [];
 let allRecords = [];
 let currentMonth = new Date().getMonth() + 1;
 let currentYear = new Date().getFullYear();
 let saveTimeout = null;
 let currentUser = null;
-
-// Auth functions
-async function checkAuth() {
-    const { data: { session }, error } = await supabaseClient.auth.getSession();
-    if (error || !session) {
-        window.location.href = "index.html";
-        return false;
-    }
-    currentUser = session.user;
-    document.getElementById("userEmail").textContent = currentUser.email || "Admin";
-    return true;
-}
-
-async function logoutUser() {
-    await supabaseClient.auth.signOut();
-    window.location.href = "index.html";
-}
 
 // Sidebar functions
 function openSidebar() {
@@ -455,7 +434,10 @@ function closeSidebar() {
 document.getElementById("menuToggle").addEventListener("click", openSidebar);
 document.getElementById("sidebarClose").addEventListener("click", closeSidebar);
 document.getElementById("sidebarOverlay").addEventListener("click", closeSidebar);
-document.getElementById("logoutBtn").addEventListener("click", logoutUser);
+document.getElementById("logoutBtn").addEventListener("click", async function() {
+    await logoutUser();
+    window.location.href = "index.html";
+});
 
 // Helper functions
 function safeValue(value) {
@@ -467,7 +449,7 @@ function safeValue(value) {
 
 function formatNumber(num) {
     if (num === null || num === undefined) return "0";
-    return num.toLocaleString("en-KE");
+    return num.toLocaleString('en-KE');
 }
 
 function escapeHtml(str) {
@@ -483,7 +465,7 @@ function escapeHtml(str) {
 function showSavedIndicator(success) {
     const indicator = document.getElementById("saving-indicator");
     if (indicator) {
-        indicator.textContent = success ? "Saved" : "Error";
+        indicator.textContent = success ? "✓ Saved" : "✗ Error";
         setTimeout(function() {
             indicator.textContent = "";
         }, 1500);
@@ -693,7 +675,7 @@ function shareToWhatsApp() {
     var monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
     var monthName = monthNames[currentMonth - 1];
     
-    var message = "CHAMA RECORDS - " + monthName + " " + currentYear + "\n\n";
+    var message = "🏦 *CHAMA RECORDS* - " + monthName + " " + currentYear + "\n\n";
     
     for (var i = 0; i < allMembers.length; i++) {
         var member = allMembers[i];
@@ -703,12 +685,12 @@ function shareToWhatsApp() {
         var monthlyContribution = safeValue(getRecordValue(member.id, "monthly_contribution"));
         var penalties = safeValue(getRecordValue(member.id, "penalties"));
         
-        message += member.name + "\n";
-        message += "Loan: KES " + formatNumber(loan) + "\n";
-        message += "Loan Deductions: KES " + formatNumber(loanDeductions) + "\n";
-        message += "Loan Balance: KES " + formatNumber(loanBalance) + "\n";
-        message += "Contribution: KES " + formatNumber(monthlyContribution) + "\n";
-        message += "Penalties: KES " + formatNumber(penalties) + "\n\n";
+        message += "*" + member.name + "*\n";
+        message += "💰 Loan: KES " + formatNumber(loan) + "\n";
+        message += "📉 Loan Deductions: KES " + formatNumber(loanDeductions) + "\n";
+        message += "⚖️ Loan Balance: KES " + formatNumber(loanBalance) + "\n";
+        message += "📋 Contribution: KES " + formatNumber(monthlyContribution) + "\n";
+        message += "⚠️ Penalties: KES " + formatNumber(penalties) + "\n\n";
     }
     
     var encodedMessage = encodeURIComponent(message);
@@ -843,8 +825,12 @@ function renderSpreadsheet() {
 
 // Initialize
 (async function() {
-    var isAuth = await checkAuth();
+    const isAuth = await protectPage();
     if (isAuth) {
+        const user = await getCurrentUser();
+        if (user && document.getElementById("userEmail")) {
+            document.getElementById("userEmail").textContent = user.email || "Admin";
+        }
         await loadData();
     }
 })();
