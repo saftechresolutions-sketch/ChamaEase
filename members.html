@@ -8,82 +8,562 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
     <style>
-        /* Additional members-specific styles */
-        .stats-summary {
+        /* Modern Members Page Styles */
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 24px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-section::before {
+            content: "👥";
+            position: absolute;
+            right: -20px;
+            bottom: -20px;
+            font-size: 100px;
+            opacity: 0.1;
+            pointer-events: none;
+        }
+        
+        .hero-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+        
+        .hero-subtitle {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+        
+        .stats-grid-modern {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.8rem;
             margin-bottom: 1.5rem;
         }
         
-        .stat-box {
-            background: white;
-            border-radius: 12px;
-            padding: 0.8rem;
-            text-align: center;
-            border: 1px solid var(--gray-border);
-            box-shadow: var(--shadow-sm);
+        @media (min-width: 768px) {
+            .stats-grid-modern {
+                grid-template-columns: repeat(4, 1fr);
+            }
         }
         
-        .stat-box h4 {
+        .stat-card-modern {
+            background: white;
+            border-radius: 20px;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            border: 1px solid var(--gray-border);
+            transition: all 0.2s;
+        }
+        
+        .stat-card-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
+        
+        .stat-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1.2;
+        }
+        
+        .stat-label {
             font-size: 0.7rem;
             color: #6c757d;
-            margin-bottom: 0.3rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
-        .stat-box .number {
+        .stat-small {
+            font-size: 0.65rem;
+            color: #6c757d;
+            margin-top: 0.25rem;
+        }
+        
+        /* Search and Action Bar */
+        .action-bar {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        @media (min-width: 768px) {
+            .action-bar {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+        
+        .search-wrapper {
+            flex: 1;
+            position: relative;
+            max-width: 100%;
+        }
+        
+        @media (min-width: 768px) {
+            .search-wrapper {
+                max-width: 320px;
+            }
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1rem;
+            pointer-events: none;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 12px 16px 12px 42px;
+            border: 1px solid var(--gray-border);
+            border-radius: 40px;
+            font-size: 0.85rem;
+            background: white;
+            transition: all 0.2s;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(44, 122, 77, 0.1);
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 0.6rem;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background: white;
+            border: 1px solid var(--gray-border);
+            padding: 10px 18px;
+            border-radius: 40px;
+            font-weight: 500;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        
+        .btn-secondary:hover {
+            background: var(--primary-light);
+            border-color: var(--primary);
+        }
+        
+        /* Member Cards - Mobile First */
+        .members-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .member-card {
+            background: white;
+            border-radius: 20px;
+            border: 1px solid var(--gray-border);
+            overflow: hidden;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        .member-card:hover {
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .member-card-header {
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border-bottom: 1px solid var(--gray-border);
+            background: #fafbfc;
+        }
+        
+        .member-avatar-large {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 1.3rem;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+        }
+        
+        .member-info-large {
+            flex: 1;
+        }
+        
+        .member-name-large {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1e2a3e;
+            margin-bottom: 0.25rem;
+        }
+        
+        .member-contact {
+            font-size: 0.7rem;
+            color: #6c757d;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .member-contact span {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .member-card-stats {
+            padding: 1rem;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.8rem;
+            background: white;
+        }
+        
+        .member-stat-item {
+            text-align: center;
+        }
+        
+        .member-stat-value {
+            font-size: 1rem;
             font-weight: 700;
             color: var(--primary);
         }
         
-        .action-buttons-cell {
+        .member-stat-label {
+            font-size: 0.6rem;
+            color: #6c757d;
+            text-transform: uppercase;
+        }
+        
+        .member-card-actions {
+            padding: 0.8rem 1rem;
             display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
+            gap: 0.5rem;
+            border-top: 1px solid var(--gray-border);
+            background: #fafbfc;
         }
         
-        .btn-icon {
-            padding: 5px 10px;
+        .action-btn {
+            flex: 1;
+            padding: 8px;
+            border-radius: 40px;
             font-size: 0.7rem;
-        }
-        
-        .member-avatar {
-            width: 32px;
-            height: 32px;
-            background: var(--primary-light);
-            border-radius: 50%;
+            font-weight: 500;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            margin-right: 8px;
-            font-weight: bold;
+            gap: 6px;
+        }
+        
+        .action-edit {
+            background: var(--primary-light);
             color: var(--primary);
         }
         
-        .member-info {
+        .action-edit:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .action-history {
+            background: #e0f2fe;
+            color: #0284c7;
+        }
+        
+        .action-history:hover {
+            background: #0284c7;
+            color: white;
+        }
+        
+        .action-delete {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+        
+        .action-delete:hover {
+            background: var(--danger);
+            color: white;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1.5rem;
+            background: white;
+            border-radius: 20px;
+            border: 1px solid var(--gray-border);
+        }
+        
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        
+        .empty-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .empty-text {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Modal Improvements */
+        .modal-modern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
             display: flex;
             align-items: center;
+            justify-content: center;
+            z-index: 1001;
+            backdrop-filter: blur(4px);
         }
         
-        .export-buttons {
+        .modal-content-modern {
+            background: white;
+            border-radius: 28px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 85vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .modal-header-modern {
+            padding: 1.2rem;
+            border-bottom: 1px solid var(--gray-border);
             display: flex;
-            gap: 8px;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 10;
         }
         
-        @media (max-width: 768px) {
-            .stats-summary {
-                grid-template-columns: repeat(2, 1fr);
+        .modal-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+        
+        .modal-close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #94a3b8;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-close-btn:hover {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+        
+        .modal-body {
+            padding: 1.2rem;
+        }
+        
+        .form-group-modern {
+            margin-bottom: 1rem;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+            color: #1e2a3e;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--gray-border);
+            border-radius: 16px;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(44, 122, 77, 0.1);
+        }
+        
+        .modal-footer {
+            padding: 1rem 1.2rem;
+            border-top: 1px solid var(--gray-border);
+            display: flex;
+            gap: 0.8rem;
+            justify-content: flex-end;
+        }
+        
+        /* Tablet and Desktop Adjustments */
+        @media (min-width: 768px) {
+            .hero-title {
+                font-size: 1.8rem;
             }
             
-            .action-buttons-cell {
-                flex-direction: column;
+            .member-card {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                flex-wrap: wrap;
             }
             
-            .btn-icon {
-                width: 100%;
-                text-align: center;
+            .member-card-header {
+                flex: 2;
+                border-bottom: none;
+                background: transparent;
             }
+            
+            .member-card-stats {
+                flex: 2;
+                border-left: 1px solid var(--gray-border);
+                padding: 0.8rem 1rem;
+            }
+            
+            .member-card-actions {
+                flex: 1;
+                border-top: none;
+                border-left: 1px solid var(--gray-border);
+                background: transparent;
+                justify-content: flex-end;
+            }
+            
+            .action-btn {
+                flex: none;
+                min-width: 80px;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .member-card-header {
+                flex: 3;
+            }
+            
+            .member-card-stats {
+                flex: 3;
+            }
+        }
+        
+        /* Loading States */
+        .skeleton-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1rem;
+            border: 1px solid var(--gray-border);
+        }
+        
+        .skeleton-line {
+            height: 12px;
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        /* Toast Notifications */
+        .toast-success {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            z-index: 1002;
+            animation: slideUp 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .toast-error {
+            background: var(--danger);
         }
     </style>
 </head>
@@ -108,7 +588,7 @@
     <main class="main-content">
         <div class="top-bar">
             <button class="menu-toggle" id="menuToggle">☰</button>
-            <div class="page-title">👥 MEMBERS</div>
+            <div class="page-title">MEMBERS</div>
             <div class="user-info">
                 <span class="user-email" id="userEmail"></span>
                 <button id="logoutBtn" class="logout-btn">LOGOUT</button>
@@ -117,7 +597,7 @@
         <div id="app-root" class="container">
             <div style="text-align: center; padding: 2rem;">
                 <div class="loading-spinner"></div>
-                <p>Loading members...</p>
+                <p style="margin-top: 1rem;">Loading members...</p>
             </div>
         </div>
         <footer>Smart Chama Management · Manage your members</footer>
@@ -129,7 +609,6 @@
 let allMembers = [];
 let searchTerm = "";
 let memberStats = {};
-let currentUser = null;
 
 // Sidebar functions
 function openSidebar() {
@@ -150,13 +629,11 @@ document.getElementById("logoutBtn").addEventListener("click", async function() 
     window.location.href = "index.html";
 });
 
-// Toast notification
-function showToast(message, type = 'success') {
+function showToast(message, isError = false) {
     const toast = document.createElement('div');
-    toast.className = `toast-notification ${type}`;
-    toast.innerHTML = (type === 'success' ? '✓ ' : '⚠️ ') + message;
+    toast.className = `toast-success ${isError ? 'toast-error' : ''}`;
+    toast.textContent = isError ? '⚠️ ' + message : '✓ ' + message;
     document.body.appendChild(toast);
-    
     setTimeout(() => {
         toast.style.opacity = '0';
         setTimeout(() => toast.remove(), 300);
@@ -205,7 +682,6 @@ async function loadMemberStats() {
             memberStats[record.member_id].months_active.add(record.year + '-' + record.month);
         }
         
-        // Convert months_active Set to count
         for (var id in memberStats) {
             memberStats[id].months_active = memberStats[id].months_active.size;
         }
@@ -215,7 +691,6 @@ async function loadMemberStats() {
 }
 
 async function loadMembers() {
-    const container = document.getElementById("app-root");
     try {
         const response = await supabaseClient.from("members").select("*").order("name");
         if (response.error) throw response.error;
@@ -224,12 +699,18 @@ async function loadMembers() {
         await loadMemberStats();
         renderMembersList();
     } catch (error) {
-        container.innerHTML = "<div class='card'><h3>⚠️ Error</h3><p>" + error.message + "</p><button class='btn' onclick='location.reload()'>Retry</button></div>";
+        document.getElementById("app-root").innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">⚠️</div>
+                <div class="empty-title">Error Loading Members</div>
+                <div class="empty-text">${error.message}</div>
+                <button class="btn-primary" onclick="location.reload()">Retry</button>
+            </div>
+        `;
     }
 }
 
 function renderMembersList() {
-    const container = document.getElementById("app-root");
     let filtered = allMembers;
     if (searchTerm !== "") {
         filtered = allMembers.filter(function(m) {
@@ -253,123 +734,267 @@ function renderMembersList() {
         if (stats.months_active > 0) activeMembers++;
     }
     
-    let tableRows = "";
-    for (var i = 0; i < filtered.length; i++) {
-        var m = filtered[i];
-        var stats = memberStats[m.id] || { total_contributions: 0, total_loans: 0, total_penalties: 0, months_active: 0 };
-        var avatarLetter = m.name.charAt(0).toUpperCase();
-        
-        tableRows += "<tr>";
-        tableRows += "<td>";
-        tableRows += "<div class='member-info'>";
-        tableRows += "<div class='member-avatar'>" + avatarLetter + "</div>";
-        tableRows += "<div><strong>" + escapeHtml(m.name) + "</strong>";
-        if (m.email) tableRows += "<br><small style='color:#6c757d'>" + escapeHtml(m.email) + "</small>";
-        tableRows += "</div></div>";
-        tableRows += "</td>";
-        tableRows += "<td>" + (m.phone ? escapeHtml(m.phone) : "—") + "</td>";
-        tableRows += "<td style='color:var(--primary); font-weight:600;'>KES " + formatNumber(stats.total_contributions) + "</td>";
-        tableRows += "<td>KES " + formatNumber(stats.total_loans) + "</td>";
-        tableRows += "<td>" + stats.months_active + " month(s)</td>";
-        tableRows += "<td class='action-buttons-cell'>";
-        tableRows += "<button class='btn-sm btn-outline edit-member' data-id='" + m.id + "' data-name='" + escapeHtml(m.name) + "' data-phone='" + escapeHtml(m.phone || "") + "' data-email='" + escapeHtml(m.email || "") + "'>✏️ Edit</button>";
-        tableRows += "<button class='btn-sm btn-danger-outline delete-member' data-id='" + m.id + "' data-name='" + escapeHtml(m.name) + "'>🗑️ Del</button>";
-        tableRows += "<button class='btn-sm btn-warning view-history' data-id='" + m.id + "' data-name='" + escapeHtml(m.name) + "'>📜 History</button>";
-        tableRows += "</td>";
-        tableRows += "</tr>";
-    }
-    
+    // Build member cards
+    let membersHtml = "";
     if (filtered.length === 0) {
-        tableRows = "<tr><td colspan='6' style='text-align:center; padding: 2rem;'>👥 No members found. Click 'ADD MEMBER' to get started.</td></tr>";
+        membersHtml = `
+            <div class="empty-state">
+                <div class="empty-icon">🔍</div>
+                <div class="empty-title">No members found</div>
+                <div class="empty-text">Try a different search term or add a new member</div>
+                <button class="btn-primary" id="emptyAddBtn">+ ADD MEMBER</button>
+            </div>
+        `;
+    } else {
+        for (var i = 0; i < filtered.length; i++) {
+            var m = filtered[i];
+            var stats = memberStats[m.id] || { total_contributions: 0, total_loans: 0, total_penalties: 0, months_active: 0, current_balance: 0 };
+            var avatarLetter = m.name.charAt(0).toUpperCase();
+            var hasEmail = m.email ? true : false;
+            var hasPhone = m.phone ? true : false;
+            
+            membersHtml += `
+                <div class="member-card" data-member-id="${m.id}">
+                    <div class="member-card-header">
+                        <div class="member-avatar-large">${avatarLetter}</div>
+                        <div class="member-info-large">
+                            <div class="member-name-large">${escapeHtml(m.name)}</div>
+                            <div class="member-contact">
+                                ${hasEmail ? `<span>📧 ${escapeHtml(m.email)}</span>` : ''}
+                                ${hasPhone ? `<span>📞 ${escapeHtml(m.phone)}</span>` : ''}
+                                ${!hasEmail && !hasPhone ? '<span>📭 No contact info</span>' : ''}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="member-card-stats">
+                        <div class="member-stat-item">
+                            <div class="member-stat-value">KES ${formatNumber(stats.total_contributions)}</div>
+                            <div class="member-stat-label">Contributions</div>
+                        </div>
+                        <div class="member-stat-item">
+                            <div class="member-stat-value">KES ${formatNumber(stats.total_loans)}</div>
+                            <div class="member-stat-label">Loans</div>
+                        </div>
+                        <div class="member-stat-item">
+                            <div class="member-stat-value">${stats.months_active}</div>
+                            <div class="member-stat-label">Active Months</div>
+                        </div>
+                    </div>
+                    <div class="member-card-actions">
+                        <button class="action-btn action-edit" onclick="editMember('${m.id}', '${escapeHtml(m.name)}', '${escapeHtml(m.phone || '')}', '${escapeHtml(m.email || '')}')">✏️ Edit</button>
+                        <button class="action-btn action-history" onclick="viewHistory('${m.id}', '${escapeHtml(m.name)}')">📜 History</button>
+                        <button class="action-btn action-delete" onclick="deleteMember('${m.id}', '${escapeHtml(m.name)}')">🗑️ Delete</button>
+                    </div>
+                </div>
+            `;
+        }
     }
     
     var html = `
-        <div class="stats-summary">
-            <div class="stat-box">
-                <h4>Total Members</h4>
-                <div class="number">${allMembers.length}</div>
+        <div class="hero-section">
+            <div class="hero-title">Member Directory</div>
+            <div class="hero-subtitle">Manage your chama members and track their contributions</div>
+        </div>
+        
+        <div class="stats-grid-modern">
+            <div class="stat-card-modern">
+                <div class="stat-icon">👥</div>
+                <div class="stat-value">${allMembers.length}</div>
+                <div class="stat-label">Total Members</div>
             </div>
-            <div class="stat-box">
-                <h4>Active Members</h4>
-                <div class="number">${activeMembers}</div>
+            <div class="stat-card-modern">
+                <div class="stat-icon">⭐</div>
+                <div class="stat-value">${activeMembers}</div>
+                <div class="stat-label">Active Members</div>
+                <div class="stat-small">have records</div>
             </div>
-            <div class="stat-box">
-                <h4>Total Contributions</h4>
-                <div class="number">KES ${(totalContributions/1000).toFixed(0)}k</div>
-                <small>KES ${formatNumber(totalContributions)}</small>
+            <div class="stat-card-modern">
+                <div class="stat-icon">💰</div>
+                <div class="stat-value">KES ${(totalContributions/1000).toFixed(0)}k</div>
+                <div class="stat-label">Total Contributions</div>
+                <div class="stat-small">KES ${formatNumber(totalContributions)}</div>
             </div>
-            <div class="stat-box">
-                <h4>Total Loans</h4>
-                <div class="number">KES ${(totalLoans/1000).toFixed(0)}k</div>
-                <small>KES ${formatNumber(totalLoans)}</small>
+            <div class="stat-card-modern">
+                <div class="stat-icon">📊</div>
+                <div class="stat-value">KES ${(totalBalance/1000).toFixed(0)}k</div>
+                <div class="stat-label">Outstanding Balance</div>
+                <div class="stat-small">loan balance</div>
             </div>
         </div>
         
-        <div class="flex-between">
-            <div>
-                <h2>👥 MEMBERS DIRECTORY</h2>
+        <div class="action-bar">
+            <div class="search-wrapper">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchMemberInput" class="search-input" placeholder="Search by name, email or phone..." value="${escapeHtml(searchTerm)}">
             </div>
-            <div class="export-buttons">
-                <button class="btn" id="addMemberBtn">+ ADD MEMBER</button>
-                <button class="btn-outline" id="exportMembersBtn">📎 Export</button>
+            <div class="btn-group">
+                <button class="btn-primary" id="addMemberBtn">➕ ADD MEMBER</button>
+                <button class="btn-secondary" id="exportMembersBtn">📎 Export</button>
             </div>
         </div>
         
-        <div class="flex-between">
-            <input type="text" id="searchMemberInput" class="search-bar" placeholder="🔍 Search by name, email or phone..." value="${escapeHtml(searchTerm)}">
-            <div style="font-size:0.75rem; color:#6c757d">💰 Total Balance: KES ${formatNumber(totalBalance)}</div>
-        </div>
-        
-        <div class="card">
-            <div class="table-wrapper">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>MEMBER</th>
-                            <th>PHONE</th>
-                            <th>TOTAL CONTRIBUTIONS</th>
-                            <th>TOTAL LOANS</th>
-                            <th>ACTIVE MONTHS</th>
-                            <th>ACTIONS</th>
-                        </tr>
-                    </thead>
-                    <tbody>${tableRows}</tbody>
-                </table>
-            </div>
+        <div class="members-grid" id="membersGrid">
+            ${membersHtml}
         </div>
     `;
     
-    container.innerHTML = html;
+    document.getElementById("app-root").innerHTML = html;
     
+    // Bind events
     document.getElementById("searchMemberInput").addEventListener("input", function(e) {
         searchTerm = e.target.value;
         renderMembersList();
     });
     
-    document.getElementById("addMemberBtn").addEventListener("click", showAddMemberModal);
-    document.getElementById("exportMembersBtn").addEventListener("click", exportMembersToCSV);
-    
-    var editBtns = document.querySelectorAll(".edit-member");
-    for (var i = 0; i < editBtns.length; i++) {
-        editBtns[i].addEventListener("click", function() {
-            showEditMemberModal(this.dataset.id, this.dataset.name, this.dataset.phone, this.dataset.email);
-        });
+    if (document.getElementById("addMemberBtn")) {
+        document.getElementById("addMemberBtn").addEventListener("click", showAddMemberModal);
     }
-    
-    var deleteBtns = document.querySelectorAll(".delete-member");
-    for (var i = 0; i < deleteBtns.length; i++) {
-        deleteBtns[i].addEventListener("click", function() {
-            confirmDeleteMember(this.dataset.id, this.dataset.name);
-        });
+    if (document.getElementById("emptyAddBtn")) {
+        document.getElementById("emptyAddBtn").addEventListener("click", showAddMemberModal);
     }
-    
-    var historyBtns = document.querySelectorAll(".view-history");
-    for (var i = 0; i < historyBtns.length; i++) {
-        historyBtns[i].addEventListener("click", function() {
-            window.location.href = "member-history.html?id=" + this.dataset.id + "&name=" + encodeURIComponent(this.dataset.name);
-        });
+    if (document.getElementById("exportMembersBtn")) {
+        document.getElementById("exportMembersBtn").addEventListener("click", exportMembersToCSV);
     }
 }
+
+function showAddMemberModal() {
+    const modalHtml = `
+        <div class="modal-modern" id="memberModal">
+            <div class="modal-content-modern">
+                <div class="modal-header-modern">
+                    <div class="modal-title">➕ Add New Member</div>
+                    <button class="modal-close-btn" onclick="closeModal()">✕</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group-modern">
+                        <label class="form-label">Full Name *</label>
+                        <input type="text" id="memberName" class="form-input" placeholder="Enter full name" autocomplete="off">
+                    </div>
+                    <div class="form-group-modern">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" id="memberEmail" class="form-input" placeholder="member@example.com">
+                    </div>
+                    <div class="form-group-modern">
+                        <label class="form-label">Phone Number</label>
+                        <input type="tel" id="memberPhone" class="form-input" placeholder="0712345678">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button class="btn-primary" id="confirmAddBtn">Add Member</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    document.getElementById("confirmAddBtn").onclick = async function() {
+        const name = document.getElementById("memberName").value.trim();
+        const email = document.getElementById("memberEmail").value.trim();
+        const phone = document.getElementById("memberPhone").value.trim();
+        
+        if (!name) {
+            showToast("Please enter member name", true);
+            return;
+        }
+        
+        const newMember = { name: name };
+        if (email) newMember.email = email;
+        if (phone) newMember.phone = phone;
+        
+        const response = await supabaseClient.from("members").insert([newMember]);
+        if (response.error) {
+            showToast(response.error.message, true);
+            return;
+        }
+        
+        closeModal();
+        await loadMembers();
+        showToast("Member added successfully!");
+    };
+}
+
+window.editMember = function(id, name, phone, email) {
+    const modalHtml = `
+        <div class="modal-modern" id="memberModal">
+            <div class="modal-content-modern">
+                <div class="modal-header-modern">
+                    <div class="modal-title">✏️ Edit Member</div>
+                    <button class="modal-close-btn" onclick="closeModal()">✕</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group-modern">
+                        <label class="form-label">Full Name *</label>
+                        <input type="text" id="memberName" class="form-input" value="${escapeHtml(name)}">
+                    </div>
+                    <div class="form-group-modern">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" id="memberEmail" class="form-input" value="${escapeHtml(email)}">
+                    </div>
+                    <div class="form-group-modern">
+                        <label class="form-label">Phone Number</label>
+                        <input type="tel" id="memberPhone" class="form-input" value="${escapeHtml(phone)}">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button class="btn-primary" id="confirmEditBtn">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    document.getElementById("confirmEditBtn").onclick = async function() {
+        const newName = document.getElementById("memberName").value.trim();
+        const newEmail = document.getElementById("memberEmail").value.trim();
+        const newPhone = document.getElementById("memberPhone").value.trim();
+        
+        if (!newName) {
+            showToast("Please enter member name", true);
+            return;
+        }
+        
+        const updateData = { name: newName };
+        updateData.email = newEmail || null;
+        updateData.phone = newPhone || null;
+        
+        const response = await supabaseClient.from("members").update(updateData).eq("id", id);
+        if (response.error) {
+            showToast(response.error.message, true);
+            return;
+        }
+        
+        closeModal();
+        await loadMembers();
+        showToast("Member updated successfully!");
+    };
+};
+
+window.deleteMember = function(id, name) {
+    if (!confirm(`⚠️ Delete "${name}"?\n\nThis will also delete ALL records (contributions, loans, penalties) for this member. This action cannot be undone!`)) return;
+    
+    (async function() {
+        const response = await supabaseClient.from("members").delete().eq("id", id);
+        if (response.error) {
+            showToast(response.error.message, true);
+            return;
+        }
+        await loadMembers();
+        showToast("Member deleted successfully!");
+    })();
+};
+
+window.viewHistory = function(id, name) {
+    window.location.href = `member-history.html?id=${id}&name=${encodeURIComponent(name)}`;
+};
+
+window.closeModal = function() {
+    const modal = document.getElementById("memberModal");
+    if (modal) modal.remove();
+};
 
 function exportMembersToCSV() {
     var csvRows = [];
@@ -407,124 +1032,6 @@ function exportMembersToCSV() {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
     showToast("Members list exported!");
-}
-
-function showAddMemberModal() {
-    var modal = document.createElement("div");
-    modal.className = "modal";
-    modal.innerHTML = `
-        <div class="modal-content">
-            <h3>➕ ADD NEW MEMBER</h3>
-            <div class="form-group">
-                <label>MEMBER NAME *</label>
-                <input type="text" id="memberName" placeholder="Enter full name" autocomplete="off">
-            </div>
-            <div class="form-group">
-                <label>EMAIL ADDRESS</label>
-                <input type="email" id="memberEmail" placeholder="member@example.com">
-            </div>
-            <div class="form-group">
-                <label>PHONE NUMBER</label>
-                <input type="tel" id="memberPhone" placeholder="0712345678">
-            </div>
-            <div style="display:flex; gap:10px; margin-top:1rem;">
-                <button id="confirmAddBtn" class="btn">✅ ADD MEMBER</button>
-                <button id="cancelModalBtn" class="btn-outline btn">❌ CANCEL</button>
-            </div>
-        </div>
-    `;
-    document.body.appendChild(modal);
-    
-    document.getElementById("confirmAddBtn").onclick = async function() {
-        var name = document.getElementById("memberName").value.trim();
-        var email = document.getElementById("memberEmail").value.trim();
-        var phone = document.getElementById("memberPhone").value.trim();
-        
-        if (!name) { 
-            showToast("Please enter member name", "error");
-            return; 
-        }
-        
-        var newMember = { name: name };
-        if (email) newMember.email = email;
-        if (phone) newMember.phone = phone;
-        
-        var response = await supabaseClient.from("members").insert([newMember]);
-        if (response.error) { 
-            showToast(response.error.message, "error");
-            return; 
-        }
-        modal.remove();
-        await loadMembers();
-        showToast("✅ Member added successfully!");
-    };
-    document.getElementById("cancelModalBtn").onclick = function() { modal.remove(); };
-}
-
-function showEditMemberModal(id, name, phone, email) {
-    var modal = document.createElement("div");
-    modal.className = "modal";
-    modal.innerHTML = `
-        <div class="modal-content">
-            <h3>✏️ EDIT MEMBER</h3>
-            <div class="form-group">
-                <label>MEMBER NAME *</label>
-                <input type="text" id="memberName" value="${escapeHtml(name)}">
-            </div>
-            <div class="form-group">
-                <label>EMAIL ADDRESS</label>
-                <input type="email" id="memberEmail" value="${escapeHtml(email || "")}">
-            </div>
-            <div class="form-group">
-                <label>PHONE NUMBER</label>
-                <input type="tel" id="memberPhone" value="${escapeHtml(phone || "")}">
-            </div>
-            <div style="display:flex; gap:10px; margin-top:1rem;">
-                <button id="confirmEditBtn" class="btn">💾 SAVE CHANGES</button>
-                <button id="cancelModalBtn" class="btn-outline btn">❌ CANCEL</button>
-            </div>
-        </div>
-    `;
-    document.body.appendChild(modal);
-    
-    document.getElementById("confirmEditBtn").onclick = async function() {
-        var newName = document.getElementById("memberName").value.trim();
-        var newEmail = document.getElementById("memberEmail").value.trim();
-        var newPhone = document.getElementById("memberPhone").value.trim();
-        
-        if (!newName) { 
-            showToast("Please enter member name", "error");
-            return; 
-        }
-        
-        var updateData = { name: newName };
-        updateData.email = newEmail || null;
-        updateData.phone = newPhone || null;
-        
-        var response = await supabaseClient.from("members").update(updateData).eq("id", id);
-        if (response.error) { 
-            showToast(response.error.message, "error");
-            return; 
-        }
-        modal.remove();
-        await loadMembers();
-        showToast("✅ Member updated successfully!");
-    };
-    document.getElementById("cancelModalBtn").onclick = function() { modal.remove(); };
-}
-
-function confirmDeleteMember(id, name) {
-    if (!confirm("⚠️ Delete " + name + "?\n\nThis will also delete ALL records (contributions, loans, penalties) for this member. This action cannot be undone!")) return;
-    
-    (async function() {
-        var response = await supabaseClient.from("members").delete().eq("id", id);
-        if (response.error) { 
-            showToast(response.error.message, "error");
-            return; 
-        }
-        await loadMembers();
-        showToast("✅ Member deleted successfully!");
-    })();
 }
 
 // Initialize
