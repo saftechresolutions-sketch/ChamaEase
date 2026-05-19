@@ -3,468 +3,339 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-    <title>ChamaEase | Reports</title>
+    <title>ChamaEase | Reports & Analytics</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Chart.js for beautiful charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- html2canvas for screenshot sharing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: system-ui, 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
-        }
-
-        body {
-            background: #f4f7fb;
-            color: #1e2a3e;
-        }
-
-        :root {
-            --primary: #2c7a4d;
-            --primary-light: #eaf5ef;
-            --primary-dark: #1f5a3a;
-            --danger: #dc4c4c;
-            --warning: #f59e0b;
-            --info: #3b82f6;
-            --gray-border: #e2e8f0;
-            --shadow-sm: 0 4px 12px rgba(0,0,0,0.04);
-            --radius-card: 16px;
-            --radius-btn: 32px;
-            --sidebar-width: 280px;
-        }
-
-        .app-wrapper {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        .sidebar {
-            width: var(--sidebar-width);
-            background: white;
-            border-right: 1px solid var(--gray-border);
-            position: fixed;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            overflow-y: auto;
-            transition: transform 0.3s ease;
-            z-index: 1000;
-            box-shadow: var(--shadow-sm);
-            transform: translateX(0);
-        }
-
-        .sidebar-header {
-            padding: 1rem;
-            border-bottom: 1px solid var(--gray-border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .sidebar-logo {
-            font-weight: 800;
-            font-size: 1.2rem;
-            background: linear-gradient(135deg, var(--primary), #3b9b62);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        .sidebar-close {
-            background: none;
-            border: none;
-            font-size: 1.3rem;
-            cursor: pointer;
-            color: #94a3b8;
-            display: none;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .sidebar-close:hover {
-            background: #fee2e2;
-            color: var(--danger);
-        }
-
-        .sidebar-nav {
-            padding: 0.8rem 0;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 0.7rem 1rem;
-            margin: 0.2rem 0.8rem;
-            border-radius: 12px;
-            text-decoration: none;
-            color: #4a5568;
-            transition: all 0.2s;
-            cursor: pointer;
-        }
-
-        .nav-item:hover {
-            background: var(--primary-light);
-            color: var(--primary);
-        }
-
-        .nav-item.active {
-            background: var(--primary);
+        /* Reports Page Additional Styles */
+        .hero-report {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 24px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
             color: white;
+            position: relative;
+            overflow: hidden;
         }
-
-        .nav-item .icon {
-            font-size: 1.1rem;
-            width: 26px;
-            text-align: center;
+        
+        .hero-report::before {
+            content: "📊";
+            position: absolute;
+            right: -20px;
+            bottom: -20px;
+            font-size: 100px;
+            opacity: 0.1;
+            pointer-events: none;
         }
-
-        .nav-item .label {
-            font-weight: 500;
-            font-size: 0.85rem;
+        
+        .hero-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
         }
-
-        .main-content {
-            flex: 1;
-            margin-left: var(--sidebar-width);
-            transition: margin-left 0.3s ease;
-            width: calc(100% - var(--sidebar-width));
+        
+        .hero-subtitle {
+            font-size: 0.8rem;
+            opacity: 0.9;
         }
-
-        .top-bar {
-            background: white;
-            padding: 0.7rem 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--gray-border);
-            box-shadow: var(--shadow-sm);
-            position: sticky;
-            top: 0;
-            z-index: 99;
+        
+        /* Chart Containers */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
         }
-
-        .menu-toggle {
-            background: none;
-            border: none;
-            font-size: 1.3rem;
-            cursor: pointer;
-            color: var(--primary);
-            padding: 6px;
-            border-radius: 50%;
-        }
-
-        .page-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #1e2a3e;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-        }
-
-        .user-email {
-            font-size: 0.7rem;
-            color: #5b6e8c;
-            display: none;
-        }
-
-        @media (min-width: 480px) {
-            .user-email {
-                display: inline;
+        
+        @media (min-width: 768px) {
+            .charts-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
-
-        .logout-btn {
-            background: transparent;
-            border: 1px solid #dc2626;
-            color: #dc2626;
-            padding: 0.35rem 0.7rem;
-            border-radius: 2rem;
-            cursor: pointer;
-            font-size: 0.7rem;
+        
+        .chart-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1rem;
+            border: 1px solid var(--gray-border);
+            box-shadow: var(--shadow-sm);
         }
-
-        .logout-btn:hover {
+        
+        .chart-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #1e2a3e;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 250px;
+        }
+        
+        canvas {
+            max-height: 250px;
+            width: 100%;
+        }
+        
+        /* Share Options Panel */
+        .share-panel {
+            background: white;
+            border-radius: 20px;
+            border: 1px solid var(--gray-border);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+        
+        .share-header {
+            padding: 1rem;
+            background: #fafbfc;
+            border-bottom: 1px solid var(--gray-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .share-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .share-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .share-btn {
+            padding: 8px 16px;
+            border-radius: 40px;
+            border: none;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+        
+        .share-btn-wa {
+            background: #25D366;
+            color: white;
+        }
+        
+        .share-btn-wa:hover {
+            background: #128C7E;
+            transform: translateY(-1px);
+        }
+        
+        .share-btn-pdf {
             background: #dc2626;
             color: white;
         }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 1rem;
-            width: 100%;
-            min-height: 70vh;
+        
+        .share-btn-pdf:hover {
+            background: #b91c1c;
+            transform: translateY(-1px);
         }
-
-        .btn {
-            border: none;
-            background: var(--primary);
+        
+        .share-btn-excel {
+            background: #10b981;
             color: white;
-            padding: 0.5rem 1rem;
-            border-radius: var(--radius-btn);
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 0.75rem;
-            text-decoration: none;
-            display: inline-block;
         }
-
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--primary);
-            color: var(--primary);
+        
+        .share-btn-excel:hover {
+            background: #059669;
+            transform: translateY(-1px);
         }
-
-        .btn-sm {
-            padding: 0.25rem 0.6rem;
-            font-size: 0.65rem;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0.8rem;
-            margin-bottom: 1.5rem;
-        }
-
-        @media (min-width: 768px) {
-            .stats-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        }
-
-        .stat-card {
-            background: white;
-            border-radius: 1rem;
-            padding: 0.8rem;
-            text-align: center;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--gray-border);
-        }
-
-        .stat-card h4 {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #5b6e8c;
-            margin-bottom: 0.3rem;
-        }
-
-        .stat-number {
-            font-size: 1.3rem;
-            font-weight: 800;
-            color: var(--primary);
-        }
-
-        .stat-full {
-            font-size: 0.7rem;
-            color: #6c757d;
-        }
-
-        .card {
-            background: white;
-            border-radius: var(--radius-card);
-            box-shadow: var(--shadow-sm);
-            padding: 1rem;
-            margin-bottom: 1rem;
-            border: 1px solid var(--gray-border);
-        }
-
-        .flex-between {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .report-tabs {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-            margin-bottom: 1rem;
-            border-bottom: 1px solid var(--gray-border);
-            padding-bottom: 0.5rem;
-        }
-
-        .tab-btn {
-            background: transparent;
-            border: none;
-            padding: 0.5rem 1rem;
-            cursor: pointer;
-            border-radius: 8px;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-
-        .tab-btn.active {
+        
+        .share-btn-chart {
             background: var(--primary);
             color: white;
         }
-
-        .tab-content {
-            display: none;
+        
+        .share-btn-chart:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
         }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .spreadsheet-container {
-            overflow-x: auto;
-            border-radius: 12px;
-            border: 1px solid var(--gray-border);
-            background: white;
-        }
-
-        .report-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.8rem;
-            min-width: 600px;
-        }
-
-        .report-table th,
-        .report-table td {
-            border: 1px solid var(--gray-border);
-            padding: 10px 8px;
-            text-align: left;
-        }
-
-        .report-table th {
-            background: #f8fafc;
-            font-weight: 600;
-        }
-
-        .report-table tr:hover {
-            background: var(--primary-light);
-        }
-
-        .month-year-selector {
+        
+        .share-options {
+            padding: 1rem;
+            border-top: 1px solid var(--gray-border);
             display: flex;
+            flex-wrap: wrap;
             gap: 1rem;
             align-items: center;
-            flex-wrap: wrap;
-            margin-bottom: 1rem;
         }
-
-        .month-year-selector select {
-            padding: 0.5rem 1rem;
-            border-radius: 40px;
-            border: 1px solid var(--gray-border);
+        
+        .share-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        
+        .share-option input {
+            width: auto;
+            margin: 0;
+            cursor: pointer;
+        }
+        
+        .share-option label {
+            font-size: 0.75rem;
+            cursor: pointer;
+            margin: 0;
+        }
+        
+        /* Date Range Selector */
+        .date-range {
             background: white;
-            font-size: 0.85rem;
+            border-radius: 20px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--gray-border);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: flex-end;
         }
-
-        footer {
-            text-align: center;
-            padding: 0.8rem;
-            font-size: 0.65rem;
-            color: #6c757d;
-            border-top: 1px solid var(--gray-border);
+        
+        .date-group {
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        .date-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            color: #1e2a3e;
+            display: block;
+        }
+        
+        .date-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--gray-border);
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+        
+        .apply-range-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        /* Preview Container for Screenshot */
+        .report-preview {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
             margin-top: 1rem;
+            border: 1px solid var(--gray-border);
         }
-
-        .sidebar-overlay {
-            display: none;
+        
+        .preview-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        .preview-header h3 {
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+        
+        /* Toast */
+        .toast-notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            z-index: 1002;
+            animation: slideUp 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .toast-error {
+            background: var(--danger);
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translateX(-50%) translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        /* Loading Overlay */
+        .loading-overlay {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
             background: rgba(0,0,0,0.5);
-            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
         }
-
-        .sidebar-overlay.active {
-            display: block;
-        }
-
-        .loading-spinner {
-            display: inline-block;
-            width: 30px;
-            height: 30px;
-            border: 3px solid #e2e8f0;
+        
+        .loading-spinner-large {
+            width: 50px;
+            height: 50px;
+            border: 4px solid white;
             border-radius: 50%;
             border-top-color: var(--primary);
             animation: spin 0.8s linear infinite;
         }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .alert {
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-        }
-
-        .alert-info {
-            background: #e0f2fe;
-            color: #0369a1;
-            border: 1px solid #bae6fd;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 600;
-        }
-
-        .badge-success {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
-        .badge-warning {
-            background: #fed7aa;
-            color: #92400e;
-        }
-
-        .badge-danger {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
+        
         @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
+            .share-buttons {
+                justify-content: stretch;
             }
-            .sidebar.open {
-                transform: translateX(0);
+            .share-btn {
+                flex: 1;
+                justify-content: center;
             }
-            .main-content {
-                margin-left: 0;
+            .date-range {
+                flex-direction: column;
+            }
+            .apply-range-btn {
                 width: 100%;
-            }
-            .sidebar-close {
-                display: flex;
-            }
-            .container {
-                padding: 0.8rem;
-            }
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .report-table th,
-            .report-table td {
-                padding: 6px 4px;
-                font-size: 0.7rem;
             }
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="supabase-config.js"></script>
 </head>
 <body>
 <div class="app-wrapper">
@@ -473,11 +344,12 @@
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">ChamaEase</div>
-            <button class="sidebar-close" id="sidebarClose">X</button>
+            <button class="sidebar-close" id="sidebarClose">✕</button>
         </div>
         <nav class="sidebar-nav">
             <a href="dashboard.html" class="nav-item"><span class="icon">📊</span><span class="label">DASHBOARD</span></a>
             <a href="members.html" class="nav-item"><span class="icon">👥</span><span class="label">MEMBERS</span></a>
+            <a href="member-history.html" class="nav-item"><span class="icon">📜</span><span class="label">MEMBER HISTORY</span></a>
             <a href="monthly-records.html" class="nav-item"><span class="icon">📅</span><span class="label">MONTHLY RECORDS</span></a>
             <a href="reports.html" class="nav-item active"><span class="icon">📈</span><span class="label">REPORTS</span></a>
             <a href="settings.html" class="nav-item"><span class="icon">⚙️</span><span class="label">SETTINGS</span></a>
@@ -487,7 +359,7 @@
     <main class="main-content">
         <div class="top-bar">
             <button class="menu-toggle" id="menuToggle">☰</button>
-            <div class="page-title">REPORTS & ANALYTICS</div>
+            <div class="page-title">📊 REPORTS & ANALYTICS</div>
             <div class="user-info">
                 <span class="user-email" id="userEmail"></span>
                 <button id="logoutBtn" class="logout-btn">LOGOUT</button>
@@ -499,7 +371,7 @@
                 <p>Loading reports...</p>
             </div>
         </div>
-        <footer>Smart Chama Management · Comprehensive reporting</footer>
+        <footer>Smart Chama Management · Comprehensive reporting and analytics</footer>
     </main>
 </div>
 
@@ -507,9 +379,13 @@
 // Using supabaseClient from supabase-config.js
 let allMembers = [];
 let allRecords = [];
-let currentReportMonth = new Date().getMonth() + 1;
-let currentReportYear = new Date().getFullYear();
-let activeTab = 'summary';
+let contributionChart = null;
+let loansChart = null;
+let selectedShareItems = {
+    stats: true,
+    charts: true,
+    table: false
+};
 
 // Sidebar functions
 function openSidebar() {
@@ -529,6 +405,30 @@ document.getElementById("logoutBtn").addEventListener("click", async function() 
     await logoutUser();
     window.location.href = "index.html";
 });
+
+function showToast(message, isError = false) {
+    const toast = document.createElement('div');
+    toast.className = `toast-notification ${isError ? 'toast-error' : ''}`;
+    toast.textContent = isError ? '⚠️ ' + message : '✓ ' + message;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+function showLoading() {
+    const overlay = document.createElement('div');
+    overlay.id = 'loadingOverlay';
+    overlay.className = 'loading-overlay';
+    overlay.innerHTML = '<div class="loading-spinner-large"></div>';
+    document.body.appendChild(overlay);
+}
+
+function hideLoading() {
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) overlay.remove();
+}
 
 function escapeHtml(str) {
     if (!str) return "";
@@ -562,29 +462,10 @@ async function loadData() {
         if (recordsResult.error) throw recordsResult.error;
         allRecords = recordsResult.data || [];
         
-        renderReports();
+        renderReportsPage();
     } catch (error) {
-        document.getElementById("app-root").innerHTML = '<div style="padding:2rem;text-align:center"><h3>Error</h3><p>' + error.message + '</p><button class="btn" onclick="location.reload()">Retry</button></div>';
+        document.getElementById("app-root").innerHTML = '<div style="padding:2rem;text-align:center"><h3>⚠️ Error</h3><p>' + error.message + '</p><button class="btn" onclick="location.reload()">Retry</button></div>';
     }
-}
-
-function getMemberName(memberId) {
-    for (var i = 0; i < allMembers.length; i++) {
-        if (allMembers[i].id === memberId) {
-            return allMembers[i].name;
-        }
-    }
-    return "Unknown";
-}
-
-function getRecordForMember(memberId, month, year) {
-    for (var i = 0; i < allRecords.length; i++) {
-        var record = allRecords[i];
-        if (record.member_id === memberId && record.month === month && record.year === year) {
-            return record;
-        }
-    }
-    return null;
 }
 
 function getSummaryStats() {
@@ -593,7 +474,6 @@ function getSummaryStats() {
     var totalLoanBalance = 0;
     var totalContributions = 0;
     var totalPenalties = 0;
-    var monthsWithData = new Set();
     
     for (var i = 0; i < allRecords.length; i++) {
         var record = allRecords[i];
@@ -601,11 +481,7 @@ function getSummaryStats() {
         totalLoanBalance += safeValue(record.loan_balance);
         totalContributions += safeValue(record.monthly_contribution);
         totalPenalties += safeValue(record.penalties);
-        monthsWithData.add(record.year + '-' + record.month);
     }
-    
-    var totalCollected = totalContributions + totalLoan - totalLoanBalance;
-    var activeMonths = monthsWithData.size;
     
     return {
         totalMembers: totalMembers,
@@ -613,250 +489,228 @@ function getSummaryStats() {
         totalLoanBalance: totalLoanBalance,
         totalContributions: totalContributions,
         totalPenalties: totalPenalties,
-        totalCollected: totalCollected,
-        activeMonths: activeMonths
+        totalCollected: totalContributions + (totalLoan - totalLoanBalance)
     };
 }
 
-function renderSummaryTab() {
+function getMonthlyTrends() {
+    var monthlyData = {};
+    var monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+    
+    for (var i = 0; i < allRecords.length; i++) {
+        var record = allRecords[i];
+        var key = record.year + '-' + record.month;
+        var label = monthNames[record.month - 1] + ' ' + record.year;
+        
+        if (!monthlyData[key]) {
+            monthlyData[key] = { label: label, contributions: 0, loans: 0, penalties: 0 };
+        }
+        monthlyData[key].contributions += safeValue(record.monthly_contribution);
+        monthlyData[key].loans += safeValue(record.loan);
+        monthlyData[key].penalties += safeValue(record.penalties);
+    }
+    
+    // Sort by year and month
+    var sortedKeys = Object.keys(monthlyData).sort();
+    var result = {
+        labels: [],
+        contributions: [],
+        loans: [],
+        penalties: []
+    };
+    
+    for (var i = 0; i < sortedKeys.length; i++) {
+        var data = monthlyData[sortedKeys[i]];
+        result.labels.push(data.label);
+        result.contributions.push(data.contributions);
+        result.loans.push(data.loans);
+        result.penalties.push(data.penalties);
+    }
+    
+    return result;
+}
+
+function getTopMembers() {
+    var memberContributions = {};
+    
+    for (var i = 0; i < allRecords.length; i++) {
+        var record = allRecords[i];
+        if (!memberContributions[record.member_id]) {
+            memberContributions[record.member_id] = 0;
+        }
+        memberContributions[record.member_id] += safeValue(record.monthly_contribution);
+    }
+    
+    var memberArray = [];
+    for (var id in memberContributions) {
+        var member = allMembers.find(m => m.id === id);
+        if (member) {
+            memberArray.push({
+                name: member.name,
+                contributions: memberContributions[id]
+            });
+        }
+    }
+    
+    memberArray.sort(function(a, b) { return b.contributions - a.contributions; });
+    return memberArray.slice(0, 5);
+}
+
+function createCharts() {
+    var trends = getMonthlyTrends();
+    var topMembers = getTopMembers();
+    
+    // Destroy existing charts
+    if (contributionChart) contributionChart.destroy();
+    if (loansChart) loansChart.destroy();
+    
+    // Contributions Trend Chart
+    var ctx1 = document.getElementById('contributionsChart').getContext('2d');
+    contributionChart = new Chart(ctx1, {
+        type: 'line',
+        data: {
+            labels: trends.labels,
+            datasets: [{
+                label: 'Monthly Contributions (KES)',
+                data: trends.contributions,
+                borderColor: '#2c7a4d',
+                backgroundColor: 'rgba(44, 122, 77, 0.1)',
+                tension: 0.3,
+                fill: true,
+                pointBackgroundColor: '#2c7a4d',
+                pointBorderColor: 'white',
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }, {
+                label: 'Loans Given (KES)',
+                data: trends.loans,
+                borderColor: '#f59e0b',
+                backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                tension: 0.3,
+                fill: true,
+                pointBackgroundColor: '#f59e0b',
+                pointBorderColor: 'white',
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom' },
+                tooltip: { callbacks: { label: function(context) { return 'KES ' + context.raw.toLocaleString(); } } }
+            }
+        }
+    });
+    
+    // Top Members Chart
+    var ctx2 = document.getElementById('topMembersChart').getContext('2d');
+    loansChart = new Chart(ctx2, {
+        type: 'bar',
+        data: {
+            labels: topMembers.map(m => m.name.length > 15 ? m.name.substring(0, 12) + '...' : m.name),
+            datasets: [{
+                label: 'Total Contributions (KES)',
+                data: topMembers.map(m => m.contributions),
+                backgroundColor: '#2c7a4d',
+                borderRadius: 8,
+                barPercentage: 0.7
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom' },
+                tooltip: { callbacks: { label: function(context) { return 'KES ' + context.raw.toLocaleString(); } } }
+            }
+        }
+    });
+}
+
+function renderStatsCards() {
     var stats = getSummaryStats();
     
-    var html = `
+    return `
         <div class="stats-grid">
             <div class="stat-card">
-                <h4>TOTAL MEMBERS</h4>
+                <div class="stat-icon">👥</div>
                 <div class="stat-number">${stats.totalMembers}</div>
+                <div class="stat-label">Total Members</div>
             </div>
             <div class="stat-card">
-                <h4>TOTAL LOANS GIVEN</h4>
-                <div class="stat-number">KES ${(stats.totalLoan/1000).toFixed(0)}k</div>
-                <div class="stat-full">KES ${formatNumber(stats.totalLoan)}</div>
-            </div>
-            <div class="stat-card">
-                <h4>TOTAL LOAN BALANCE</h4>
-                <div class="stat-number">KES ${(stats.totalLoanBalance/1000).toFixed(0)}k</div>
-                <div class="stat-full">KES ${formatNumber(stats.totalLoanBalance)}</div>
-            </div>
-            <div class="stat-card">
-                <h4>TOTAL CONTRIBUTIONS</h4>
+                <div class="stat-icon">💰</div>
                 <div class="stat-number">KES ${(stats.totalContributions/1000).toFixed(0)}k</div>
+                <div class="stat-label">Total Contributions</div>
                 <div class="stat-full">KES ${formatNumber(stats.totalContributions)}</div>
             </div>
             <div class="stat-card">
-                <h4>TOTAL PENALTIES</h4>
-                <div class="stat-number">KES ${(stats.totalPenalties/1000).toFixed(0)}k</div>
-                <div class="stat-full">KES ${formatNumber(stats.totalPenalties)}</div>
+                <div class="stat-icon">🏦</div>
+                <div class="stat-number">KES ${(stats.totalLoan/1000).toFixed(0)}k</div>
+                <div class="stat-label">Total Loans</div>
+                <div class="stat-full">KES ${formatNumber(stats.totalLoan)}</div>
             </div>
             <div class="stat-card">
-                <h4>TOTAL COLLECTED</h4>
-                <div class="stat-number">KES ${(stats.totalCollected/1000).toFixed(0)}k</div>
-                <div class="stat-full">KES ${formatNumber(stats.totalCollected)}</div>
+                <div class="stat-icon">⚖️</div>
+                <div class="stat-number">KES ${(stats.totalLoanBalance/1000).toFixed(0)}k</div>
+                <div class="stat-label">Outstanding Balance</div>
+                <div class="stat-full">KES ${formatNumber(stats.totalLoanBalance)}</div>
             </div>
-            <div class="stat-card">
-                <h4>ACTIVE MONTHS</h4>
-                <div class="stat-number">${stats.activeMonths}</div>
-            </div>
-            <div class="stat-card">
-                <h4>AVG CONTRIBUTION/MEMBER</h4>
-                <div class="stat-number">KES ${Math.round(stats.totalContributions / (stats.totalMembers || 1))}</div>
-            </div>
-        </div>
-        
-        <div class="alert alert-info">
-            <strong>📊 Summary Report</strong><br>
-            Total collected includes contributions + loan repayments. Active months show periods with recorded transactions.
-        </div>
-        
-        <div class="flex-between">
-            <button id="exportSummaryBtn" class="btn">📥 Export Summary Report</button>
-            <button id="printSummaryBtn" class="btn-outline btn">🖨️ Print Report</button>
         </div>
     `;
-    
-    return html;
 }
 
-function renderMonthlyReport() {
-    var monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
-    var monthName = monthNames[currentReportMonth - 1];
-    
-    var tableRows = "";
-    var totalLoan = 0;
-    var totalLoanDeductions = 0;
-    var totalLoanBalance = 0;
-    var totalContributions = 0;
-    var totalPenalties = 0;
-    
-    for (var i = 0; i < allMembers.length; i++) {
-        var member = allMembers[i];
-        var record = getRecordForMember(member.id, currentReportMonth, currentReportYear);
-        
-        var loan = record ? safeValue(record.loan) : 0;
-        var loanDeductions = record ? safeValue(record.loan_deductions) : 0;
-        var loanBalance = record ? safeValue(record.loan_balance) : 0;
-        var contributions = record ? safeValue(record.monthly_contribution) : 0;
-        var penalties = record ? safeValue(record.penalties) : 0;
-        
-        totalLoan += loan;
-        totalLoanDeductions += loanDeductions;
-        totalLoanBalance += loanBalance;
-        totalContributions += contributions;
-        totalPenalties += penalties;
-        
-        var statusClass = "";
-        if (contributions === 0 && loan === 0 && penalties === 0) {
-            statusClass = 'badge-warning';
-        } else if (penalties > 0) {
-            statusClass = 'badge-danger';
-        } else {
-            statusClass = 'badge-success';
-        }
-        
-        tableRows += `<tr>`;
-        tableRows += `<td><strong>${escapeHtml(member.name)}</strong></td>`;
-        tableRows += `<td>KES ${formatNumber(loan)}</td>`;
-        tableRows += `<td>KES ${formatNumber(loanDeductions)}</td>`;
-        tableRows += `<td>KES ${formatNumber(loanBalance)}</td>`;
-        tableRows += `<td>KES ${formatNumber(contributions)}</td>`;
-        tableRows += `<td>KES ${formatNumber(penalties)}</td>`;
-        tableRows += `<td><span class="badge ${statusClass}">${contributions > 0 ? 'Active' : (penalties > 0 ? 'Penalty' : 'Inactive')}</span></td>`;
-        tableRows += `</tr>`;
-    }
-    
-    if (allMembers.length === 0) {
-        tableRows = `<tr><td colspan="7" style="text-align:center;">No members found. Please add members first.</td></tr>`;
-    }
-    
-    var html = `
-        <div class="month-year-selector">
-            <select id="reportMonthSelect">
-                <option value="1" ${currentReportMonth === 1 ? 'selected' : ''}>JANUARY</option>
-                <option value="2" ${currentReportMonth === 2 ? 'selected' : ''}>FEBRUARY</option>
-                <option value="3" ${currentReportMonth === 3 ? 'selected' : ''}>MARCH</option>
-                <option value="4" ${currentReportMonth === 4 ? 'selected' : ''}>APRIL</option>
-                <option value="5" ${currentReportMonth === 5 ? 'selected' : ''}>MAY</option>
-                <option value="6" ${currentReportMonth === 6 ? 'selected' : ''}>JUNE</option>
-                <option value="7" ${currentReportMonth === 7 ? 'selected' : ''}>JULY</option>
-                <option value="8" ${currentReportMonth === 8 ? 'selected' : ''}>AUGUST</option>
-                <option value="9" ${currentReportMonth === 9 ? 'selected' : ''}>SEPTEMBER</option>
-                <option value="10" ${currentReportMonth === 10 ? 'selected' : ''}>OCTOBER</option>
-                <option value="11" ${currentReportMonth === 11 ? 'selected' : ''}>NOVEMBER</option>
-                <option value="12" ${currentReportMonth === 12 ? 'selected' : ''}>DECEMBER</option>
-            </select>
-            <select id="reportYearSelect">
-                ${getYearOptions()}
-            </select>
-            <span style="font-size:0.75rem; color:#6c757d;">📅 Showing report for ${monthName} ${currentReportYear}</span>
-        </div>
-        
-        <div class="spreadsheet-container">
-            <table class="report-table" id="monthly-report-table">
-                <thead>
-                    <tr>
-                        <th>MEMBER</th>
-                        <th>LOAN</th>
-                        <th>LOAN DEDUCTIONS</th>
-                        <th>LOAN BALANCE</th>
-                        <th>MONTHLY CONTRIBUTION</th>
-                        <th>PENALTIES</th>
-                        <th>STATUS</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${tableRows}
-                    <tr style="background:#f1f5f9; font-weight:600;">
-                        <td><strong>TOTAL</strong></td>
-                        <td><strong>KES ${formatNumber(totalLoan)}</strong></td>
-                        <td><strong>KES ${formatNumber(totalLoanDeductions)}</strong></td>
-                        <td><strong>KES ${formatNumber(totalLoanBalance)}</strong></td>
-                        <td><strong>KES ${formatNumber(totalContributions)}</strong></td>
-                        <td><strong>KES ${formatNumber(totalPenalties)}</strong></td>
-                        <td></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        
-        <div class="flex-between" style="margin-top: 1rem;">
-            <button id="exportMonthlyBtn" class="btn">📥 Export Monthly Report</button>
-            <button id="printMonthlyBtn" class="btn-outline btn">🖨️ Print Report</button>
-        </div>
-    `;
-    
-    return html;
-}
-
-function getYearOptions() {
-    var currentYear = new Date().getFullYear();
-    var years = [currentYear - 2, currentYear - 1, currentYear, currentYear + 1];
-    var options = "";
-    for (var i = 0; i < years.length; i++) {
-        var selected = (currentReportYear === years[i]) ? 'selected' : '';
-        options += `<option value="${years[i]}" ${selected}>${years[i]}</option>`;
-    }
-    return options;
-}
-
-function renderMemberPerformance() {
+function renderMemberTable() {
     var memberPerformance = [];
     
     for (var i = 0; i < allMembers.length; i++) {
         var member = allMembers[i];
         var memberRecords = allRecords.filter(function(r) { return r.member_id === member.id; });
         
-        var totalLoan = 0;
         var totalContributions = 0;
+        var totalLoan = 0;
         var totalPenalties = 0;
-        var monthsActive = memberRecords.length;
         
         for (var j = 0; j < memberRecords.length; j++) {
-            totalLoan += safeValue(memberRecords[j].loan);
             totalContributions += safeValue(memberRecords[j].monthly_contribution);
+            totalLoan += safeValue(memberRecords[j].loan);
             totalPenalties += safeValue(memberRecords[j].penalties);
         }
         
         memberPerformance.push({
-            id: member.id,
             name: member.name,
-            totalLoan: totalLoan,
-            totalContributions: totalContributions,
-            totalPenalties: totalPenalties,
-            monthsActive: monthsActive,
-            avgContribution: monthsActive > 0 ? totalContributions / monthsActive : 0
+            contributions: totalContributions,
+            loans: totalLoan,
+            penalties: totalPenalties,
+            months: memberRecords.length
         });
     }
     
-    memberPerformance.sort(function(a, b) { return b.totalContributions - a.totalContributions; });
+    memberPerformance.sort(function(a, b) { return b.contributions - a.contributions; });
     
-    var tableRows = "";
+    var tableRows = '';
     for (var i = 0; i < memberPerformance.length; i++) {
         var m = memberPerformance[i];
-        var rank = i + 1;
-        var rankIcon = rank === 1 ? "🥇" : (rank === 2 ? "🥈" : (rank === 3 ? "🥉" : "#" + rank));
-        
-        tableRows += `<tr>`;
-        tableRows += `<td>${rankIcon}</td>`;
-        tableRows += `<td><strong>${escapeHtml(m.name)}</strong></td>`;
-        tableRows += `<td>${m.monthsActive}</td>`;
-        tableRows += `<td>KES ${formatNumber(m.totalContributions)}</td>`;
-        tableRows += `<td>KES ${formatNumber(m.totalLoan)}</td>`;
-        tableRows += `<td>KES ${formatNumber(m.totalPenalties)}</td>`;
-        tableRows += `<td>KES ${Math.round(m.avgContribution)}</td>`;
-        tableRows += `</tr>`;
+        tableRows += `<tr>
+            <td><strong>${escapeHtml(m.name)}</strong></td>
+            <td>KES ${formatNumber(m.contributions)}</td>
+            <td>KES ${formatNumber(m.loans)}</td>
+            <td>KES ${formatNumber(m.penalties)}</td>
+            <td>${m.months}</td>
+        </tr>`;
     }
     
-    var html = `
-        <div class="spreadsheet-container">
-            <table class="report-table" id="performance-table">
+    return `
+        <div class="spreadsheet-container" id="memberTableContainer">
+            <table class="report-table">
                 <thead>
                     <tr>
-                        <th>RANK</th>
-                        <th>MEMBER</th>
-                        <th>MONTHS ACTIVE</th>
-                        <th>TOTAL CONTRIBUTIONS</th>
-                        <th>TOTAL LOANS</th>
-                        <th>TOTAL PENALTIES</th>
-                        <th>AVG CONTRIBUTION</th>
+                        <th>Member</th>
+                        <th>Total Contributions</th>
+                        <th>Total Loans</th>
+                        <th>Total Penalties</th>
+                        <th>Active Months</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -864,224 +718,251 @@ function renderMemberPerformance() {
                 </tbody>
             </table>
         </div>
-        
-        <div class="alert alert-info" style="margin-top: 1rem;">
-            <strong>🏆 Performance Insights</strong><br>
-            Members are ranked by total contributions. Consistent contributors help the chama grow!
-        </div>
-        
-        <div class="flex-between" style="margin-top: 1rem;">
-            <button id="exportPerformanceBtn" class="btn">📥 Export Performance Report</button>
-            <button id="printPerformanceBtn" class="btn-outline btn">🖨️ Print Report</button>
-        </div>
     `;
-    
-    return html;
 }
 
-function renderReports() {
+async function captureScreenshot() {
+    showLoading();
+    
+    // Create a temporary container for the report
+    var tempDiv = document.createElement('div');
+    tempDiv.style.position = 'absolute';
+    tempDiv.style.left = '-9999px';
+    tempDiv.style.top = '0';
+    tempDiv.style.backgroundColor = 'white';
+    tempDiv.style.padding = '20px';
+    tempDiv.style.width = '800px';
+    
+    var stats = getSummaryStats();
+    var trends = getMonthlyTrends();
+    var topMembers = getTopMembers();
+    
+    tempDiv.innerHTML = `
+        <div style="text-align: center; margin-bottom: 20px;">
+            <h1 style="color: #2c7a4d;">ChamaEase Report</h1>
+            <p>Generated: ${new Date().toLocaleString()}</p>
+        </div>
+        ${selectedShareItems.stats ? `
+            <div style="margin-bottom: 20px;">
+                <h3>📊 Summary Statistics</h3>
+                <table style="width:100%; border-collapse: collapse;">
+                    <tr><td style="padding: 8px; border:1px solid #ddd;"><strong>Total Members</strong></td><td style="padding: 8px; border:1px solid #ddd;">${stats.totalMembers}</td></tr>
+                    <tr><td style="padding: 8px; border:1px solid #ddd;"><strong>Total Contributions</strong></td><td style="padding: 8px; border:1px solid #ddd;">KES ${formatNumber(stats.totalContributions)}</td></tr>
+                    <tr><td style="padding: 8px; border:1px solid #ddd;"><strong>Total Loans</strong></td><td style="padding: 8px; border:1px solid #ddd;">KES ${formatNumber(stats.totalLoan)}</td></tr>
+                    <tr><td style="padding: 8px; border:1px solid #ddd;"><strong>Outstanding Balance</strong></td><td style="padding: 8px; border:1px solid #ddd;">KES ${formatNumber(stats.totalLoanBalance)}</td></tr>
+                </table>
+            </div>
+        ` : ''}
+        ${selectedShareItems.charts ? `
+            <div style="margin-bottom: 20px;">
+                <h3>📈 Top Contributors</h3>
+                <ul>
+                    ${topMembers.map(m => `<li>${escapeHtml(m.name)}: KES ${formatNumber(m.contributions)}</li>`).join('')}
+                </ul>
+            </div>
+        ` : ''}
+        ${selectedShareItems.table ? `
+            <div style="margin-bottom: 20px;">
+                <h3>👥 Member Details</h3>
+                <div>${renderMemberTable()}</div>
+            </div>
+        ` : ''}
+    `;
+    
+    document.body.appendChild(tempDiv);
+    
+    try {
+        await new Promise(resolve => setTimeout(resolve, 500));
+        var canvas = await html2canvas(tempDiv, { scale: 2 });
+        var image = canvas.toDataURL('image/png');
+        tempDiv.remove();
+        hideLoading();
+        return image;
+    } catch (error) {
+        console.error("Screenshot error:", error);
+        tempDiv.remove();
+        hideLoading();
+        showToast("Error capturing report", true);
+        return null;
+    }
+}
+
+async function shareToWhatsApp() {
+    var image = await captureScreenshot();
+    if (image) {
+        var link = document.createElement('a');
+        link.href = image;
+        link.download = 'chama_report.png';
+        link.click();
+        
+        var message = encodeURIComponent("🏦 *ChamaEase Report*\n\nHere's the latest chama report. Check the downloaded image for details.");
+        window.open(`https://web.whatsapp.com/send?text=${message}`, '_blank');
+        showToast("Report ready! Share the downloaded image on WhatsApp");
+    }
+}
+
+async function exportToPDF() {
+    showLoading();
+    var image = await captureScreenshot();
+    if (image) {
+        var printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <html>
+                <head><title>ChamaEase Report</title></head>
+                <body style="text-align:center; padding:20px;">
+                    <img src="${image}" style="max-width:100%; height:auto;">
+                    <script>window.onload = function() { window.print(); setTimeout(function() { window.close(); }, 1000); }<\/script>
+                </body>
+            </html>
+        `);
+        printWindow.document.close();
+        hideLoading();
+        showToast("PDF ready for printing");
+    } else {
+        hideLoading();
+    }
+}
+
+function exportToExcel() {
+    var csvRows = [];
+    csvRows.push(["CHAMA REPORTS - " + new Date().toLocaleString()]);
+    csvRows.push([]);
+    csvRows.push(["MEMBER", "TOTAL CONTRIBUTIONS", "TOTAL LOANS", "TOTAL PENALTIES", "ACTIVE MONTHS"]);
+    
+    for (var i = 0; i < allMembers.length; i++) {
+        var member = allMembers[i];
+        var memberRecords = allRecords.filter(function(r) { return r.member_id === member.id; });
+        
+        var totalContributions = 0;
+        var totalLoan = 0;
+        var totalPenalties = 0;
+        
+        for (var j = 0; j < memberRecords.length; j++) {
+            totalContributions += safeValue(memberRecords[j].monthly_contribution);
+            totalLoan += safeValue(memberRecords[j].loan);
+            totalPenalties += safeValue(memberRecords[j].penalties);
+        }
+        
+        csvRows.push([
+            member.name,
+            "KES " + formatNumber(totalContributions),
+            "KES " + formatNumber(totalLoan),
+            "KES " + formatNumber(totalPenalties),
+            memberRecords.length
+        ]);
+    }
+    
+    var csv = "";
+    for (var i = 0; i < csvRows.length; i++) {
+        csv += csvRows[i].join(",") + "\n";
+    }
+    
+    var blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    var link = document.createElement("a");
+    var url = URL.createObjectURL(blob);
+    link.href = url;
+    link.setAttribute("download", "chama_report_" + new Date().toISOString().slice(0,10) + ".csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    showToast("Excel file exported!");
+}
+
+function renderReportsPage() {
     var container = document.getElementById("app-root");
     
     var html = `
-        <div class="report-tabs">
-            <button class="tab-btn ${activeTab === 'summary' ? 'active' : ''}" data-tab="summary">📊 SUMMARY</button>
-            <button class="tab-btn ${activeTab === 'monthly' ? 'active' : ''}" data-tab="monthly">📅 MONTHLY REPORT</button>
-            <button class="tab-btn ${activeTab === 'performance' ? 'active' : ''}" data-tab="performance">🏆 MEMBER PERFORMANCE</button>
+        <div class="hero-report">
+            <div class="hero-title">📊 Reports & Analytics</div>
+            <div class="hero-subtitle">Comprehensive insights into your chama's financial health</div>
         </div>
         
-        <div id="summary-tab" class="tab-content ${activeTab === 'summary' ? 'active' : ''}">
-            ${renderSummaryTab()}
+        ${renderStatsCards()}
+        
+        <div class="share-panel">
+            <div class="share-header">
+                <div class="share-title">📤 Share Report</div>
+                <div class="share-buttons">
+                    <button class="share-btn share-btn-wa" id="shareWABtn">📱 Share on WhatsApp</button>
+                    <button class="share-btn share-btn-pdf" id="sharePDFBtn">📄 Download as PDF</button>
+                    <button class="share-btn share-btn-excel" id="shareExcelBtn">📊 Export to Excel</button>
+                </div>
+            </div>
+            <div class="share-options">
+                <div class="share-option">
+                    <input type="checkbox" id="includeStats" ${selectedShareItems.stats ? 'checked' : ''}>
+                    <label for="includeStats">Include Statistics</label>
+                </div>
+                <div class="share-option">
+                    <input type="checkbox" id="includeCharts" ${selectedShareItems.charts ? 'checked' : ''}>
+                    <label for="includeCharts">Include Charts</label>
+                </div>
+                <div class="share-option">
+                    <input type="checkbox" id="includeTable" ${selectedShareItems.table ? 'checked' : ''}>
+                    <label for="includeTable">Include Member Details</label>
+                </div>
+            </div>
         </div>
         
-        <div id="monthly-tab" class="tab-content ${activeTab === 'monthly' ? 'active' : ''}">
-            ${renderMonthlyReport()}
+        <div class="charts-grid">
+            <div class="chart-card">
+                <div class="chart-title">📈 Monthly Trends</div>
+                <div class="chart-container">
+                    <canvas id="contributionsChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-card">
+                <div class="chart-title">🏆 Top Contributors</div>
+                <div class="chart-container">
+                    <canvas id="topMembersChart"></canvas>
+                </div>
+            </div>
         </div>
         
-        <div id="performance-tab" class="tab-content ${activeTab === 'performance' ? 'active' : ''}">
-            ${renderMemberPerformance()}
+        <div class="card">
+            <div class="flex-between">
+                <h3>👥 Member Performance Details</h3>
+                <button id="toggleTableBtn" class="btn-outline btn-sm">Show/Hide Table</button>
+            </div>
+            <div id="memberTableSection">
+                ${renderMemberTable()}
+            </div>
         </div>
     `;
     
     container.innerHTML = html;
     
-    // Tab switching
-    var tabBtns = document.querySelectorAll(".tab-btn");
-    for (var i = 0; i < tabBtns.length; i++) {
-        tabBtns[i].addEventListener("click", function() {
-            var tab = this.dataset.tab;
-            activeTab = tab;
-            renderReports();
-        });
-    }
+    // Create charts
+    createCharts();
     
-    // Monthly report selectors
-    var monthSelect = document.getElementById("reportMonthSelect");
-    if (monthSelect) {
-        monthSelect.addEventListener("change", function(e) {
-            currentReportMonth = parseInt(e.target.value);
-            renderReports();
-        });
-    }
+    // Bind events
+    document.getElementById("shareWABtn").addEventListener("click", shareToWhatsApp);
+    document.getElementById("sharePDFBtn").addEventListener("click", exportToPDF);
+    document.getElementById("shareExcelBtn").addEventListener("click", exportToExcel);
     
-    var yearSelect = document.getElementById("reportYearSelect");
-    if (yearSelect) {
-        yearSelect.addEventListener("change", function(e) {
-            currentReportYear = parseInt(e.target.value);
-            renderReports();
-        });
-    }
+    document.getElementById("includeStats").addEventListener("change", function(e) {
+        selectedShareItems.stats = e.target.checked;
+    });
+    document.getElementById("includeCharts").addEventListener("change", function(e) {
+        selectedShareItems.charts = e.target.checked;
+    });
+    document.getElementById("includeTable").addEventListener("change", function(e) {
+        selectedShareItems.table = e.target.checked;
+    });
     
-    // Export buttons
-    var exportSummaryBtn = document.getElementById("exportSummaryBtn");
-    if (exportSummaryBtn) exportSummaryBtn.addEventListener("click", exportSummaryReport);
-    
-    var exportMonthlyBtn = document.getElementById("exportMonthlyBtn");
-    if (exportMonthlyBtn) exportMonthlyBtn.addEventListener("click", exportMonthlyReport);
-    
-    var exportPerformanceBtn = document.getElementById("exportPerformanceBtn");
-    if (exportPerformanceBtn) exportPerformanceBtn.addEventListener("click", exportPerformanceReport);
-    
-    // Print buttons
-    var printSummaryBtn = document.getElementById("printSummaryBtn");
-    if (printSummaryBtn) printSummaryBtn.addEventListener("click", function() { window.print(); });
-    
-    var printMonthlyBtn = document.getElementById("printMonthlyBtn");
-    if (printMonthlyBtn) printMonthlyBtn.addEventListener("click", function() { window.print(); });
-    
-    var printPerformanceBtn = document.getElementById("printPerformanceBtn");
-    if (printPerformanceBtn) printPerformanceBtn.addEventListener("click", function() { window.print(); });
-}
-
-function exportSummaryReport() {
-    var stats = getSummaryStats();
-    var csvRows = [];
-    csvRows.push(["CHAMA SUMMARY REPORT"]);
-    csvRows.push(["Generated:", new Date().toLocaleString()]);
-    csvRows.push([]);
-    csvRows.push(["Metric", "Value"]);
-    csvRows.push(["Total Members", stats.totalMembers]);
-    csvRows.push(["Total Loans Given", "KES " + formatNumber(stats.totalLoan)]);
-    csvRows.push(["Total Loan Balance", "KES " + formatNumber(stats.totalLoanBalance)]);
-    csvRows.push(["Total Contributions", "KES " + formatNumber(stats.totalContributions)]);
-    csvRows.push(["Total Penalties", "KES " + formatNumber(stats.totalPenalties)]);
-    csvRows.push(["Total Collected", "KES " + formatNumber(stats.totalCollected)]);
-    csvRows.push(["Active Months", stats.activeMonths]);
-    csvRows.push(["Average Contribution/Member", "KES " + Math.round(stats.totalContributions / (stats.totalMembers || 1))]);
-    
-    var csv = "";
-    for (var i = 0; i < csvRows.length; i++) {
-        csv += csvRows[i].join(",") + "\n";
-    }
-    
-    var blob = new Blob([csv], { type: "application/vnd.ms-excel" });
-    var link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "chama_summary_report.csv";
-    link.click();
-    URL.revokeObjectURL(link.href);
-    alert("Summary report exported!");
-}
-
-function exportMonthlyReport() {
-    var monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
-    var monthName = monthNames[currentReportMonth - 1];
-    
-    var csvRows = [];
-    csvRows.push(["MONTHLY REPORT - " + monthName + " " + currentReportYear]);
-    csvRows.push(["Generated:", new Date().toLocaleString()]);
-    csvRows.push([]);
-    csvRows.push(["MEMBER", "LOAN", "LOAN DEDUCTIONS", "LOAN BALANCE", "MONTHLY CONTRIBUTION", "PENALTIES", "STATUS"]);
-    
-    for (var i = 0; i < allMembers.length; i++) {
-        var member = allMembers[i];
-        var record = getRecordForMember(member.id, currentReportMonth, currentReportYear);
-        
-        csvRows.push([
-            member.name,
-            "KES " + (record ? safeValue(record.loan) : 0),
-            "KES " + (record ? safeValue(record.loan_deductions) : 0),
-            "KES " + (record ? safeValue(record.loan_balance) : 0),
-            "KES " + (record ? safeValue(record.monthly_contribution) : 0),
-            "KES " + (record ? safeValue(record.penalties) : 0),
-            (record && record.monthly_contribution > 0) ? "Active" : "Inactive"
-        ]);
-    }
-    
-    var csv = "";
-    for (var i = 0; i < csvRows.length; i++) {
-        csv += csvRows[i].join(",") + "\n";
-    }
-    
-    var blob = new Blob([csv], { type: "application/vnd.ms-excel" });
-    var link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "chama_monthly_report_" + monthName + "_" + currentReportYear + ".csv";
-    link.click();
-    URL.revokeObjectURL(link.href);
-    alert("Monthly report exported!");
-}
-
-function exportPerformanceReport() {
-    var memberPerformance = [];
-    
-    for (var i = 0; i < allMembers.length; i++) {
-        var member = allMembers[i];
-        var memberRecords = allRecords.filter(function(r) { return r.member_id === member.id; });
-        
-        var totalLoan = 0;
-        var totalContributions = 0;
-        var totalPenalties = 0;
-        var monthsActive = memberRecords.length;
-        
-        for (var j = 0; j < memberRecords.length; j++) {
-            totalLoan += safeValue(memberRecords[j].loan);
-            totalContributions += safeValue(memberRecords[j].monthly_contribution);
-            totalPenalties += safeValue(memberRecords[j].penalties);
+    var tableVisible = true;
+    document.getElementById("toggleTableBtn").addEventListener("click", function() {
+        var tableSection = document.getElementById("memberTableSection");
+        if (tableVisible) {
+            tableSection.style.display = "none";
+            this.textContent = "Show Table";
+        } else {
+            tableSection.style.display = "block";
+            this.textContent = "Hide Table";
         }
-        
-        memberPerformance.push({
-            name: member.name,
-            monthsActive: monthsActive,
-            totalContributions: totalContributions,
-            totalLoan: totalLoan,
-            totalPenalties: totalPenalties,
-            avgContribution: monthsActive > 0 ? totalContributions / monthsActive : 0
-        });
-    }
-    
-    memberPerformance.sort(function(a, b) { return b.totalContributions - a.totalContributions; });
-    
-    var csvRows = [];
-    csvRows.push(["MEMBER PERFORMANCE REPORT"]);
-    csvRows.push(["Generated:", new Date().toLocaleString()]);
-    csvRows.push([]);
-    csvRows.push(["RANK", "MEMBER", "MONTHS ACTIVE", "TOTAL CONTRIBUTIONS", "TOTAL LOANS", "TOTAL PENALTIES", "AVG CONTRIBUTION"]);
-    
-    for (var i = 0; i < memberPerformance.length; i++) {
-        var m = memberPerformance[i];
-        csvRows.push([
-            i + 1,
-            m.name,
-            m.monthsActive,
-            "KES " + formatNumber(m.totalContributions),
-            "KES " + formatNumber(m.totalLoan),
-            "KES " + formatNumber(m.totalPenalties),
-            "KES " + Math.round(m.avgContribution)
-        ]);
-    }
-    
-    var csv = "";
-    for (var i = 0; i < csvRows.length; i++) {
-        csv += csvRows[i].join(",") + "\n";
-    }
-    
-    var blob = new Blob([csv], { type: "application/vnd.ms-excel" });
-    var link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "chama_performance_report.csv";
-    link.click();
-    URL.revokeObjectURL(link.href);
-    alert("Performance report exported!");
+        tableVisible = !tableVisible;
+    });
 }
 
 // Initialize
