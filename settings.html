@@ -22,12 +22,32 @@
             --primary-light: #eaf5ef;
             --primary-dark: #1f5a3a;
             --danger: #dc4c4c;
-            --warning: #e6a017;
+            --warning: #f59e0b;
             --gray-border: #e2e8f0;
             --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.04);
             --radius-card: 16px;
             --radius-btn: 32px;
             --sidebar-width: 280px;
+        }
+
+        .dark-theme {
+            background: #1a1a2e;
+            color: #e2e8f0;
+        }
+
+        .dark-theme .sidebar,
+        .dark-theme .card,
+        .dark-theme .top-bar,
+        .dark-theme .stat-card {
+            background: #16213e;
+            border-color: #2d3748;
+        }
+
+        .dark-theme input,
+        .dark-theme select {
+            background: #0f3460;
+            border-color: #2d3748;
+            color: #e2e8f0;
         }
 
         .app-wrapper {
@@ -125,21 +145,6 @@
             font-size: 0.85rem;
         }
 
-        .nav-submenu {
-            padding-left: 2.8rem;
-        }
-
-        .nav-submenu .nav-item {
-            padding: 0.5rem 1rem;
-            font-size: 0.8rem;
-        }
-
-        .nav-divider {
-            height: 1px;
-            background: var(--gray-border);
-            margin: 0.6rem 1rem;
-        }
-
         .main-content {
             flex: 1;
             margin-left: var(--sidebar-width);
@@ -175,6 +180,10 @@
             font-size: 1.1rem;
             font-weight: 600;
             color: #1e2a3e;
+        }
+
+        .dark-theme .page-title {
+            color: #e2e8f0;
         }
 
         .user-info {
@@ -242,10 +251,19 @@
             display: inline-block;
         }
 
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
         .btn-outline {
             background: transparent;
             border: 1px solid var(--primary);
             color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-light);
         }
 
         .btn-sm {
@@ -255,6 +273,10 @@
 
         .btn-danger {
             background: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
         }
 
         .flex-between {
@@ -278,6 +300,10 @@
             color: #1e2a3e;
         }
 
+        .dark-theme .form-group label {
+            color: #e2e8f0;
+        }
+
         input, select {
             width: 100%;
             padding: 0.5rem 0.8rem;
@@ -291,6 +317,11 @@
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(44, 122, 77, 0.1);
+        }
+
+        input:disabled {
+            background: #f8fafc;
+            cursor: not-allowed;
         }
 
         .setting-item {
@@ -401,6 +432,16 @@
             display: block;
         }
 
+        .stat-badge {
+            display: inline-block;
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -426,6 +467,7 @@
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
 </head>
 <body>
 <div class="app-wrapper">
@@ -433,62 +475,29 @@
     
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <div class="sidebar-logo">🌿 ChamaEase</div>
+            <div class="sidebar-logo">ChamaEase</div>
             <button class="sidebar-close" id="sidebarClose">✕</button>
         </div>
         <nav class="sidebar-nav">
             <a href="dashboard.html" class="nav-item">
                 <span class="icon">📊</span>
-                <span class="label">Dashboard</span>
+                <span class="label">DASHBOARD</span>
             </a>
             <a href="members.html" class="nav-item">
                 <span class="icon">👥</span>
-                <span class="label">Members</span>
+                <span class="label">MEMBERS</span>
             </a>
-            <a href="contributions.html" class="nav-item">
-                <span class="icon">💰</span>
-                <span class="label">Contributions</span>
+            <a href="monthly-records.html" class="nav-item">
+                <span class="icon">📅</span>
+                <span class="label">MONTHLY RECORDS</span>
             </a>
-            
-            <div class="nav-divider"></div>
-            
-            <div class="nav-item" style="cursor: default; opacity: 0.7;">
-                <span class="icon">📜</span>
-                <span class="label">History</span>
-            </div>
-            <div class="nav-submenu">
-                <a href="contribution-history.html" class="nav-item">
-                    <span class="icon">📋</span>
-                    <span class="label">Contributions History</span>
-                </a>
-                <a href="member-history.html" class="nav-item">
-                    <span class="icon">👤</span>
-                    <span class="label">Members History</span>
-                </a>
-            </div>
-            
-            <div class="nav-divider"></div>
-            
-            <div class="nav-item" style="cursor: default; opacity: 0.7;">
+            <a href="reports.html" class="nav-item">
                 <span class="icon">📈</span>
-                <span class="label">Analytics</span>
-            </div>
-            <div class="nav-submenu">
-                <a href="statistics.html" class="nav-item">
-                    <span class="icon">📊</span>
-                    <span class="label">Monthly Statistics</span>
-                </a>
-                <a href="reports.html" class="nav-item">
-                    <span class="icon">📋</span>
-                    <span class="label">Reports</span>
-                </a>
-            </div>
-            
-            <div class="nav-divider"></div>
-            
+                <span class="label">REPORTS</span>
+            </a>
             <a href="settings.html" class="nav-item active">
                 <span class="icon">⚙️</span>
-                <span class="label">Settings</span>
+                <span class="label">SETTINGS</span>
             </a>
         </nav>
     </aside>
@@ -496,10 +505,10 @@
     <main class="main-content">
         <div class="top-bar">
             <button class="menu-toggle" id="menuToggle">☰</button>
-            <div class="page-title">⚙️ Settings</div>
+            <div class="page-title">⚙️ SETTINGS</div>
             <div class="user-info">
                 <span class="user-email" id="userEmail"></span>
-                <button id="logoutBtn" class="logout-btn">Logout</button>
+                <button id="logoutBtn" class="logout-btn">LOGOUT</button>
             </div>
         </div>
         <div id="app-root" class="container">
@@ -508,291 +517,363 @@
                 <p style="margin-top: 0.5rem; font-size: 0.8rem;">Loading settings...</p>
             </div>
         </div>
-        <footer>✨ Smart Chama Management · System settings and preferences</footer>
+        <footer>Smart Chama Management · System settings and preferences</footer>
     </main>
 </div>
 
-<script src="supabase-config.js"></script>
 <script>
-    let currentUser = null;
-    let emailNotifications = true;
-    let darkMode = false;
+// Using supabaseClient from supabase-config.js
+let currentUser = null;
+let emailNotifications = true;
+let darkMode = false;
+let systemStats = {};
 
-    // Sidebar functionality
-    const menuToggle = document.getElementById('menuToggle');
-    const sidebar = document.getElementById('sidebar');
-    const sidebarClose = document.getElementById('sidebarClose');
-    const sidebarOverlay = document.getElementById('sidebarOverlay');
-    
-    function openSidebar() {
-        sidebar.classList.add('open');
-        sidebarOverlay.classList.add('active');
-    }
-    
-    function closeSidebar() {
-        sidebar.classList.remove('open');
-        sidebarOverlay.classList.remove('active');
-    }
-    
-    if (menuToggle) menuToggle.addEventListener('click', openSidebar);
-    if (sidebarClose) sidebarClose.addEventListener('click', closeSidebar);
-    if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebar);
-    
-    window.addEventListener('resize', () => {
-        if (window.innerWidth > 768) closeSidebar();
+// Sidebar functionality
+const menuToggle = document.getElementById('menuToggle');
+const sidebar = document.getElementById('sidebar');
+const sidebarClose = document.getElementById('sidebarClose');
+const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+function openSidebar() {
+    sidebar.classList.add('open');
+    sidebarOverlay.classList.add('active');
+}
+
+function closeSidebar() {
+    sidebar.classList.remove('open');
+    sidebarOverlay.classList.remove('active');
+}
+
+if (menuToggle) menuToggle.addEventListener('click', openSidebar);
+if (sidebarClose) sidebarClose.addEventListener('click', closeSidebar);
+if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebar);
+
+window.addEventListener('resize', function() {
+    if (window.innerWidth > 768) closeSidebar();
+});
+
+function escapeHtml(str) {
+    if (!str) return "";
+    return str.replace(/[&<>]/g, function(m) {
+        if (m === "&") return "&amp;";
+        if (m === "<") return "&lt;";
+        if (m === ">") return "&gt;";
+        return m;
     });
+}
 
-    (async function() {
-        const isAuth = await protectPage();
-        if (!isAuth) return;
-        
-        currentUser = await getCurrentUser();
-        if (currentUser) {
-            document.getElementById('userEmail').textContent = currentUser.email || 'Admin';
-        }
-        
-        renderSettings();
-    })();
-
-    document.getElementById('logoutBtn').addEventListener('click', async () => {
-        await logoutUser();
-        window.location.href = 'index.html';
-    });
-
-    function showMessage(message, type) {
-        const msgDiv = document.getElementById('messageArea');
-        if (msgDiv) {
-            msgDiv.innerHTML = `<div class="${type === 'error' ? 'error-message' : 'success-message'}">${message}</div>`;
-            setTimeout(() => {
-                if (msgDiv.innerHTML) msgDiv.innerHTML = '';
-            }, 4000);
-        } else {
-            const toast = document.createElement('div');
-            toast.style.cssText = `position:fixed; bottom:20px; right:20px; background:${type === 'error' ? '#dc2626' : '#2c7a4d'}; color:white; padding:10px 16px; border-radius:40px; font-size:0.75rem; z-index:1002;`;
-            toast.textContent = message;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
-        }
+function showMessage(message, type) {
+    const msgDiv = document.getElementById('messageArea');
+    if (msgDiv) {
+        msgDiv.innerHTML = `<div class="${type === 'error' ? 'error-message' : 'success-message'}">${message}</div>`;
+        setTimeout(function() {
+            if (msgDiv.innerHTML) msgDiv.innerHTML = '';
+        }, 4000);
     }
+}
 
-    async function updatePassword() {
-        const currentPassword = document.getElementById('currentPassword')?.value;
-        const newPassword = document.getElementById('newPassword')?.value;
-        const confirmPassword = document.getElementById('confirmPassword')?.value;
+async function loadSystemStats() {
+    try {
+        const membersRes = await supabaseClient.from('members').select('*', { count: 'exact' });
+        const recordsRes = await supabaseClient.from('monthly_records').select('*', { count: 'exact' });
         
-        if (!currentPassword || !newPassword || !confirmPassword) {
-            showMessage('Please fill in all password fields', 'error');
-            return;
-        }
+        systemStats = {
+            totalMembers: membersRes.data ? membersRes.data.length : 0,
+            totalRecords: recordsRes.data ? recordsRes.data.length : 0,
+            lastUpdated: new Date().toLocaleString()
+        };
         
-        if (newPassword !== confirmPassword) {
-            showMessage('New passwords do not match', 'error');
-            return;
+        // Update stats display
+        const statsSpan = document.getElementById('systemStats');
+        if (statsSpan) {
+            statsSpan.innerHTML = `${systemStats.totalMembers} Members | ${systemStats.totalRecords} Records | Updated: ${systemStats.lastUpdated}`;
         }
-        
-        if (newPassword.length < 6) {
-            showMessage('Password must be at least 6 characters', 'error');
-            return;
-        }
-        
-        try {
-            const { error } = await supabaseClient.auth.updateUser({ password: newPassword });
-            if (error) throw error;
-            
-            showMessage('✅ Password updated successfully!', 'success');
-            document.getElementById('currentPassword').value = '';
-            document.getElementById('newPassword').value = '';
-            document.getElementById('confirmPassword').value = '';
-            
-        } catch (error) {
-            console.error("Password update error:", error);
-            showMessage(error.message || 'Error updating password', 'error');
-        }
+    } catch (error) {
+        console.error("Error loading stats:", error);
     }
+}
 
-    async function updateProfile() {
-        const fullName = document.getElementById('fullName')?.value;
-        const phone = document.getElementById('phone')?.value;
+async function updatePassword() {
+    const currentPassword = document.getElementById('currentPassword')?.value;
+    const newPassword = document.getElementById('newPassword')?.value;
+    const confirmPassword = document.getElementById('confirmPassword')?.value;
+    
+    if (!currentPassword || !newPassword || !confirmPassword) {
+        showMessage('Please fill in all password fields', 'error');
+        return;
+    }
+    
+    if (newPassword !== confirmPassword) {
+        showMessage('New passwords do not match', 'error');
+        return;
+    }
+    
+    if (newPassword.length < 6) {
+        showMessage('Password must be at least 6 characters', 'error');
+        return;
+    }
+    
+    try {
+        const { error } = await supabaseClient.auth.updateUser({ password: newPassword });
+        if (error) throw error;
         
-        if (!fullName) {
-            showMessage('Please enter your name', 'error');
-            return;
-        }
+        showMessage('✅ Password updated successfully!', 'success');
+        document.getElementById('currentPassword').value = '';
+        document.getElementById('newPassword').value = '';
+        document.getElementById('confirmPassword').value = '';
         
-        try {
-            const { error } = await supabaseClient.auth.updateUser({
-                data: { full_name: fullName, phone: phone }
-            });
-            if (error) throw error;
-            showMessage('✅ Profile updated successfully!', 'success');
-        } catch (error) {
-            console.error("Profile update error:", error);
-            showMessage(error.message || 'Error updating profile', 'error');
-        }
+    } catch (error) {
+        console.error("Password update error:", error);
+        showMessage(error.message || 'Error updating password', 'error');
     }
+}
 
-    async function exportAllData() {
-        try {
-            const [membersRes, contribRes] = await Promise.all([
-                supabaseClient.from('members').select('*'),
-                supabaseClient.from('contributions').select('*, members:member_id(name)')
-            ]);
-            
-            const exportData = {
-                exported_at: new Date().toISOString(),
-                members: membersRes.data || [],
-                contributions: contribRes.data || []
-            };
-            
-            const dataStr = JSON.stringify(exportData, null, 2);
-            const blob = new Blob([dataStr], { type: 'application/json' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `chamaease_backup_${new Date().toISOString().slice(0,10)}.json`;
-            link.click();
-            URL.revokeObjectURL(link.href);
-            showMessage('✅ Data exported successfully!', 'success');
-        } catch (error) {
-            console.error("Export error:", error);
-            showMessage('Error exporting data: ' + error.message, 'error');
-        }
+async function updateProfile() {
+    const fullName = document.getElementById('fullName')?.value;
+    const phone = document.getElementById('phone')?.value;
+    
+    try {
+        const { error } = await supabaseClient.auth.updateUser({
+            data: { full_name: fullName, phone: phone }
+        });
+        if (error) throw error;
+        showMessage('✅ Profile updated successfully!', 'success');
+    } catch (error) {
+        console.error("Profile update error:", error);
+        showMessage(error.message || 'Error updating profile', 'error');
     }
+}
 
-    function toggleNotification() {
-        emailNotifications = !emailNotifications;
-        const toggle = document.getElementById('notificationToggle');
-        if (toggle) {
-            if (emailNotifications) toggle.classList.add('active');
-            else toggle.classList.remove('active');
-        }
-        localStorage.setItem('emailNotifications', emailNotifications);
-        showMessage(`Email notifications ${emailNotifications ? 'enabled' : 'disabled'}`, 'success');
+async function exportAllData() {
+    try {
+        const membersRes = await supabaseClient.from('members').select('*');
+        const recordsRes = await supabaseClient.from('monthly_records').select('*');
+        
+        if (membersRes.error) throw membersRes.error;
+        if (recordsRes.error) throw recordsRes.error;
+        
+        const exportData = {
+            exported_at: new Date().toISOString(),
+            app_version: "2.0.0",
+            members: membersRes.data || [],
+            monthly_records: recordsRes.data || []
+        };
+        
+        const dataStr = JSON.stringify(exportData, null, 2);
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `chamaease_backup_${new Date().toISOString().slice(0,10)}.json`;
+        link.click();
+        URL.revokeObjectURL(link.href);
+        showMessage('✅ Data exported successfully!', 'success');
+    } catch (error) {
+        console.error("Export error:", error);
+        showMessage('Error exporting data: ' + error.message, 'error');
     }
+}
 
-    function toggleTheme() {
-        darkMode = !darkMode;
-        const toggle = document.getElementById('themeToggle');
-        if (toggle) {
-            if (darkMode) toggle.classList.add('active');
-            else toggle.classList.remove('active');
-        }
-        localStorage.setItem('darkMode', darkMode);
+async function clearAllData() {
+    if (!confirm('⚠️ WARNING: This will delete ALL members and records. This action cannot be undone!\n\nAre you absolutely sure?')) {
+        return;
+    }
+    
+    if (!confirm('Type "DELETE" to confirm:')) {
+        return;
+    }
+    
+    try {
+        // Delete all records first (due to foreign key constraints)
+        const { error: recordsError } = await supabaseClient
+            .from('monthly_records')
+            .delete()
+            .neq('id', '00000000-0000-0000-0000-000000000000');
+        
+        if (recordsError) throw recordsError;
+        
+        // Delete all members
+        const { error: membersError } = await supabaseClient
+            .from('members')
+            .delete()
+            .neq('id', '00000000-0000-0000-0000-000000000000');
+        
+        if (membersError) throw membersError;
+        
+        showMessage('✅ All data cleared successfully!', 'success');
+        loadSystemStats();
+    } catch (error) {
+        console.error("Clear data error:", error);
+        showMessage('Error clearing data: ' + error.message, 'error');
+    }
+}
+
+function toggleNotification() {
+    emailNotifications = !emailNotifications;
+    const toggle = document.getElementById('notificationToggle');
+    if (toggle) {
+        if (emailNotifications) toggle.classList.add('active');
+        else toggle.classList.remove('active');
+    }
+    localStorage.setItem('emailNotifications', emailNotifications);
+    showMessage(`Email notifications ${emailNotifications ? 'enabled' : 'disabled'}`, 'success');
+}
+
+function toggleTheme() {
+    darkMode = !darkMode;
+    const toggle = document.getElementById('themeToggle');
+    if (toggle) {
+        if (darkMode) toggle.classList.add('active');
+        else toggle.classList.remove('active');
+    }
+    localStorage.setItem('darkMode', darkMode);
+    
+    if (darkMode) {
+        document.body.classList.add('dark-theme');
+    } else {
+        document.body.classList.remove('dark-theme');
+    }
+}
+
+async function renderSettings() {
+    const container = document.getElementById('app-root');
+    
+    await loadSystemStats();
+    
+    const html = `
+        <div id="messageArea"></div>
+        
+        <div class="card">
+            <h3 style="font-size:1rem;">📊 System Overview</h3>
+            <div class="setting-item">
+                <div class="setting-info">
+                    <h4>Database Statistics</h4>
+                    <p id="systemStats">${systemStats.totalMembers} Members | ${systemStats.totalRecords} Records | Updated: ${systemStats.lastUpdated}</p>
+                </div>
+                <button class="btn-outline btn-sm" onclick="loadSystemStats()">🔄 Refresh</button>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h3 style="font-size:1rem;">👤 Profile Settings</h3>
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" value="${escapeHtml(currentUser?.email || '')}" disabled style="background:#f8fafc;">
+                <small style="color:#6c757d; font-size:0.65rem;">Email cannot be changed</small>
+            </div>
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="fullName" placeholder="Enter your full name" value="${escapeHtml(currentUser?.user_metadata?.full_name || '')}">
+            </div>
+            <div class="form-group">
+                <label>Phone Number</label>
+                <input type="tel" id="phone" placeholder="Enter phone number" value="${escapeHtml(currentUser?.user_metadata?.phone || '')}">
+            </div>
+            <button class="btn" onclick="updateProfile()">💾 Update Profile</button>
+        </div>
+        
+        <div class="card">
+            <h3 style="font-size:1rem;">🔒 Security & Password</h3>
+            <div class="form-group">
+                <label>Current Password</label>
+                <input type="password" id="currentPassword" placeholder="Enter current password">
+            </div>
+            <div class="form-group">
+                <label>New Password</label>
+                <input type="password" id="newPassword" placeholder="Enter new password (min 6 characters)">
+            </div>
+            <div class="form-group">
+                <label>Confirm New Password</label>
+                <input type="password" id="confirmPassword" placeholder="Confirm new password">
+            </div>
+            <button class="btn" onclick="updatePassword()">🔑 Change Password</button>
+        </div>
+        
+        <div class="card">
+            <h3 style="font-size:1rem;">⚙️ Preferences</h3>
+            <div class="setting-item">
+                <div class="setting-info">
+                    <h4>Email Notifications</h4>
+                    <p>Receive email alerts for contributions and updates</p>
+                </div>
+                <div class="toggle-switch ${emailNotifications ? 'active' : ''}" id="notificationToggle" onclick="toggleNotification()"></div>
+            </div>
+            <div class="setting-item">
+                <div class="setting-info">
+                    <h4>Dark Mode</h4>
+                    <p>Switch between light and dark theme</p>
+                </div>
+                <div class="toggle-switch ${darkMode ? 'active' : ''}" id="themeToggle" onclick="toggleTheme()"></div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h3 style="font-size:1rem;">💾 Data Management</h3>
+            <div class="setting-item">
+                <div class="setting-info">
+                    <h4>Export All Data</h4>
+                    <p>Download backup of members and monthly records in JSON format</p>
+                </div>
+                <button class="btn-outline btn-sm" onclick="exportAllData()">📎 Export</button>
+            </div>
+            <div class="setting-item">
+                <div class="setting-info">
+                    <h4>Clear All Data</h4>
+                    <p>⚠️ Delete ALL members and records (irreversible)</p>
+                </div>
+                <button class="btn-danger btn-sm" onclick="clearAllData()">🗑️ Clear All</button>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h3 style="font-size:1rem;">ℹ️ About & Support</h3>
+            <div class="setting-item">
+                <div class="setting-info">
+                    <h4>System Information</h4>
+                    <p>Version: 2.0.0 | Built with Supabase | © 2024 ChamaEase</p>
+                </div>
+            </div>
+            <div class="setting-item">
+                <div class="setting-info">
+                    <h4>Need Help?</h4>
+                    <p>Email: support@chamaease.com | Documentation available online</p>
+                </div>
+                <button class="btn-outline btn-sm" onclick="window.open('https://github.com', '_blank')">📖 Documentation</button>
+            </div>
+        </div>
+    `;
+    
+    container.innerHTML = html;
+}
+
+// Initialize page
+(async function() {
+    const isAuth = await protectPage();
+    if (!isAuth) return;
+    
+    currentUser = await getCurrentUser();
+    if (currentUser && document.getElementById('userEmail')) {
+        document.getElementById('userEmail').textContent = currentUser.email || 'Admin';
+    }
+    
+    // Load saved preferences
+    const savedNotifications = localStorage.getItem('emailNotifications');
+    const savedTheme = localStorage.getItem('darkMode');
+    
+    if (savedNotifications !== null) emailNotifications = savedNotifications === 'true';
+    if (savedTheme !== null) {
+        darkMode = savedTheme === 'true';
         if (darkMode) {
-            document.body.style.background = '#1a1a2e';
-            document.body.style.color = '#e2e8f0';
-        } else {
-            document.body.style.background = '#f4f7fb';
-            document.body.style.color = '#1e2a3e';
+            document.body.classList.add('dark-theme');
         }
     }
+    
+    await renderSettings();
+})();
 
-    function renderSettings() {
-        const container = document.getElementById('app-root');
-        
-        const html = `
-            <div id="messageArea"></div>
-            
-            <div class="card">
-                <h3 style="font-size:1rem;">👤 Profile Settings</h3>
-                <div class="form-group">
-                    <label>Email Address</label>
-                    <input type="email" value="${currentUser?.email || ''}" disabled style="background:#f8fafc;">
-                    <small style="color:#6c757d; font-size:0.65rem;">Email cannot be changed</small>
-                </div>
-                <div class="form-group">
-                    <label>Full Name</label>
-                    <input type="text" id="fullName" placeholder="Enter your full name" value="${currentUser?.user_metadata?.full_name || ''}">
-                </div>
-                <div class="form-group">
-                    <label>Phone Number</label>
-                    <input type="tel" id="phone" placeholder="Enter phone number" value="${currentUser?.user_metadata?.phone || ''}">
-                </div>
-                <button class="btn" onclick="updateProfile()">💾 Update Profile</button>
-            </div>
-            
-            <div class="card">
-                <h3 style="font-size:1rem;">🔒 Security & Password</h3>
-                <div class="form-group">
-                    <label>Current Password</label>
-                    <input type="password" id="currentPassword" placeholder="Enter current password">
-                </div>
-                <div class="form-group">
-                    <label>New Password</label>
-                    <input type="password" id="newPassword" placeholder="Enter new password">
-                </div>
-                <div class="form-group">
-                    <label>Confirm New Password</label>
-                    <input type="password" id="confirmPassword" placeholder="Confirm new password">
-                </div>
-                <button class="btn" onclick="updatePassword()">🔑 Change Password</button>
-            </div>
-            
-            <div class="card">
-                <h3 style="font-size:1rem;">⚙️ Preferences</h3>
-                <div class="setting-item">
-                    <div class="setting-info">
-                        <h4>Email Notifications</h4>
-                        <p>Receive email alerts for contributions</p>
-                    </div>
-                    <div class="toggle-switch ${emailNotifications ? 'active' : ''}" id="notificationToggle" onclick="toggleNotification()"></div>
-                </div>
-                <div class="setting-item">
-                    <div class="setting-info">
-                        <h4>Dark Mode</h4>
-                        <p>Switch between light and dark theme</p>
-                    </div>
-                    <div class="toggle-switch ${darkMode ? 'active' : ''}" id="themeToggle" onclick="toggleTheme()"></div>
-                </div>
-            </div>
-            
-            <div class="card">
-                <h3 style="font-size:1rem;">💾 Data Management</h3>
-                <div class="setting-item">
-                    <div class="setting-info">
-                        <h4>Export All Data</h4>
-                        <p>Download backup of members and contributions in JSON format</p>
-                    </div>
-                    <button class="btn-outline btn-sm" onclick="exportAllData()">📎 Export</button>
-                </div>
-                <div class="setting-item">
-                    <div class="setting-info">
-                        <h4>System Information</h4>
-                        <p>Version: 2.0.0 | Built with Supabase | ${new Date().toLocaleDateString()}</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="card">
-                <h3 style="font-size:1rem;">🆘 Support & Help</h3>
-                <div class="setting-item">
-                    <div class="setting-info">
-                        <h4>Need Help?</h4>
-                        <p>Email: support@chamaease.com | Phone: +254 700 000 000</p>
-                    </div>
-                </div>
-                <div class="setting-item">
-                    <div class="setting-info">
-                        <h4>Documentation</h4>
-                        <p>View user guide and tutorials</p>
-                    </div>
-                    <button class="btn-outline btn-sm" onclick="alert('Documentation coming soon!')">📖 View Docs</button>
-                </div>
-            </div>
-        `;
-        
-        container.innerHTML = html;
-        
-        const savedNotifications = localStorage.getItem('emailNotifications');
-        const savedTheme = localStorage.getItem('darkMode');
-        if (savedNotifications !== null) emailNotifications = savedNotifications === 'true';
-        if (savedTheme !== null) {
-            darkMode = savedTheme === 'true';
-            if (darkMode) {
-                document.body.style.background = '#1a1a2e';
-                document.body.style.color = '#e2e8f0';
-            }
-        }
-    }
+document.getElementById('logoutBtn').addEventListener('click', async function() {
+    await logoutUser();
+    window.location.href = 'index.html';
+});
 </script>
 </body>
 </html>
