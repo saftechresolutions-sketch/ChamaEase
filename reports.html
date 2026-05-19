@@ -29,7 +29,97 @@
             opacity: 0.9;
         }
         
-        /* Stats Grid - Clean and Clear */
+        /* Filter Section */
+        .filter-section {
+            background: white;
+            border-radius: 20px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--gray-border);
+        }
+        
+        .filter-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary);
+            display: inline-block;
+        }
+        
+        .filter-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        .filter-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            color: #1e2a3e;
+            display: block;
+        }
+        
+        .filter-select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--gray-border);
+            border-radius: 12px;
+            font-size: 0.8rem;
+            background: white;
+            cursor: pointer;
+        }
+        
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .filter-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn-apply {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.75rem;
+        }
+        
+        .btn-reset {
+            background: #f1f5f9;
+            color: #64748b;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.75rem;
+        }
+        
+        .active-filter-badge {
+            display: inline-block;
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            margin-top: 0.8rem;
+        }
+        
+        /* Stats Grid */
         .stats-container {
             background: white;
             border-radius: 20px;
@@ -136,7 +226,7 @@
             transform: translateY(-2px);
         }
         
-        /* Member Rankings Table - Clean Design */
+        /* Member Rankings Table */
         .rankings-container {
             background: white;
             border-radius: 20px;
@@ -213,7 +303,7 @@
             color: var(--primary);
         }
         
-        /* Charts Section - At Bottom */
+        /* Charts Section */
         .charts-section {
             background: white;
             border-radius: 20px;
@@ -269,7 +359,6 @@
             height: 250px;
         }
         
-        /* Footer Note */
         .report-footer {
             text-align: center;
             padding: 1rem;
@@ -279,7 +368,6 @@
             margin-top: 1rem;
         }
         
-        /* Toast Message */
         .toast-success {
             position: fixed;
             bottom: 20px;
@@ -306,6 +394,15 @@
         }
         
         @media (max-width: 640px) {
+            .filter-controls {
+                flex-direction: column;
+            }
+            .filter-buttons {
+                width: 100%;
+            }
+            .btn-apply, .btn-reset {
+                flex: 1;
+            }
             .action-buttons-container {
                 flex-direction: column;
             }
@@ -320,6 +417,7 @@
         }
         
         @media print {
+            .filter-section,
             .action-buttons-container,
             .sidebar,
             .top-bar,
@@ -374,8 +472,19 @@
 // Using supabaseClient from supabase-config.js
 let allMembers = [];
 let allRecords = [];
+let filteredRecords = [];
 let trendsChart = null;
 let topMembersChart = null;
+
+// Filter state
+let currentFilter = {
+    year: 'all',
+    month: 'all'
+};
+
+// Available years and months
+let availableYears = [];
+let monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
 
 // Sidebar functions
 function openSidebar() {
@@ -439,10 +548,31 @@ async function loadData() {
         if (recordsResult.error) throw recordsResult.error;
         allRecords = recordsResult.data || [];
         
-        renderReports();
+        // Extract available years from records
+        var yearsSet = new Set();
+        for (var i = 0; i < allRecords.length; i++) {
+            yearsSet.add(allRecords[i].year);
+        }
+        availableYears = Array.from(yearsSet).sort((a, b) => b - a);
+        
+        // Apply initial filter
+        applyFilter();
     } catch (error) {
         document.getElementById("app-root").innerHTML = '<div style="padding:2rem;text-align:center"><h3>⚠️ Error</h3><p>' + error.message + '</p><button class="btn" onclick="location.reload()">Retry</button></div>';
     }
+}
+
+function applyFilter() {
+    if (currentFilter.year === 'all' && currentFilter.month === 'all') {
+        filteredRecords = [...allRecords];
+    } else {
+        filteredRecords = allRecords.filter(function(record) {
+            if (currentFilter.year !== 'all' && record.year != currentFilter.year) return false;
+            if (currentFilter.month !== 'all' && record.month != currentFilter.month) return false;
+            return true;
+        });
+    }
+    renderReports();
 }
 
 function getSummaryStats() {
@@ -452,29 +582,46 @@ function getSummaryStats() {
     var totalContributions = 0;
     var totalPenalties = 0;
     
-    for (var i = 0; i < allRecords.length; i++) {
-        var record = allRecords[i];
+    // Get unique members in filtered records
+    var membersInFilter = new Set();
+    
+    for (var i = 0; i < filteredRecords.length; i++) {
+        var record = filteredRecords[i];
         totalLoan += safeValue(record.loan);
         totalLoanBalance += safeValue(record.loan_balance);
         totalContributions += safeValue(record.monthly_contribution);
         totalPenalties += safeValue(record.penalties);
+        membersInFilter.add(record.member_id);
     }
     
     return {
         totalMembers: totalMembers,
+        activeMembers: membersInFilter.size,
         totalLoan: totalLoan,
         totalLoanBalance: totalLoanBalance,
         totalContributions: totalContributions,
-        totalPenalties: totalPenalties
+        totalPenalties: totalPenalties,
+        totalCollected: totalContributions + (totalLoan - totalLoanBalance)
     };
+}
+
+function getFilterDisplayText() {
+    if (currentFilter.year === 'all' && currentFilter.month === 'all') {
+        return "All Time";
+    } else if (currentFilter.year !== 'all' && currentFilter.month === 'all') {
+        return "Year " + currentFilter.year;
+    } else if (currentFilter.year === 'all' && currentFilter.month !== 'all') {
+        return monthNames[currentFilter.month - 1];
+    } else {
+        return monthNames[currentFilter.month - 1] + " " + currentFilter.year;
+    }
 }
 
 function getMonthlyTrends() {
     var monthlyMap = {};
-    var monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
     
-    for (var i = 0; i < allRecords.length; i++) {
-        var record = allRecords[i];
+    for (var i = 0; i < filteredRecords.length; i++) {
+        var record = filteredRecords[i];
         var key = record.year + '-' + record.month;
         var label = monthNames[record.month - 1] + ' ' + record.year;
         
@@ -496,8 +643,8 @@ function getMonthlyTrends() {
 function getMemberRankings() {
     var memberMap = {};
     
-    for (var i = 0; i < allRecords.length; i++) {
-        var record = allRecords[i];
+    for (var i = 0; i < filteredRecords.length; i++) {
+        var record = filteredRecords[i];
         if (!memberMap[record.member_id]) {
             memberMap[record.member_id] = { contributions: 0, loans: 0 };
         }
@@ -535,7 +682,6 @@ function createCharts() {
     var trends = getMonthlyTrends();
     var topContributors = getTopContributors();
     
-    // Destroy existing charts
     if (trendsChart) trendsChart.destroy();
     if (topMembersChart) topMembersChart.destroy();
     
@@ -636,13 +782,16 @@ function createCharts() {
 function shareToWhatsApp() {
     var stats = getSummaryStats();
     var rankings = getMemberRankings();
+    var filterText = getFilterDisplayText();
     
     var message = "🏦 *CHAMA FINANCIAL REPORT*\n";
-    message += "📅 *Date:* " + new Date().toLocaleDateString() + "\n";
+    message += "📅 *Period:* " + filterText + "\n";
+    message += "📊 *Generated:* " + new Date().toLocaleString() + "\n";
     message += "━━━━━━━━━━━━━━━━━━━━━\n\n";
     
     message += "📊 *SUMMARY STATISTICS*\n";
     message += "👥 Total Members: *" + stats.totalMembers + "*\n";
+    message += "⭐ Active Members: *" + stats.activeMembers + "*\n";
     message += "💰 Total Contributions: *KES " + formatNumber(stats.totalContributions) + "*\n";
     message += "🏦 Total Loans Given: *KES " + formatNumber(stats.totalLoan) + "*\n";
     message += "⚖️ Outstanding Balance: *KES " + formatNumber(stats.totalLoanBalance) + "*\n";
@@ -662,21 +811,33 @@ function shareToWhatsApp() {
     message += "📊 Generated by ChamaEase";
     
     var encodedMessage = encodeURIComponent(message);
-    // Opens WhatsApp directly
-    window.open("https://wa.me/?text=" + encodedMessage, "_blank");
+    var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+        window.location.href = "whatsapp://send?text=" + encodedMessage;
+        setTimeout(function() {
+            window.open("https://wa.me/?text=" + encodedMessage, "_blank");
+        }, 500);
+    } else {
+        window.open("https://wa.me/?text=" + encodedMessage, "_blank");
+    }
+    
     showToast("Opening WhatsApp...");
 }
 
 function exportToExcel() {
     var stats = getSummaryStats();
     var rankings = getMemberRankings();
+    var filterText = getFilterDisplayText();
     
     var csvRows = [];
     csvRows.push(["CHAMA FINANCIAL REPORT"]);
+    csvRows.push(["Period:", filterText]);
     csvRows.push(["Generated:", new Date().toLocaleString()]);
     csvRows.push([]);
     csvRows.push(["SUMMARY STATISTICS"]);
     csvRows.push(["Total Members", stats.totalMembers]);
+    csvRows.push(["Active Members", stats.activeMembers]);
     csvRows.push(["Total Contributions", "KES " + formatNumber(stats.totalContributions)]);
     csvRows.push(["Total Loans Given", "KES " + formatNumber(stats.totalLoan)]);
     csvRows.push(["Outstanding Balance", "KES " + formatNumber(stats.totalLoanBalance)]);
@@ -699,7 +860,7 @@ function exportToExcel() {
     var link = document.createElement("a");
     var url = URL.createObjectURL(blob);
     link.href = url;
-    link.setAttribute("download", "chama_report_" + new Date().toISOString().slice(0,10) + ".csv");
+    link.setAttribute("download", "chama_report_" + getFilterDisplayText().replace(/ /g, '_') + ".csv");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -715,6 +876,19 @@ function renderReports() {
     var container = document.getElementById("app-root");
     var stats = getSummaryStats();
     var rankings = getMemberRankings();
+    var filterText = getFilterDisplayText();
+    
+    // Build year options
+    var yearOptions = '<option value="all" ' + (currentFilter.year === 'all' ? 'selected' : '') + '>All Years</option>';
+    for (var i = 0; i < availableYears.length; i++) {
+        yearOptions += '<option value="' + availableYears[i] + '" ' + (currentFilter.year == availableYears[i] ? 'selected' : '') + '>' + availableYears[i] + '</option>';
+    }
+    
+    // Build month options
+    var monthOptions = '<option value="all" ' + (currentFilter.month === 'all' ? 'selected' : '') + '>All Months</option>';
+    for (var i = 1; i <= 12; i++) {
+        monthOptions += '<option value="' + i + '" ' + (currentFilter.month == i ? 'selected' : '') + '>' + monthNames[i - 1] + '</option>';
+    }
     
     // Build rankings table rows
     var tableRows = '';
@@ -728,11 +902,15 @@ function renderReports() {
         tableRows += `<tr>
             <td style="width: 60px; text-align: center;">
                 <span class="rank-number ${rankClass}">${i + 1}</span>
-            </td>
-            <td class="member-name">${escapeHtml(m.name)}</td>
-            <td class="amount">KES ${formatNumber(m.contributions)}</td>
-            <td>KES ${formatNumber(m.loans)}</td>
+            侧
+            <td class="member-name">${escapeHtml(m.name)}侧
+            <td class="amount">KES ${formatNumber(m.contributions)}侧
+            <td>KES ${formatNumber(m.loans)}侧
         </tr>`;
+    }
+    
+    if (rankings.length === 0) {
+        tableRows = `<tr><td colspan="4" style="text-align:center; padding:2rem;">No records found for selected period<td</tr>`;
     }
     
     var html = `
@@ -741,13 +919,40 @@ function renderReports() {
             <p>Generated on ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}</p>
         </div>
         
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <div class="filter-title">🔍 Filter Reports</div>
+            <div class="filter-controls">
+                <div class="filter-group">
+                    <label class="filter-label">Select Year</label>
+                    <select id="yearFilter" class="filter-select">${yearOptions}</select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Select Month</label>
+                    <select id="monthFilter" class="filter-select">${monthOptions}</select>
+                </div>
+                <div class="filter-buttons">
+                    <button class="btn-apply" id="applyFilterBtn">Apply Filter</button>
+                    <button class="btn-reset" id="resetFilterBtn">Reset</button>
+                </div>
+            </div>
+            <div class="active-filter-badge">
+                📅 Showing: <strong>${filterText}</strong> (${filteredRecords.length} records)
+            </div>
+        </div>
+        
         <!-- Statistics Section -->
         <div class="stats-container">
-            <div class="stats-title">📈 Key Statistics</div>
+            <div class="stats-title">📈 Key Statistics (${filterText})</div>
             <div class="stats-grid-clean">
                 <div class="stat-item">
                     <div class="stat-value-large">${stats.totalMembers}</div>
                     <div class="stat-label-clean">Total Members</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value-large">${stats.activeMembers}</div>
+                    <div class="stat-label-clean">Active Members</div>
+                    <div class="stat-sub">with transactions</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-value-large">KES ${(stats.totalContributions/1000).toFixed(1)}k</div>
@@ -763,6 +968,11 @@ function renderReports() {
                     <div class="stat-value-large">KES ${(stats.totalLoanBalance/1000).toFixed(1)}k</div>
                     <div class="stat-label-clean">Outstanding Balance</div>
                     <div class="stat-sub">KES ${formatNumber(stats.totalLoanBalance)}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value-large">KES ${(stats.totalPenalties/1000).toFixed(1)}k</div>
+                    <div class="stat-label-clean">Total Penalties</div>
+                    <div class="stat-sub">KES ${formatNumber(stats.totalPenalties)}</div>
                 </div>
             </div>
         </div>
@@ -783,7 +993,7 @@ function renderReports() {
         <!-- Member Rankings Table -->
         <div class="rankings-container">
             <div class="rankings-header">
-                <h3>🏆 Member Rankings</h3>
+                <h3>🏆 Member Rankings (${filterText})</h3>
             </div>
             <div class="rankings-table-wrapper">
                 <table class="rankings-table">
@@ -796,16 +1006,16 @@ function renderReports() {
                         </tr>
                     </thead>
                     <tbody>
-                        ${tableRows || '<tr><td colspan="4" style="text-align:center; padding:2rem;">No member records found<td</tr>'}
+                        ${tableRows}
                     </tbody>
                 </table>
             </div>
         </div>
         
-        <!-- Charts Section at Bottom -->
+        <!-- Charts Section -->
         <div class="charts-section">
             <div class="charts-header">
-                <h3>📊 Financial Charts</h3>
+                <h3>📊 Financial Charts (${filterText})</h3>
             </div>
             <div class="charts-grid-bottom">
                 <div class="chart-box">
@@ -833,7 +1043,20 @@ function renderReports() {
     // Create charts
     createCharts();
     
-    // Bind events
+    // Bind filter events
+    document.getElementById("applyFilterBtn").addEventListener("click", function() {
+        currentFilter.year = document.getElementById("yearFilter").value;
+        currentFilter.month = document.getElementById("monthFilter").value;
+        applyFilter();
+    });
+    
+    document.getElementById("resetFilterBtn").addEventListener("click", function() {
+        currentFilter = { year: 'all', month: 'all' };
+        document.getElementById("yearFilter").value = 'all';
+        document.getElementById("monthFilter").value = 'all';
+        applyFilter();
+    });
+    
     document.getElementById("shareWABtn").addEventListener("click", shareToWhatsApp);
     document.getElementById("exportExcelBtn").addEventListener("click", exportToExcel);
     document.getElementById("printBtn").addEventListener("click", printReport);
