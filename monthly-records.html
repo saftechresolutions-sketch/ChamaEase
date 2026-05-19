@@ -53,32 +53,15 @@
             border-color: var(--primary);
         }
         
-        .btn-apply {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 10px 24px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.8rem;
-            transition: all 0.2s;
-        }
-        
-        .btn-apply:hover {
-            background: var(--primary-dark);
-            transform: translateY(-1px);
-        }
-        
         .active-period-badge {
             display: inline-flex;
             align-items: center;
             gap: 8px;
             background: var(--primary-light);
             color: var(--primary);
-            padding: 6px 14px;
+            padding: 10px 16px;
             border-radius: 30px;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             font-weight: 600;
         }
         
@@ -105,13 +88,13 @@
             transition: all 0.2s;
         }
         
-        .btn-wa {
-            background: #25D366;
+        .btn-save {
+            background: #3b82f6;
             color: white;
         }
         
-        .btn-wa:hover {
-            background: #128C7E;
+        .btn-save:hover {
+            background: #2563eb;
             transform: translateY(-1px);
         }
         
@@ -135,13 +118,13 @@
             transform: translateY(-1px);
         }
         
-        .btn-save {
-            background: #3b82f6;
+        .btn-share {
+            background: #25D366;
             color: white;
         }
         
-        .btn-save:hover {
-            background: #2563eb;
+        .btn-share:hover {
+            background: #128C7E;
             transform: translateY(-1px);
         }
         
@@ -171,9 +154,6 @@
                 flex-direction: column;
             }
             .filter-item {
-                width: 100%;
-            }
-            .btn-apply {
                 width: 100%;
             }
             .action-buttons-row {
@@ -583,10 +563,12 @@ function exportToPDF() {
     showToast("PDF ready for printing");
 }
 
+// WhatsApp Share - Opens WhatsApp App Directly with ALL columns
 function shareToWhatsApp() {
     var monthName = monthNames[currentMonth - 1];
     
-    var message = "🏦 *CHAMA RECORDS* - " + monthName + " " + currentYear + "\n\n";
+    var message = "🏦 *CHAMA RECORDS* - " + monthName + " " + currentYear + "\n";
+    message += "━━━━━━━━━━━━━━━━━━━━━\n\n";
     
     for (var i = 0; i < allMembers.length; i++) {
         var member = allMembers[i];
@@ -596,30 +578,36 @@ function shareToWhatsApp() {
         var monthlyContribution = safeValue(getRecordValue(member.id, "monthly_contribution"));
         var penalties = safeValue(getRecordValue(member.id, "penalties"));
         
+        // Only show members with any activity
         if (loan > 0 || loanDeductions > 0 || loanBalance > 0 || monthlyContribution > 0 || penalties > 0) {
-            message += "*" + member.name + "*\n";
-            if (loan > 0) message += "💰 Loan: KES " + formatNumber(loan) + "\n";
-            if (loanDeductions > 0) message += "📉 Deductions: KES " + formatNumber(loanDeductions) + "\n";
-            if (loanBalance > 0) message += "⚖️ Balance: KES " + formatNumber(loanBalance) + "\n";
-            if (monthlyContribution > 0) message += "📋 Contribution: KES " + formatNumber(monthlyContribution) + "\n";
-            if (penalties > 0) message += "⚠️ Penalties: KES " + formatNumber(penalties) + "\n";
-            message += "\n";
+            message += "👤 *" + member.name + "*\n";
+            message += "├─ 💰 Loan: KES " + formatNumber(loan) + "\n";
+            message += "├─ 📉 Loan Deductions: KES " + formatNumber(loanDeductions) + "\n";
+            message += "├─ ⚖️ Loan Balance: KES " + formatNumber(loanBalance) + "\n";
+            message += "├─ 📋 Contribution: KES " + formatNumber(monthlyContribution) + "\n";
+            message += "└─ ⚠️ Penalties: KES " + formatNumber(penalties) + "\n\n";
         }
     }
     
-    var totalLoan = 0, totalLoanBalance = 0, totalMonthlyContribution = 0, totalPenalties = 0;
+    // Add totals
+    var totalLoan = 0, totalLoanDeductions = 0, totalLoanBalance = 0, totalMonthlyContribution = 0, totalPenalties = 0;
     for (var i = 0; i < allMembers.length; i++) {
         var member = allMembers[i];
         totalLoan += safeValue(getRecordValue(member.id, "loan"));
+        totalLoanDeductions += safeValue(getRecordValue(member.id, "loan_deductions"));
         totalLoanBalance += safeValue(getRecordValue(member.id, "loan_balance"));
         totalMonthlyContribution += safeValue(getRecordValue(member.id, "monthly_contribution"));
         totalPenalties += safeValue(getRecordValue(member.id, "penalties"));
     }
+    
+    message += "━━━━━━━━━━━━━━━━━━━━━\n";
     message += "📊 *TOTALS*\n";
-    message += "💰 Total Loans: KES " + formatNumber(totalLoan) + "\n";
-    message += "⚖️ Outstanding Balance: KES " + formatNumber(totalLoanBalance) + "\n";
-    message += "📋 Total Contributions: KES " + formatNumber(totalMonthlyContribution) + "\n";
-    message += "⚠️ Total Penalties: KES " + formatNumber(totalPenalties) + "\n";
+    message += "├─ 💰 Total Loans: KES " + formatNumber(totalLoan) + "\n";
+    message += "├─ 📉 Total Deductions: KES " + formatNumber(totalLoanDeductions) + "\n";
+    message += "├─ ⚖️ Outstanding Balance: KES " + formatNumber(totalLoanBalance) + "\n";
+    message += "├─ 📋 Total Contributions: KES " + formatNumber(totalMonthlyContribution) + "\n";
+    message += "└─ ⚠️ Total Penalties: KES " + formatNumber(totalPenalties) + "\n\n";
+    message += "📅 Generated by ChamaEase";
     
     var encodedMessage = encodeURIComponent(message);
     var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
@@ -664,17 +652,17 @@ function renderSpreadsheet() {
         var penalties = safeValue(getRecordValue(member.id, "penalties"));
         
         tableRows += `<tr>
-            <td class="member-name-cell"><strong>${escapeHtml(member.name)}</strong></td>
-            <td><input type="number" value="${loan}" step="any" onchange="handleCellChange('${member.id}', 'loan', event)" placeholder="0"></td>
-            <td><input type="number" value="${loanDeductions}" step="any" onchange="handleCellChange('${member.id}', 'loan_deductions', event)" placeholder="0"></td>
-            <td><input type="number" value="${loanBalance}" step="any" onchange="handleCellChange('${member.id}', 'loan_balance', event)" placeholder="0"></td>
-            <td><input type="number" value="${monthlyContribution}" step="any" onchange="handleCellChange('${member.id}', 'monthly_contribution', event)" placeholder="0"></td>
-            <td><input type="number" value="${penalties}" step="any" onchange="handleCellChange('${member.id}', 'penalties', event)" placeholder="0"></td>
+            <td class="member-name-cell"><strong>${escapeHtml(member.name)}</strong>侧
+            <td><input type="number" value="${loan}" step="any" onchange="handleCellChange('${member.id}', 'loan', event)" placeholder="0">侧
+            <td><input type="number" value="${loanDeductions}" step="any" onchange="handleCellChange('${member.id}', 'loan_deductions', event)" placeholder="0">侧
+            <td><input type="number" value="${loanBalance}" step="any" onchange="handleCellChange('${member.id}', 'loan_balance', event)" placeholder="0">侧
+            <td><input type="number" value="${monthlyContribution}" step="any" onchange="handleCellChange('${member.id}', 'monthly_contribution', event)" placeholder="0">侧
+            <td><input type="number" value="${penalties}" step="any" onchange="handleCellChange('${member.id}', 'penalties', event)" placeholder="0">侧
         </tr>`;
     }
     
     if (allMembers.length === 0) {
-        tableRows = `<tr><td colspan="6" style="text-align:center; padding: 2rem;">👥 No members found. Please <a href="members.html">add members</a> first.</td></tr>`;
+        tableRows = `<tr><td colspan="6" style="text-align:center; padding: 2rem;">👥 No members found. Please <a href="members.html">add members</a> first.侧侧</tr>`;
     }
     
     var totalLoan = 0, totalLoanDeductions = 0, totalLoanBalance = 0, totalMonthlyContribution = 0, totalPenalties = 0;
@@ -690,7 +678,7 @@ function renderSpreadsheet() {
     
     var html = `
         <div class="records-header-section">
-            <!-- Filter Row - Positioned at top near table -->
+            <!-- Filter Row - Auto-updates when changed -->
             <div class="filter-row">
                 <div class="filter-item">
                     <label class="filter-label">📅 Select Month</label>
@@ -699,9 +687,6 @@ function renderSpreadsheet() {
                 <div class="filter-item">
                     <label class="filter-label">📆 Select Year</label>
                     <select id="yearSelect" class="filter-select">${yearOptions}</select>
-                </div>
-                <div class="filter-item">
-                    <button id="applyFilterBtn" class="btn-apply">Apply Filter</button>
                 </div>
                 <div class="filter-item">
                     <div class="active-period-badge">
@@ -722,8 +707,8 @@ function renderSpreadsheet() {
                 <button class="action-btn btn-pdf" id="exportPDFBtn">
                     📄 Export PDF
                 </button>
-                <button class="action-btn btn-wa" id="shareWABtn">
-                    📱 Share
+                <button class="action-btn btn-share" id="shareWABtn">
+                    📱 Share to WhatsApp
                 </button>
             </div>
         </div>
@@ -744,12 +729,12 @@ function renderSpreadsheet() {
                 <tbody>
                     ${tableRows}
                     <tr id="totals-row" class="totals-row">
-                        <td><strong>📊 TOTAL</strong></td>
-                        <td><strong>KES ${formatNumber(totalLoan)}</strong></td>
-                        <td><strong>KES ${formatNumber(totalLoanDeductions)}</strong></td>
-                        <td><strong>KES ${formatNumber(totalLoanBalance)}</strong></td>
-                        <td><strong>KES ${formatNumber(totalMonthlyContribution)}</strong></td>
-                        <td><strong>KES ${formatNumber(totalPenalties)}</strong></td>
+                        <td><strong>📊 TOTAL</strong>侧
+                        <td><strong>KES ${formatNumber(totalLoan)}</strong>侧
+                        <td><strong>KES ${formatNumber(totalLoanDeductions)}</strong>侧
+                        <td><strong>KES ${formatNumber(totalLoanBalance)}</strong>侧
+                        <td><strong>KES ${formatNumber(totalMonthlyContribution)}</strong>侧
+                        <td><strong>KES ${formatNumber(totalPenalties)}</strong>侧
                     </tr>
                 </tbody>
             </table>
@@ -762,22 +747,19 @@ function renderSpreadsheet() {
     
     container.innerHTML = html;
     
-    // Bind events
+    // Auto-update when month or year changes (no apply button needed)
     document.getElementById("monthSelect").addEventListener("change", function() {
-        if (pendingSaves.size > 0 && confirm("You have unsaved changes. Apply filter anyway?")) {
+        if (pendingSaves.size > 0 && confirm("You have unsaved changes. Change period anyway?")) {
             saveAllChanges();
         }
+        currentMonth = parseInt(document.getElementById("monthSelect").value);
+        currentYear = parseInt(document.getElementById("yearSelect").value);
+        renderSpreadsheet();
     });
     
     document.getElementById("yearSelect").addEventListener("change", function() {
-        if (pendingSaves.size > 0 && confirm("You have unsaved changes. Apply filter anyway?")) {
+        if (pendingSaves.size > 0 && confirm("You have unsaved changes. Change period anyway?")) {
             saveAllChanges();
-        }
-    });
-    
-    document.getElementById("applyFilterBtn").addEventListener("click", function() {
-        if (pendingSaves.size > 0 && !confirm("You have unsaved changes. Apply filter anyway?")) {
-            return;
         }
         currentMonth = parseInt(document.getElementById("monthSelect").value);
         currentYear = parseInt(document.getElementById("yearSelect").value);
