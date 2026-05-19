@@ -7,6 +7,176 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
+    <style>
+        /* Additional styles for monthly records */
+        .filter-section {
+            background: white;
+            border-radius: 20px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--gray-border);
+        }
+        
+        .filter-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary);
+            display: inline-block;
+        }
+        
+        .filter-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        .filter-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            color: #1e2a3e;
+            display: block;
+        }
+        
+        .filter-select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--gray-border);
+            border-radius: 12px;
+            font-size: 0.8rem;
+            background: white;
+            cursor: pointer;
+        }
+        
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .filter-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn-apply {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.75rem;
+        }
+        
+        .btn-reset {
+            background: #f1f5f9;
+            color: #64748b;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.75rem;
+        }
+        
+        .active-filter-badge {
+            display: inline-block;
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            margin-top: 0.8rem;
+        }
+        
+        .action-buttons-container {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn-clean {
+            padding: 12px 24px;
+            border-radius: 40px;
+            border: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        
+        .btn-whatsapp {
+            background: #25D366;
+            color: white;
+        }
+        
+        .btn-whatsapp:hover {
+            background: #128C7E;
+            transform: translateY(-2px);
+        }
+        
+        .btn-excel {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-excel:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+        
+        .btn-pdf {
+            background: #dc2626;
+            color: white;
+        }
+        
+        .btn-pdf:hover {
+            background: #b91c1c;
+            transform: translateY(-2px);
+        }
+        
+        .btn-save {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .btn-save:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+        
+        @media (max-width: 640px) {
+            .filter-controls {
+                flex-direction: column;
+            }
+            .filter-buttons {
+                width: 100%;
+            }
+            .btn-apply, .btn-reset {
+                flex: 1;
+            }
+            .action-buttons-container {
+                flex-direction: column;
+            }
+            .action-btn-clean {
+                justify-content: center;
+            }
+        }
+    </style>
 </head>
 <body>
 <div class="app-wrapper">
@@ -54,6 +224,10 @@ let currentMonth = new Date().getMonth() + 1;
 let currentYear = new Date().getFullYear();
 let saveTimeout = null;
 let pendingSaves = new Map();
+
+// Available years
+let availableYears = [];
+let monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
 
 // Sidebar functions
 function openSidebar() {
@@ -185,6 +359,15 @@ async function loadData() {
         
         if (recordsError) throw recordsError;
         allRecords = recordsData || [];
+        
+        // Extract available years from records
+        var yearsSet = new Set();
+        for (var i = 0; i < allRecords.length; i++) {
+            yearsSet.add(allRecords[i].year);
+        }
+        // Also add current year
+        yearsSet.add(new Date().getFullYear());
+        availableYears = Array.from(yearsSet).sort((a, b) => b - a);
         
         renderSpreadsheet();
     } catch (error) {
@@ -323,7 +506,6 @@ window.handleCellChange = function(memberId, field, event) {
 
 // Export functions
 function exportToExcel() {
-    var monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
     var monthName = monthNames[currentMonth - 1];
     
     var csvRows = [];
@@ -374,7 +556,6 @@ function exportToExcel() {
 
 function exportToPDF() {
     var printContents = document.getElementById("data-table").outerHTML;
-    var monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
     var monthName = monthNames[currentMonth - 1];
     
     var printWindow = window.open("", "_blank");
@@ -398,7 +579,6 @@ function exportToPDF() {
 
 // WhatsApp Share - Opens WhatsApp App Directly
 function shareToWhatsApp() {
-    var monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
     var monthName = monthNames[currentMonth - 1];
     
     var message = "🏦 *CHAMA RECORDS* - " + monthName + " " + currentYear + "\n\n";
@@ -440,25 +620,15 @@ function shareToWhatsApp() {
     message += "\n📅 Generated by ChamaEase";
     
     var encodedMessage = encodeURIComponent(message);
-    
-    // Try to open WhatsApp app directly (works on mobile)
-    // Use 'whatsapp://' protocol for mobile app, fallback to web
-    var whatsappUrl = "https://wa.me/?text=" + encodedMessage;
-    
-    // Try to detect if on mobile
     var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     
     if (isMobile) {
-        // On mobile - try to open WhatsApp app
         window.location.href = "whatsapp://send?text=" + encodedMessage;
-        
-        // Fallback: if app doesn't open, open web version after timeout
         setTimeout(function() {
-            window.open(whatsappUrl, "_blank");
+            window.open("https://wa.me/?text=" + encodedMessage, "_blank");
         }, 500);
     } else {
-        // On desktop - open WhatsApp Web
-        window.open(whatsappUrl, "_blank");
+        window.open("https://wa.me/?text=" + encodedMessage, "_blank");
     }
     
     showToast("Opening WhatsApp...");
@@ -467,34 +637,18 @@ function shareToWhatsApp() {
 function renderSpreadsheet() {
     var container = document.getElementById("app-root");
     
-    var months = [
-        { value: 1, name: "JANUARY" },
-        { value: 2, name: "FEBRUARY" },
-        { value: 3, name: "MARCH" },
-        { value: 4, name: "APRIL" },
-        { value: 5, name: "MAY" },
-        { value: 6, name: "JUNE" },
-        { value: 7, name: "JULY" },
-        { value: 8, name: "AUGUST" },
-        { value: 9, name: "SEPTEMBER" },
-        { value: 10, name: "OCTOBER" },
-        { value: 11, name: "NOVEMBER" },
-        { value: 12, name: "DECEMBER" }
-    ];
-    
-    var currentYearNum = new Date().getFullYear();
-    var availableYears = [currentYearNum - 1, currentYearNum, currentYearNum + 1, currentYearNum + 2];
-    
-    var monthOptions = "";
-    for (var i = 0; i < months.length; i++) {
-        var selected = (currentMonth === months[i].value) ? "selected" : "";
-        monthOptions += "<option value=\"" + months[i].value + "\" " + selected + ">" + months[i].name + "</option>";
+    // Build month options for filter
+    var monthOptions = '';
+    for (var i = 1; i <= 12; i++) {
+        var selected = (currentMonth === i) ? 'selected' : '';
+        monthOptions += '<option value="' + i + '" ' + selected + '>' + monthNames[i - 1] + '</option>';
     }
     
-    var yearOptions = "";
+    // Build year options for filter
+    var yearOptions = '';
     for (var i = 0; i < availableYears.length; i++) {
-        var selected = (currentYear === availableYears[i]) ? "selected" : "";
-        yearOptions += "<option value=\"" + availableYears[i] + "\" " + selected + ">" + availableYears[i] + "</option>";
+        var selected = (currentYear === availableYears[i]) ? 'selected' : '';
+        yearOptions += '<option value="' + availableYears[i] + '" ' + selected + '>' + availableYears[i] + '</option>';
     }
     
     var tableRows = "";
@@ -533,20 +687,44 @@ function renderSpreadsheet() {
     }
     
     var html = `
-        <div class="action-buttons">
-            <a href="members.html" class="btn">👥 MANAGE MEMBERS</a>
-            <button id="saveAllBtn" class="btn">💾 Save All Changes <span id="pendingCount" style="display:none; background:#f59e0b; color:white; border-radius:50%; padding:2px 6px; margin-left:5px; font-size:10px;"></span></button>
-            <button id="exportExcelBtn" class="btn-outline btn">📊 EXPORT EXCEL</button>
-            <button id="exportPDFBtn" class="btn-outline btn">📄 EXPORT PDF</button>
-            <button id="shareWhatsAppBtn" class="btn-outline btn">📱 SHARE</button>
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <div class="filter-title">📅 Select Period</div>
+            <div class="filter-controls">
+                <div class="filter-group">
+                    <label class="filter-label">Select Month</label>
+                    <select id="monthFilter" class="filter-select">${monthOptions}</select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Select Year</label>
+                    <select id="yearFilter" class="filter-select">${yearOptions}</select>
+                </div>
+                <div class="filter-buttons">
+                    <button class="btn-apply" id="applyFilterBtn">Apply Filter</button>
+                </div>
+            </div>
+            <div class="active-filter-badge">
+                📅 Showing: <strong>${monthNames[currentMonth - 1]} ${currentYear}</strong>
+            </div>
         </div>
         
-        <div class="month-year-selector">
-            <select id="monthSelect">${monthOptions}</select>
-            <select id="yearSelect">${yearOptions}</select>
-            <span id="saving-indicator" class="saving-indicator"></span>
+        <!-- Action Buttons -->
+        <div class="action-buttons-container">
+            <button class="action-btn-clean btn-whatsapp" id="shareWABtn">
+                📱 Share on WhatsApp
+            </button>
+            <button class="action-btn-clean btn-excel" id="exportExcelBtn">
+                📊 Export to Excel
+            </button>
+            <button class="action-btn-clean btn-pdf" id="exportPDFBtn">
+                📄 Export to PDF
+            </button>
+            <button class="action-btn-clean btn-save" id="saveAllBtn">
+                💾 Save All Changes <span id="pendingCount" style="display:none; background:#f59e0b; color:white; border-radius:50%; padding:2px 6px; margin-left:5px; font-size:10px;"></span>
+            </button>
         </div>
         
+        <!-- Records Table -->
         <div class="spreadsheet-container">
             <table class="spreadsheet-table" id="data-table">
                 <thead>
@@ -562,12 +740,12 @@ function renderSpreadsheet() {
                 <tbody>
                     ${tableRows}
                     <tr id="totals-row" class="totals-row">
-                        <td><strong>📊 TOTAL</strong></td>
-                        <td><strong>KES ${formatNumber(totalLoan)}</strong></td>
-                        <td><strong>KES ${formatNumber(totalLoanDeductions)}</strong></td>
-                        <td><strong>KES ${formatNumber(totalLoanBalance)}</strong></td>
-                        <td><strong>KES ${formatNumber(totalMonthlyContribution)}</strong></td>
-                        <td><strong>KES ${formatNumber(totalPenalties)}</strong></td>
+                        <td><strong>📊 TOTAL</strong>侧
+                        <td><strong>KES ${formatNumber(totalLoan)}</strong>侧
+                        <td><strong>KES ${formatNumber(totalLoanDeductions)}</strong>侧
+                        <td><strong>KES ${formatNumber(totalLoanBalance)}</strong>侧
+                        <td><strong>KES ${formatNumber(totalMonthlyContribution)}</strong>侧
+                        <td><strong>KES ${formatNumber(totalPenalties)}</strong>侧
                     </tr>
                 </tbody>
             </table>
@@ -580,30 +758,22 @@ function renderSpreadsheet() {
     
     container.innerHTML = html;
     
-    document.getElementById("monthSelect").addEventListener("change", function(e) {
+    // Bind filter events
+    document.getElementById("applyFilterBtn").addEventListener("click", function() {
         if (pendingSaves.size > 0) {
-            if (confirm("You have unsaved changes. Save before changing month?")) {
+            if (confirm("You have unsaved changes. Save before changing period?")) {
                 saveAllChanges();
             }
         }
-        currentMonth = parseInt(e.target.value);
-        renderSpreadsheet();
-    });
-    
-    document.getElementById("yearSelect").addEventListener("change", function(e) {
-        if (pendingSaves.size > 0) {
-            if (confirm("You have unsaved changes. Save before changing year?")) {
-                saveAllChanges();
-            }
-        }
-        currentYear = parseInt(e.target.value);
+        currentMonth = parseInt(document.getElementById("monthFilter").value);
+        currentYear = parseInt(document.getElementById("yearFilter").value);
         renderSpreadsheet();
     });
     
     document.getElementById("saveAllBtn").addEventListener("click", saveAllChanges);
     document.getElementById("exportExcelBtn").addEventListener("click", exportToExcel);
     document.getElementById("exportPDFBtn").addEventListener("click", exportToPDF);
-    document.getElementById("shareWhatsAppBtn").addEventListener("click", shareToWhatsApp);
+    document.getElementById("shareWABtn").addEventListener("click", shareToWhatsApp);
 }
 
 // Initialize
