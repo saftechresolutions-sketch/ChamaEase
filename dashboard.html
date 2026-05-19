@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-    <title>ChamaEase | Monthly Records</title>
+    <title>ChamaEase | Dashboard</title>
     <style>
         * {
             margin: 0;
@@ -193,11 +193,56 @@
         }
 
         .container {
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 1rem;
             width: 100%;
             min-height: 70vh;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        @media (min-width: 640px) {
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 0.8rem;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-border);
+        }
+
+        .stat-card h4 {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #5b6e8c;
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-number {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .card {
+            background: white;
+            border-radius: var(--radius-card);
+            box-shadow: var(--shadow-sm);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--gray-border);
         }
 
         .btn {
@@ -219,103 +264,47 @@
             color: var(--primary);
         }
 
-        .spreadsheet-container {
-            overflow-x: auto;
-            border-radius: 12px;
-            border: 1px solid var(--gray-border);
-            background: white;
-        }
-
-        .spreadsheet-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.8rem;
-            min-width: 800px;
-        }
-
-        .spreadsheet-table th,
-        .spreadsheet-table td {
-            border: 1px solid var(--gray-border);
-            padding: 10px 8px;
-            text-align: left;
-            vertical-align: middle;
-        }
-
-        .spreadsheet-table th {
-            background: #f8fafc;
-            font-weight: 600;
-        }
-
-        .spreadsheet-table td input {
-            width: 100%;
-            padding: 6px 8px;
-            border: 1px solid transparent;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            background: transparent;
-        }
-
-        .spreadsheet-table td input:focus {
-            outline: none;
-            border-color: var(--primary);
-            background: #fff;
-        }
-
-        .member-name-cell {
-            font-weight: 600;
-            background: #f8fafc;
-        }
-
-        .totals-row {
-            background: #f1f5f9;
-            font-weight: 600;
-        }
-
-        .totals-row td {
-            border-top: 2px solid var(--primary);
-        }
-
-        .action-buttons {
+        .flex-between {
             display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 1rem;
-        }
-
-        .month-year-selector {
-            display: flex;
-            gap: 1rem;
+            justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
+            gap: 0.5rem;
             margin-bottom: 1rem;
-        }
-
-        .month-year-selector select {
-            padding: 0.5rem 1rem;
-            border-radius: 40px;
-            border: 1px solid var(--gray-border);
-            background: white;
-            font-size: 0.85rem;
-        }
-
-        .saving-indicator {
-            font-size: 0.7rem;
-            color: #94a3b8;
-            display: inline-block;
-            margin-left: 1rem;
-        }
-
-        .saving {
-            color: var(--primary);
         }
 
         footer {
             text-align: center;
             padding: 0.8rem;
-            font-size: 0.65rem;
+            font-size: 0.7rem;
             color: #6c757d;
             border-top: 1px solid var(--gray-border);
             margin-top: 1rem;
+        }
+
+        .welcome-card {
+            background: linear-gradient(135deg, var(--primary), #3b9b62);
+            color: white;
+            margin-bottom: 1rem;
+        }
+        
+        .welcome-card h1 {
+            font-size: 1.3rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 3px solid #e2e8f0;
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         .sidebar-overlay {
@@ -333,20 +322,6 @@
             display: block;
         }
 
-        .loading-spinner {
-            display: inline-block;
-            width: 30px;
-            height: 30px;
-            border: 3px solid #e2e8f0;
-            border-radius: 50%;
-            border-top-color: var(--primary);
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -361,13 +336,8 @@
             .sidebar-close {
                 display: flex;
             }
-            .container {
-                padding: 0.8rem;
-            }
-            .spreadsheet-table th,
-            .spreadsheet-table td {
-                padding: 6px 4px;
-                font-size: 0.7rem;
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
     </style>
@@ -383,9 +353,9 @@
             <button class="sidebar-close" id="sidebarClose">X</button>
         </div>
         <nav class="sidebar-nav">
-            <a href="dashboard.html" class="nav-item"><span class="icon">DASH</span><span class="label">DASHBOARD</span></a>
+            <a href="dashboard.html" class="nav-item active"><span class="icon">DASH</span><span class="label">DASHBOARD</span></a>
             <a href="members.html" class="nav-item"><span class="icon">MEM</span><span class="label">MEMBERS</span></a>
-            <a href="monthly-records.html" class="nav-item active"><span class="icon">REC</span><span class="label">MONTHLY RECORDS</span></a>
+            <a href="monthly-records.html" class="nav-item"><span class="icon">REC</span><span class="label">MONTHLY RECORDS</span></a>
             <a href="reports.html" class="nav-item"><span class="icon">RPT</span><span class="label">REPORTS</span></a>
             <a href="settings.html" class="nav-item"><span class="icon">SET</span><span class="label">SETTINGS</span></a>
         </nav>
@@ -394,460 +364,102 @@
     <main class="main-content">
         <div class="top-bar">
             <button class="menu-toggle" id="menuToggle">MENU</button>
-            <div class="page-title">MONTHLY RECORDS</div>
+            <div class="page-title">DASHBOARD</div>
             <div class="user-info">
                 <span class="user-email" id="userEmail"></span>
                 <button id="logoutBtn" class="logout-btn">LOGOUT</button>
             </div>
         </div>
         <div id="app-root" class="container">
-            <div style="text-align: center; padding: 2rem;">
+            <div style="text-align: center; padding: 1.5rem;">
                 <div class="loading-spinner"></div>
-                <p>Loading spreadsheet...</p>
+                <p>Loading dashboard...</p>
             </div>
         </div>
-        <footer>Smart Chama Management · Click any cell to edit · Auto-saves</footer>
+        <footer>Smart Chama Management</footer>
     </main>
 </div>
 
+<script src="supabase-config.js"></script>
 <script>
-// Supabase Configuration - REPLACE WITH YOUR ACTUAL CREDENTIALS
-const SUPABASE_URL = 'https://qfihebqomluleywpgufv.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFmaWhlYnFvbWx1bGV5d3BndWZ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxOTM5NDEsImV4cCI6MjA5Mzc2OTk0MX0.yKFXsCDYReshZKL9oosvm5ZwHh4GUZy1SYwFyqhDv9I';
+    const menuToggle = document.getElementById("menuToggle");
+    const sidebar = document.getElementById("sidebar");
+    const sidebarClose = document.getElementById("sidebarClose");
+    const sidebarOverlay = document.getElementById("sidebarOverlay");
+    
+    function openSidebar() { 
+        sidebar.classList.add("open"); 
+        sidebarOverlay.classList.add("active"); 
+    }
+    
+    function closeSidebar() { 
+        sidebar.classList.remove("open"); 
+        sidebarOverlay.classList.remove("active"); 
+    }
+    
+    if (menuToggle) menuToggle.addEventListener("click", openSidebar);
+    if (sidebarClose) sidebarClose.addEventListener("click", closeSidebar);
+    if (sidebarOverlay) sidebarOverlay.addEventListener("click", closeSidebar);
+    
+    window.addEventListener("resize", function() { 
+        if (window.innerWidth > 768) closeSidebar(); 
+    });
 
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    (async function() {
+        const isAuth = await protectPage();
+        if (!isAuth) return;
+        const user = await getCurrentUser();
+        if (user) document.getElementById("userEmail").textContent = user.email || "Admin";
+        await loadDashboardData();
+    })();
 
-let allMembers = [];
-let allRecords = [];
-let currentMonth = new Date().getMonth() + 1;
-let currentYear = new Date().getFullYear();
-let saveTimeout = null;
-let currentUser = null;
-
-// Auth functions
-async function checkAuth() {
-    const { data: { session }, error } = await supabaseClient.auth.getSession();
-    if (error || !session) {
+    document.getElementById("logoutBtn").addEventListener("click", async function() {
+        await logoutUser();
         window.location.href = "index.html";
-        return false;
-    }
-    currentUser = session.user;
-    document.getElementById("userEmail").textContent = currentUser.email || "Admin";
-    return true;
-}
-
-async function logoutUser() {
-    await supabaseClient.auth.signOut();
-    window.location.href = "index.html";
-}
-
-// Sidebar functions
-function openSidebar() {
-    document.getElementById("sidebar").classList.add("open");
-    document.getElementById("sidebarOverlay").classList.add("active");
-}
-
-function closeSidebar() {
-    document.getElementById("sidebar").classList.remove("open");
-    document.getElementById("sidebarOverlay").classList.remove("active");
-}
-
-document.getElementById("menuToggle").addEventListener("click", openSidebar);
-document.getElementById("sidebarClose").addEventListener("click", closeSidebar);
-document.getElementById("sidebarOverlay").addEventListener("click", closeSidebar);
-document.getElementById("logoutBtn").addEventListener("click", logoutUser);
-
-// Helper functions
-function safeValue(value) {
-    if (value === null || value === undefined || value === '' || isNaN(value)) {
-        return 0;
-    }
-    return parseFloat(value);
-}
-
-function formatNumber(num) {
-    if (num === null || num === undefined) return "0";
-    return num.toLocaleString("en-KE");
-}
-
-function escapeHtml(str) {
-    if (!str) return "";
-    return str.replace(/[&<>]/g, function(m) {
-        if (m === "&") return "&amp;";
-        if (m === "<") return "&lt;";
-        if (m === ">") return "&gt;";
-        return m;
     });
-}
 
-function showSavedIndicator(success) {
-    const indicator = document.getElementById("saving-indicator");
-    if (indicator) {
-        indicator.textContent = success ? "Saved" : "Error";
-        setTimeout(function() {
-            indicator.textContent = "";
-        }, 1500);
-    }
-}
-
-// Data functions
-async function loadData() {
-    try {
-        const { data: membersData, error: membersError } = await supabaseClient
-            .from("members")
-            .select("*")
-            .order("name");
-        
-        if (membersError) throw membersError;
-        allMembers = membersData || [];
-        
-        const { data: recordsData, error: recordsError } = await supabaseClient
-            .from("monthly_records")
-            .select("*");
-        
-        if (recordsError) throw recordsError;
-        allRecords = recordsData || [];
-        
-        renderSpreadsheet();
-    } catch (error) {
-        document.getElementById("app-root").innerHTML = '<div style="padding:2rem;text-align:center"><h3>Error</h3><p>' + error.message + '</p><button class="btn" onclick="location.reload()">Retry</button></div>';
-    }
-}
-
-function getRecordForMember(memberId) {
-    for (var i = 0; i < allRecords.length; i++) {
-        var record = allRecords[i];
-        if (record.member_id === memberId && record.month === currentMonth && record.year === currentYear) {
-            return record;
-        }
-    }
-    return null;
-}
-
-function getRecordValue(memberId, field) {
-    var record = getRecordForMember(memberId);
-    if (record && record[field] !== null && record[field] !== undefined) {
-        return record[field];
-    }
-    return 0;
-}
-
-async function updateRecordValue(memberId, field, value) {
-    var record = getRecordForMember(memberId);
-    var numValue = safeValue(value);
-    
-    try {
-        if (record) {
-            var updateData = {};
-            updateData[field] = numValue;
-            updateData.updated_at = new Date().toISOString();
+    async function loadDashboardData() {
+        const container = document.getElementById("app-root");
+        try {
+            const membersRes = await supabaseClient.from("members").select("*");
+            const recordsRes = await supabaseClient.from("monthly_records").select("*");
             
-            var { error } = await supabaseClient
-                .from("monthly_records")
-                .update(updateData)
-                .eq("id", record.id);
+            if (membersRes.error) throw membersRes.error;
+            if (recordsRes.error) throw recordsRes.error;
             
-            if (error) throw error;
-            record[field] = numValue;
-        } else {
-            var newRecord = {
-                member_id: memberId,
-                month: currentMonth,
-                year: currentYear,
-                loan: 0,
-                loan_deductions: 0,
-                loan_balance: 0,
-                monthly_contribution: 0,
-                penalties: 0
-            };
-            newRecord[field] = numValue;
+            const members = membersRes.data || [];
+            const records = recordsRes.data || [];
             
-            var { data, error } = await supabaseClient
-                .from("monthly_records")
-                .insert([newRecord])
-                .select();
+            const totalMembers = members.length;
+            let totalLoan = 0;
+            let totalMonthlyContribution = 0;
+            let totalPenalties = 0;
             
-            if (error) throw error;
-            if (data && data[0]) {
-                allRecords.push(data[0]);
+            for (var i = 0; i < records.length; i++) {
+                totalLoan += records[i].loan || 0;
+                totalMonthlyContribution += records[i].monthly_contribution || 0;
+                totalPenalties += records[i].penalties || 0;
             }
-        }
-        updateTotalsRow();
-        showSavedIndicator(true);
-    } catch (error) {
-        console.error("Update error:", error);
-        showSavedIndicator(false);
-    }
-}
-
-function updateTotalsRow() {
-    var totalLoan = 0;
-    var totalLoanDeductions = 0;
-    var totalLoanBalance = 0;
-    var totalMonthlyContribution = 0;
-    var totalPenalties = 0;
-    
-    for (var i = 0; i < allMembers.length; i++) {
-        var member = allMembers[i];
-        totalLoan += safeValue(getRecordValue(member.id, "loan"));
-        totalLoanDeductions += safeValue(getRecordValue(member.id, "loan_deductions"));
-        totalLoanBalance += safeValue(getRecordValue(member.id, "loan_balance"));
-        totalMonthlyContribution += safeValue(getRecordValue(member.id, "monthly_contribution"));
-        totalPenalties += safeValue(getRecordValue(member.id, "penalties"));
-    }
-    
-    var totalsRow = document.getElementById("totals-row");
-    if (totalsRow) {
-        var cells = totalsRow.getElementsByTagName("td");
-        if (cells.length >= 6) {
-            cells[1].innerHTML = "KES " + formatNumber(totalLoan);
-            cells[2].innerHTML = "KES " + formatNumber(totalLoanDeductions);
-            cells[3].innerHTML = "KES " + formatNumber(totalLoanBalance);
-            cells[4].innerHTML = "KES " + formatNumber(totalMonthlyContribution);
-            cells[5].innerHTML = "KES " + formatNumber(totalPenalties);
+            
+            function formatNumber(num) {
+                return (num || 0).toLocaleString("en-KE");
+            }
+            
+            var html = "";
+            html += "<div class='welcome-card card'><h1>CHAMA DASHBOARD</h1><p>Overview of your chama records</p></div>";
+            html += "<div class='stats-grid'>";
+            html += "<div class='stat-card'><h4>TOTAL MEMBERS</h4><div class='stat-number'>" + totalMembers + "</div></div>";
+            html += "<div class='stat-card'><h4>TOTAL LOAN</h4><div class='stat-number'>KES " + (totalLoan/1000).toFixed(0) + "k</div><div class='stat-full'>" + formatNumber(totalLoan) + "</div></div>";
+            html += "<div class='stat-card'><h4>TOTAL CONTRIBUTIONS</h4><div class='stat-number'>KES " + (totalMonthlyContribution/1000).toFixed(0) + "k</div><div class='stat-full'>" + formatNumber(totalMonthlyContribution) + "</div></div>";
+            html += "<div class='stat-card'><h4>TOTAL PENALTIES</h4><div class='stat-number'>KES " + (totalPenalties/1000).toFixed(0) + "k</div><div class='stat-full'>" + formatNumber(totalPenalties) + "</div></div>";
+            html += "</div>";
+            html += "<div class='flex-between'><a href='members.html' class='btn'>MANAGE MEMBERS</a><a href='monthly-records.html' class='btn-outline btn'>VIEW RECORDS</a><a href='reports.html' class='btn-outline btn'>EXPORT REPORTS</a></div>";
+            
+            container.innerHTML = html;
+        } catch (error) {
+            container.innerHTML = "<div class='card'><h3>ERROR</h3><p>" + error.message + "</p><button class='btn' onclick='location.reload()'>RETRY</button></div>";
         }
     }
-}
-
-window.handleCellChange = function(memberId, field, event) {
-    var newValue = event.target.value;
-    var indicator = document.getElementById("saving-indicator");
-    if (indicator) {
-        indicator.textContent = "Saving...";
-    }
-    
-    if (saveTimeout) clearTimeout(saveTimeout);
-    saveTimeout = setTimeout(function() {
-        updateRecordValue(memberId, field, newValue);
-    }, 500);
-};
-
-// Export functions
-function exportToExcel() {
-    var monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
-    var monthName = monthNames[currentMonth - 1];
-    
-    var csvRows = [];
-    csvRows.push(["CHAMA RECORDS - " + monthName + " " + currentYear]);
-    csvRows.push([]);
-    csvRows.push(["MEMBER", "LOAN", "LOAN DEDUCTIONS", "LOAN BALANCE", "MONTHLY CONTRIBUTION", "PENALTIES"]);
-    
-    for (var i = 0; i < allMembers.length; i++) {
-        var member = allMembers[i];
-        csvRows.push([
-            member.name,
-            safeValue(getRecordValue(member.id, "loan")),
-            safeValue(getRecordValue(member.id, "loan_deductions")),
-            safeValue(getRecordValue(member.id, "loan_balance")),
-            safeValue(getRecordValue(member.id, "monthly_contribution")),
-            safeValue(getRecordValue(member.id, "penalties"))
-        ]);
-    }
-    
-    var totalLoan = 0, totalLoanDeductions = 0, totalLoanBalance = 0, totalMonthlyContribution = 0, totalPenalties = 0;
-    for (var i = 0; i < allMembers.length; i++) {
-        var member = allMembers[i];
-        totalLoan += safeValue(getRecordValue(member.id, "loan"));
-        totalLoanDeductions += safeValue(getRecordValue(member.id, "loan_deductions"));
-        totalLoanBalance += safeValue(getRecordValue(member.id, "loan_balance"));
-        totalMonthlyContribution += safeValue(getRecordValue(member.id, "monthly_contribution"));
-        totalPenalties += safeValue(getRecordValue(member.id, "penalties"));
-    }
-    csvRows.push(["TOTAL", totalLoan, totalLoanDeductions, totalLoanBalance, totalMonthlyContribution, totalPenalties]);
-    
-    var csv = "";
-    for (var i = 0; i < csvRows.length; i++) {
-        csv += csvRows[i].join(",") + "\n";
-    }
-    
-    var blob = new Blob([csv], { type: "application/vnd.ms-excel" });
-    var link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "chama_" + monthName + "_" + currentYear + ".xls";
-    link.click();
-    URL.revokeObjectURL(link.href);
-    alert("Excel file downloaded!");
-}
-
-function exportToPDF() {
-    var printContents = document.getElementById("data-table").outerHTML;
-    var monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
-    var monthName = monthNames[currentMonth - 1];
-    
-    var printWindow = window.open("", "_blank");
-    printWindow.document.write("<html><head><title>ChamaEase Report</title>");
-    printWindow.document.write("<style>");
-    printWindow.document.write("table { border-collapse: collapse; width: 100%; }");
-    printWindow.document.write("th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }");
-    printWindow.document.write("th { background: #2c7a4d; color: white; }");
-    printWindow.document.write("</style>");
-    printWindow.document.write("</head><body>");
-    printWindow.document.write("<h2>CHAMA RECORDS - " + monthName + " " + currentYear + "</h2>");
-    printWindow.document.write(printContents);
-    printWindow.document.write("</body></html>");
-    printWindow.document.close();
-    printWindow.print();
-}
-
-function shareToWhatsApp() {
-    var monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
-    var monthName = monthNames[currentMonth - 1];
-    
-    var message = "CHAMA RECORDS - " + monthName + " " + currentYear + "\n\n";
-    
-    for (var i = 0; i < allMembers.length; i++) {
-        var member = allMembers[i];
-        var loan = safeValue(getRecordValue(member.id, "loan"));
-        var loanDeductions = safeValue(getRecordValue(member.id, "loan_deductions"));
-        var loanBalance = safeValue(getRecordValue(member.id, "loan_balance"));
-        var monthlyContribution = safeValue(getRecordValue(member.id, "monthly_contribution"));
-        var penalties = safeValue(getRecordValue(member.id, "penalties"));
-        
-        message += member.name + "\n";
-        message += "Loan: KES " + formatNumber(loan) + "\n";
-        message += "Loan Deductions: KES " + formatNumber(loanDeductions) + "\n";
-        message += "Loan Balance: KES " + formatNumber(loanBalance) + "\n";
-        message += "Contribution: KES " + formatNumber(monthlyContribution) + "\n";
-        message += "Penalties: KES " + formatNumber(penalties) + "\n\n";
-    }
-    
-    var encodedMessage = encodeURIComponent(message);
-    window.open("https://wa.me/?text=" + encodedMessage, "_blank");
-}
-
-function renderSpreadsheet() {
-    var container = document.getElementById("app-root");
-    
-    var months = [
-        { value: 1, name: "JANUARY" },
-        { value: 2, name: "FEBRUARY" },
-        { value: 3, name: "MARCH" },
-        { value: 4, name: "APRIL" },
-        { value: 5, name: "MAY" },
-        { value: 6, name: "JUNE" },
-        { value: 7, name: "JULY" },
-        { value: 8, name: "AUGUST" },
-        { value: 9, name: "SEPTEMBER" },
-        { value: 10, name: "OCTOBER" },
-        { value: 11, name: "NOVEMBER" },
-        { value: 12, name: "DECEMBER" }
-    ];
-    
-    var currentYearNum = new Date().getFullYear();
-    var availableYears = [currentYearNum - 1, currentYearNum, currentYearNum + 1, currentYearNum + 2];
-    
-    var monthOptions = "";
-    for (var i = 0; i < months.length; i++) {
-        var selected = (currentMonth === months[i].value) ? "selected" : "";
-        monthOptions += "<option value=\"" + months[i].value + "\" " + selected + ">" + months[i].name + "</option>";
-    }
-    
-    var yearOptions = "";
-    for (var i = 0; i < availableYears.length; i++) {
-        var selected = (currentYear === availableYears[i]) ? "selected" : "";
-        yearOptions += "<option value=\"" + availableYears[i] + "\" " + selected + ">" + availableYears[i] + "</option>";
-    }
-    
-    var tableRows = "";
-    
-    for (var i = 0; i < allMembers.length; i++) {
-        var member = allMembers[i];
-        var loan = safeValue(getRecordValue(member.id, "loan"));
-        var loanDeductions = safeValue(getRecordValue(member.id, "loan_deductions"));
-        var loanBalance = safeValue(getRecordValue(member.id, "loan_balance"));
-        var monthlyContribution = safeValue(getRecordValue(member.id, "monthly_contribution"));
-        var penalties = safeValue(getRecordValue(member.id, "penalties"));
-        
-        tableRows += "<tr>";
-        tableRows += "<td class=\"member-name-cell\"><strong>" + escapeHtml(member.name) + "</strong></td>";
-        tableRows += "<td><input type=\"number\" value=\"" + loan + "\" step=\"any\" onchange=\"handleCellChange('" + member.id + "', 'loan', event)\"></td>";
-        tableRows += "<td><input type=\"number\" value=\"" + loanDeductions + "\" step=\"any\" onchange=\"handleCellChange('" + member.id + "', 'loan_deductions', event)\"></td>";
-        tableRows += "<td><input type=\"number\" value=\"" + loanBalance + "\" step=\"any\" onchange=\"handleCellChange('" + member.id + "', 'loan_balance', event)\"></td>";
-        tableRows += "<td><input type=\"number\" value=\"" + monthlyContribution + "\" step=\"any\" onchange=\"handleCellChange('" + member.id + "', 'monthly_contribution', event)\"></td>";
-        tableRows += "<td><input type=\"number\" value=\"" + penalties + "\" step=\"any\" onchange=\"handleCellChange('" + member.id + "', 'penalties', event)\"></td>";
-        tableRows += "</tr>";
-    }
-    
-    if (allMembers.length === 0) {
-        tableRows = "<tr><td colspan=\"6\" style=\"text-align:center;\">No members found. Please add members first.</td></tr>";
-    }
-    
-    var totalLoan = 0, totalLoanDeductions = 0, totalLoanBalance = 0, totalMonthlyContribution = 0, totalPenalties = 0;
-    
-    for (var i = 0; i < allMembers.length; i++) {
-        var member = allMembers[i];
-        totalLoan += safeValue(getRecordValue(member.id, "loan"));
-        totalLoanDeductions += safeValue(getRecordValue(member.id, "loan_deductions"));
-        totalLoanBalance += safeValue(getRecordValue(member.id, "loan_balance"));
-        totalMonthlyContribution += safeValue(getRecordValue(member.id, "monthly_contribution"));
-        totalPenalties += safeValue(getRecordValue(member.id, "penalties"));
-    }
-    
-    var html = `
-        <div class="action-buttons">
-            <a href="members.html" class="btn">MANAGE MEMBERS</a>
-            <button id="exportExcelBtn" class="btn-outline btn">EXPORT EXCEL</button>
-            <button id="exportPDFBtn" class="btn-outline btn">EXPORT PDF</button>
-            <button id="shareWhatsAppBtn" class="btn-outline btn">SHARE</button>
-        </div>
-        
-        <div class="month-year-selector">
-            <select id="monthSelect">${monthOptions}</select>
-            <select id="yearSelect">${yearOptions}</select>
-            <span id="saving-indicator" class="saving-indicator"></span>
-        </div>
-        
-        <div class="spreadsheet-container">
-            <table class="spreadsheet-table" id="data-table">
-                <thead>
-                    <tr>
-                        <th style="min-width:120px;">MEMBER</th>
-                        <th style="min-width:100px;">LOAN</th>
-                        <th style="min-width:130px;">LOAN DEDUCTIONS</th>
-                        <th style="min-width:120px;">LOAN BALANCE</th>
-                        <th style="min-width:150px;">MONTHLY CONTRIBUTION</th>
-                        <th style="min-width:100px;">PENALTIES</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${tableRows}
-                    <tr id="totals-row" class="totals-row">
-                        <td><strong>TOTAL</strong></td>
-                        <td><strong>KES ${formatNumber(totalLoan)}</strong></td>
-                        <td><strong>KES ${formatNumber(totalLoanDeductions)}</strong></td>
-                        <td><strong>KES ${formatNumber(totalLoanBalance)}</strong></td>
-                        <td><strong>KES ${formatNumber(totalMonthlyContribution)}</strong></td>
-                        <td><strong>KES ${formatNumber(totalPenalties)}</strong></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    `;
-    
-    container.innerHTML = html;
-    
-    document.getElementById("monthSelect").addEventListener("change", function(e) {
-        currentMonth = parseInt(e.target.value);
-        renderSpreadsheet();
-    });
-    
-    document.getElementById("yearSelect").addEventListener("change", function(e) {
-        currentYear = parseInt(e.target.value);
-        renderSpreadsheet();
-    });
-    
-    document.getElementById("exportExcelBtn").addEventListener("click", exportToExcel);
-    document.getElementById("exportPDFBtn").addEventListener("click", exportToPDF);
-    document.getElementById("shareWhatsAppBtn").addEventListener("click", shareToWhatsApp);
-}
-
-// Initialize
-(async function() {
-    var isAuth = await checkAuth();
-    if (isAuth) {
-        await loadData();
-    }
-})();
 </script>
 </body>
 </html>
