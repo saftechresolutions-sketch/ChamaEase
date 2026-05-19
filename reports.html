@@ -3,44 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-    <title>ChamaEase | Reports & Analytics</title>
+    <title>ChamaEase | Reports</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Chart.js for beautiful charts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <!-- html2canvas for screenshot sharing -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
     <style>
-        /* Reports Page Additional Styles */
+        /* Reports Page Styles */
         .hero-report {
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            border-radius: 24px;
+            border-radius: 20px;
             padding: 1.5rem;
             margin-bottom: 1.5rem;
             color: white;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .hero-report::before {
-            content: "📊";
-            position: absolute;
-            right: -20px;
-            bottom: -20px;
-            font-size: 100px;
-            opacity: 0.1;
-            pointer-events: none;
         }
         
         .hero-title {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             font-weight: 700;
             margin-bottom: 0.25rem;
         }
         
         .hero-subtitle {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             opacity: 0.9;
         }
         
@@ -48,7 +33,7 @@
         .charts-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 1.5rem;
+            gap: 1rem;
             margin-bottom: 1.5rem;
         }
         
@@ -60,279 +45,158 @@
         
         .chart-card {
             background: white;
-            border-radius: 20px;
+            border-radius: 16px;
             padding: 1rem;
             border: 1px solid var(--gray-border);
-            box-shadow: var(--shadow-sm);
         }
         
         .chart-title {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 600;
             margin-bottom: 1rem;
             color: #1e2a3e;
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
         
         .chart-container {
             position: relative;
-            height: 250px;
+            height: 220px;
         }
         
-        canvas {
-            max-height: 250px;
-            width: 100%;
-        }
-        
-        /* Share Options Panel */
-        .share-panel {
-            background: white;
-            border-radius: 20px;
-            border: 1px solid var(--gray-border);
+        /* Action Buttons */
+        .report-actions {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
             margin-bottom: 1.5rem;
-            overflow: hidden;
+            justify-content: center;
         }
         
-        .share-header {
-            padding: 1rem;
-            background: #fafbfc;
-            border-bottom: 1px solid var(--gray-border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-        
-        .share-title {
-            font-weight: 600;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .share-buttons {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-        
-        .share-btn {
-            padding: 8px 16px;
+        .action-btn {
+            padding: 10px 20px;
             border-radius: 40px;
             border: none;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             font-weight: 500;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             transition: all 0.2s;
         }
         
-        .share-btn-wa {
+        .action-btn-wa {
             background: #25D366;
             color: white;
         }
         
-        .share-btn-wa:hover {
+        .action-btn-wa:hover {
             background: #128C7E;
             transform: translateY(-1px);
         }
         
-        .share-btn-pdf {
-            background: #dc2626;
-            color: white;
-        }
-        
-        .share-btn-pdf:hover {
-            background: #b91c1c;
-            transform: translateY(-1px);
-        }
-        
-        .share-btn-excel {
+        .action-btn-excel {
             background: #10b981;
             color: white;
         }
         
-        .share-btn-excel:hover {
+        .action-btn-excel:hover {
             background: #059669;
             transform: translateY(-1px);
         }
         
-        .share-btn-chart {
-            background: var(--primary);
+        .action-btn-pdf {
+            background: #dc2626;
             color: white;
         }
         
-        .share-btn-chart:hover {
-            background: var(--primary-dark);
+        .action-btn-pdf:hover {
+            background: #b91c1c;
             transform: translateY(-1px);
         }
         
-        .share-options {
-            padding: 1rem;
-            border-top: 1px solid var(--gray-border);
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            align-items: center;
+        /* Member Table */
+        .member-table-wrapper {
+            overflow-x: auto;
         }
         
-        .share-option {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-        }
-        
-        .share-option input {
-            width: auto;
-            margin: 0;
-            cursor: pointer;
-        }
-        
-        .share-option label {
-            font-size: 0.75rem;
-            cursor: pointer;
-            margin: 0;
-        }
-        
-        /* Date Range Selector */
-        .date-range {
-            background: white;
-            border-radius: 20px;
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-            border: 1px solid var(--gray-border);
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            align-items: flex-end;
-        }
-        
-        .date-group {
-            flex: 1;
-            min-width: 120px;
-        }
-        
-        .date-label {
-            font-size: 0.7rem;
-            font-weight: 600;
-            margin-bottom: 0.3rem;
-            color: #1e2a3e;
-            display: block;
-        }
-        
-        .date-input {
+        .member-table {
             width: 100%;
-            padding: 10px 12px;
-            border: 1px solid var(--gray-border);
-            border-radius: 12px;
-            font-size: 0.8rem;
+            border-collapse: collapse;
+            font-size: 0.75rem;
         }
         
-        .apply-range-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: 500;
+        .member-table th,
+        .member-table td {
+            padding: 10px 8px;
+            text-align: left;
+            border-bottom: 1px solid var(--gray-border);
         }
         
-        /* Preview Container for Screenshot */
-        .report-preview {
-            background: white;
-            border-radius: 20px;
-            padding: 1.5rem;
-            margin-top: 1rem;
-            border: 1px solid var(--gray-border);
+        .member-table th {
+            background: #f8fafc;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
         }
         
-        .preview-header {
-            text-align: center;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid var(--primary);
+        .member-table tr:hover {
+            background: var(--primary-light);
         }
         
-        .preview-header h3 {
+        .rank-badge {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            background: var(--primary-light);
             color: var(--primary);
-            margin-bottom: 0.25rem;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+        
+        .rank-1 { background: #fbbf24; color: #92400e; }
+        .rank-2 { background: #e5e7eb; color: #374151; }
+        .rank-3 { background: #fdba74; color: #9a3412; }
+        
+        @media (max-width: 768px) {
+            .report-actions {
+                flex-direction: column;
+            }
+            .action-btn {
+                justify-content: center;
+            }
+            .member-table th,
+            .member-table td {
+                padding: 6px 4px;
+                font-size: 0.65rem;
+            }
         }
         
         /* Toast */
-        .toast-notification {
+        .toast-msg {
             position: fixed;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
             background: var(--primary);
             color: white;
-            padding: 12px 24px;
+            padding: 10px 20px;
             border-radius: 40px;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             z-index: 1002;
-            animation: slideUp 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: fadeInUp 0.3s ease;
         }
         
-        .toast-error {
-            background: var(--danger);
-        }
-        
-        @keyframes slideUp {
+        @keyframes fadeInUp {
             from {
-                transform: translateX(-50%) translateY(30px);
+                transform: translateX(-50%) translateY(20px);
                 opacity: 0;
             }
             to {
                 transform: translateX(-50%) translateY(0);
                 opacity: 1;
-            }
-        }
-        
-        /* Loading Overlay */
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-        }
-        
-        .loading-spinner-large {
-            width: 50px;
-            height: 50px;
-            border: 4px solid white;
-            border-radius: 50%;
-            border-top-color: var(--primary);
-            animation: spin 0.8s linear infinite;
-        }
-        
-        @media (max-width: 768px) {
-            .share-buttons {
-                justify-content: stretch;
-            }
-            .share-btn {
-                flex: 1;
-                justify-content: center;
-            }
-            .date-range {
-                flex-direction: column;
-            }
-            .apply-range-btn {
-                width: 100%;
             }
         }
     </style>
@@ -359,7 +223,7 @@
     <main class="main-content">
         <div class="top-bar">
             <button class="menu-toggle" id="menuToggle">☰</button>
-            <div class="page-title">📊 REPORTS & ANALYTICS</div>
+            <div class="page-title">📈 REPORTS</div>
             <div class="user-info">
                 <span class="user-email" id="userEmail"></span>
                 <button id="logoutBtn" class="logout-btn">LOGOUT</button>
@@ -371,7 +235,7 @@
                 <p>Loading reports...</p>
             </div>
         </div>
-        <footer>Smart Chama Management · Comprehensive reporting and analytics</footer>
+        <footer>Smart Chama Management · Reports and analytics</footer>
     </main>
 </div>
 
@@ -380,12 +244,6 @@
 let allMembers = [];
 let allRecords = [];
 let contributionChart = null;
-let loansChart = null;
-let selectedShareItems = {
-    stats: true,
-    charts: true,
-    table: false
-};
 
 // Sidebar functions
 function openSidebar() {
@@ -406,28 +264,16 @@ document.getElementById("logoutBtn").addEventListener("click", async function() 
     window.location.href = "index.html";
 });
 
-function showToast(message, isError = false) {
+function showMessage(message, isError = false) {
     const toast = document.createElement('div');
-    toast.className = `toast-notification ${isError ? 'toast-error' : ''}`;
+    toast.className = 'toast-msg';
+    toast.style.background = isError ? '#dc2626' : '#2c7a4d';
     toast.textContent = isError ? '⚠️ ' + message : '✓ ' + message;
     document.body.appendChild(toast);
     setTimeout(() => {
         toast.style.opacity = '0';
         setTimeout(() => toast.remove(), 300);
     }, 3000);
-}
-
-function showLoading() {
-    const overlay = document.createElement('div');
-    overlay.id = 'loadingOverlay';
-    overlay.className = 'loading-overlay';
-    overlay.innerHTML = '<div class="loading-spinner-large"></div>';
-    document.body.appendChild(overlay);
-}
-
-function hideLoading() {
-    const overlay = document.getElementById('loadingOverlay');
-    if (overlay) overlay.remove();
 }
 
 function escapeHtml(str) {
@@ -462,7 +308,7 @@ async function loadData() {
         if (recordsResult.error) throw recordsResult.error;
         allRecords = recordsResult.data || [];
         
-        renderReportsPage();
+        renderReports();
     } catch (error) {
         document.getElementById("app-root").innerHTML = '<div style="padding:2rem;text-align:center"><h3>⚠️ Error</h3><p>' + error.message + '</p><button class="btn" onclick="location.reload()">Retry</button></div>';
     }
@@ -493,8 +339,8 @@ function getSummaryStats() {
     };
 }
 
-function getMonthlyTrends() {
-    var monthlyData = {};
+function getMonthlyData() {
+    var monthlyMap = {};
     var monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
     
     for (var i = 0; i < allRecords.length; i++) {
@@ -502,127 +348,100 @@ function getMonthlyTrends() {
         var key = record.year + '-' + record.month;
         var label = monthNames[record.month - 1] + ' ' + record.year;
         
-        if (!monthlyData[key]) {
-            monthlyData[key] = { label: label, contributions: 0, loans: 0, penalties: 0 };
+        if (!monthlyMap[key]) {
+            monthlyMap[key] = { label: label, contributions: 0, loans: 0 };
         }
-        monthlyData[key].contributions += safeValue(record.monthly_contribution);
-        monthlyData[key].loans += safeValue(record.loan);
-        monthlyData[key].penalties += safeValue(record.penalties);
+        monthlyMap[key].contributions += safeValue(record.monthly_contribution);
+        monthlyMap[key].loans += safeValue(record.loan);
     }
     
-    // Sort by year and month
-    var sortedKeys = Object.keys(monthlyData).sort();
+    var sortedKeys = Object.keys(monthlyMap).sort();
     var result = {
         labels: [],
         contributions: [],
-        loans: [],
-        penalties: []
+        loans: []
     };
     
     for (var i = 0; i < sortedKeys.length; i++) {
-        var data = monthlyData[sortedKeys[i]];
+        var data = monthlyMap[sortedKeys[i]];
         result.labels.push(data.label);
         result.contributions.push(data.contributions);
         result.loans.push(data.loans);
-        result.penalties.push(data.penalties);
     }
     
     return result;
 }
 
-function getTopMembers() {
-    var memberContributions = {};
+function getMemberRankings() {
+    var memberData = {};
     
     for (var i = 0; i < allRecords.length; i++) {
         var record = allRecords[i];
-        if (!memberContributions[record.member_id]) {
-            memberContributions[record.member_id] = 0;
+        if (!memberData[record.member_id]) {
+            memberData[record.member_id] = { contributions: 0, loans: 0, months: 0 };
         }
-        memberContributions[record.member_id] += safeValue(record.monthly_contribution);
+        memberData[record.member_id].contributions += safeValue(record.monthly_contribution);
+        memberData[record.member_id].loans += safeValue(record.loan);
+        memberData[record.member_id].months++;
     }
     
-    var memberArray = [];
-    for (var id in memberContributions) {
+    var rankings = [];
+    for (var id in memberData) {
         var member = allMembers.find(m => m.id === id);
         if (member) {
-            memberArray.push({
+            rankings.push({
                 name: member.name,
-                contributions: memberContributions[id]
+                contributions: memberData[id].contributions,
+                loans: memberData[id].loans,
+                months: memberData[id].months
             });
         }
     }
     
-    memberArray.sort(function(a, b) { return b.contributions - a.contributions; });
-    return memberArray.slice(0, 5);
+    rankings.sort(function(a, b) { return b.contributions - a.contributions; });
+    return rankings;
 }
 
-function createCharts() {
-    var trends = getMonthlyTrends();
-    var topMembers = getTopMembers();
+function createChart() {
+    var monthlyData = getMonthlyData();
     
-    // Destroy existing charts
     if (contributionChart) contributionChart.destroy();
-    if (loansChart) loansChart.destroy();
     
-    // Contributions Trend Chart
-    var ctx1 = document.getElementById('contributionsChart').getContext('2d');
-    contributionChart = new Chart(ctx1, {
+    var ctx = document.getElementById('trendsChart').getContext('2d');
+    contributionChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: trends.labels,
-            datasets: [{
-                label: 'Monthly Contributions (KES)',
-                data: trends.contributions,
-                borderColor: '#2c7a4d',
-                backgroundColor: 'rgba(44, 122, 77, 0.1)',
-                tension: 0.3,
-                fill: true,
-                pointBackgroundColor: '#2c7a4d',
-                pointBorderColor: 'white',
-                pointRadius: 4,
-                pointHoverRadius: 6
-            }, {
-                label: 'Loans Given (KES)',
-                data: trends.loans,
-                borderColor: '#f59e0b',
-                backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                tension: 0.3,
-                fill: true,
-                pointBackgroundColor: '#f59e0b',
-                pointBorderColor: 'white',
-                pointRadius: 4,
-                pointHoverRadius: 6
-            }]
+            labels: monthlyData.labels,
+            datasets: [
+                {
+                    label: 'Contributions (KES)',
+                    data: monthlyData.contributions,
+                    borderColor: '#2c7a4d',
+                    backgroundColor: 'rgba(44, 122, 77, 0.1)',
+                    tension: 0.3,
+                    fill: true,
+                    pointBackgroundColor: '#2c7a4d',
+                    pointBorderColor: 'white',
+                    pointRadius: 4
+                },
+                {
+                    label: 'Loans (KES)',
+                    data: monthlyData.loans,
+                    borderColor: '#f59e0b',
+                    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                    tension: 0.3,
+                    fill: true,
+                    pointBackgroundColor: '#f59e0b',
+                    pointBorderColor: 'white',
+                    pointRadius: 4
+                }
+            ]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { position: 'bottom' },
-                tooltip: { callbacks: { label: function(context) { return 'KES ' + context.raw.toLocaleString(); } } }
-            }
-        }
-    });
-    
-    // Top Members Chart
-    var ctx2 = document.getElementById('topMembersChart').getContext('2d');
-    loansChart = new Chart(ctx2, {
-        type: 'bar',
-        data: {
-            labels: topMembers.map(m => m.name.length > 15 ? m.name.substring(0, 12) + '...' : m.name),
-            datasets: [{
-                label: 'Total Contributions (KES)',
-                data: topMembers.map(m => m.contributions),
-                backgroundColor: '#2c7a4d',
-                borderRadius: 8,
-                barPercentage: 0.7
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { position: 'bottom' },
+                legend: { position: 'bottom', labels: { font: { size: 10 } } },
                 tooltip: { callbacks: { label: function(context) { return 'KES ' + context.raw.toLocaleString(); } } }
             }
         }
@@ -635,26 +454,22 @@ function renderStatsCards() {
     return `
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-icon">👥</div>
                 <div class="stat-number">${stats.totalMembers}</div>
                 <div class="stat-label">Total Members</div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon">💰</div>
                 <div class="stat-number">KES ${(stats.totalContributions/1000).toFixed(0)}k</div>
-                <div class="stat-label">Total Contributions</div>
+                <div class="stat-label">Contributions</div>
                 <div class="stat-full">KES ${formatNumber(stats.totalContributions)}</div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon">🏦</div>
                 <div class="stat-number">KES ${(stats.totalLoan/1000).toFixed(0)}k</div>
-                <div class="stat-label">Total Loans</div>
+                <div class="stat-label">Loans Given</div>
                 <div class="stat-full">KES ${formatNumber(stats.totalLoan)}</div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon">⚖️</div>
                 <div class="stat-number">KES ${(stats.totalLoanBalance/1000).toFixed(0)}k</div>
-                <div class="stat-label">Outstanding Balance</div>
+                <div class="stat-label">Outstanding</div>
                 <div class="stat-full">KES ${formatNumber(stats.totalLoanBalance)}</div>
             </div>
         </div>
@@ -662,55 +477,39 @@ function renderStatsCards() {
 }
 
 function renderMemberTable() {
-    var memberPerformance = [];
+    var rankings = getMemberRankings();
     
-    for (var i = 0; i < allMembers.length; i++) {
-        var member = allMembers[i];
-        var memberRecords = allRecords.filter(function(r) { return r.member_id === member.id; });
-        
-        var totalContributions = 0;
-        var totalLoan = 0;
-        var totalPenalties = 0;
-        
-        for (var j = 0; j < memberRecords.length; j++) {
-            totalContributions += safeValue(memberRecords[j].monthly_contribution);
-            totalLoan += safeValue(memberRecords[j].loan);
-            totalPenalties += safeValue(memberRecords[j].penalties);
-        }
-        
-        memberPerformance.push({
-            name: member.name,
-            contributions: totalContributions,
-            loans: totalLoan,
-            penalties: totalPenalties,
-            months: memberRecords.length
-        });
+    if (rankings.length === 0) {
+        return '<div style="text-align:center; padding:2rem;">No member records found</div>';
     }
     
-    memberPerformance.sort(function(a, b) { return b.contributions - a.contributions; });
-    
     var tableRows = '';
-    for (var i = 0; i < memberPerformance.length; i++) {
-        var m = memberPerformance[i];
+    for (var i = 0; i < rankings.length; i++) {
+        var m = rankings[i];
+        var rankClass = '';
+        if (i === 0) rankClass = 'rank-1';
+        else if (i === 1) rankClass = 'rank-2';
+        else if (i === 2) rankClass = 'rank-3';
+        
         tableRows += `<tr>
+            <td style="text-align:center; width:50px;"><span class="rank-badge ${rankClass}">${i + 1}</span></td>
             <td><strong>${escapeHtml(m.name)}</strong></td>
             <td>KES ${formatNumber(m.contributions)}</td>
             <td>KES ${formatNumber(m.loans)}</td>
-            <td>KES ${formatNumber(m.penalties)}</td>
             <td>${m.months}</td>
         </tr>`;
     }
     
     return `
-        <div class="spreadsheet-container" id="memberTableContainer">
-            <table class="report-table">
+        <div class="member-table-wrapper">
+            <table class="member-table">
                 <thead>
                     <tr>
+                        <th style="width:50px;">#</th>
                         <th>Member</th>
-                        <th>Total Contributions</th>
-                        <th>Total Loans</th>
-                        <th>Total Penalties</th>
-                        <th>Active Months</th>
+                        <th>Contributions</th>
+                        <th>Loans</th>
+                        <th>Months</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -721,135 +520,25 @@ function renderMemberTable() {
     `;
 }
 
-async function captureScreenshot() {
-    showLoading();
-    
-    // Create a temporary container for the report
-    var tempDiv = document.createElement('div');
-    tempDiv.style.position = 'absolute';
-    tempDiv.style.left = '-9999px';
-    tempDiv.style.top = '0';
-    tempDiv.style.backgroundColor = 'white';
-    tempDiv.style.padding = '20px';
-    tempDiv.style.width = '800px';
-    
-    var stats = getSummaryStats();
-    var trends = getMonthlyTrends();
-    var topMembers = getTopMembers();
-    
-    tempDiv.innerHTML = `
-        <div style="text-align: center; margin-bottom: 20px;">
-            <h1 style="color: #2c7a4d;">ChamaEase Report</h1>
-            <p>Generated: ${new Date().toLocaleString()}</p>
-        </div>
-        ${selectedShareItems.stats ? `
-            <div style="margin-bottom: 20px;">
-                <h3>📊 Summary Statistics</h3>
-                <table style="width:100%; border-collapse: collapse;">
-                    <tr><td style="padding: 8px; border:1px solid #ddd;"><strong>Total Members</strong></td><td style="padding: 8px; border:1px solid #ddd;">${stats.totalMembers}</td></tr>
-                    <tr><td style="padding: 8px; border:1px solid #ddd;"><strong>Total Contributions</strong></td><td style="padding: 8px; border:1px solid #ddd;">KES ${formatNumber(stats.totalContributions)}</td></tr>
-                    <tr><td style="padding: 8px; border:1px solid #ddd;"><strong>Total Loans</strong></td><td style="padding: 8px; border:1px solid #ddd;">KES ${formatNumber(stats.totalLoan)}</td></tr>
-                    <tr><td style="padding: 8px; border:1px solid #ddd;"><strong>Outstanding Balance</strong></td><td style="padding: 8px; border:1px solid #ddd;">KES ${formatNumber(stats.totalLoanBalance)}</td></tr>
-                </table>
-            </div>
-        ` : ''}
-        ${selectedShareItems.charts ? `
-            <div style="margin-bottom: 20px;">
-                <h3>📈 Top Contributors</h3>
-                <ul>
-                    ${topMembers.map(m => `<li>${escapeHtml(m.name)}: KES ${formatNumber(m.contributions)}</li>`).join('')}
-                </ul>
-            </div>
-        ` : ''}
-        ${selectedShareItems.table ? `
-            <div style="margin-bottom: 20px;">
-                <h3>👥 Member Details</h3>
-                <div>${renderMemberTable()}</div>
-            </div>
-        ` : ''}
-    `;
-    
-    document.body.appendChild(tempDiv);
-    
-    try {
-        await new Promise(resolve => setTimeout(resolve, 500));
-        var canvas = await html2canvas(tempDiv, { scale: 2 });
-        var image = canvas.toDataURL('image/png');
-        tempDiv.remove();
-        hideLoading();
-        return image;
-    } catch (error) {
-        console.error("Screenshot error:", error);
-        tempDiv.remove();
-        hideLoading();
-        showToast("Error capturing report", true);
-        return null;
-    }
-}
-
-async function shareToWhatsApp() {
-    var image = await captureScreenshot();
-    if (image) {
-        var link = document.createElement('a');
-        link.href = image;
-        link.download = 'chama_report.png';
-        link.click();
-        
-        var message = encodeURIComponent("🏦 *ChamaEase Report*\n\nHere's the latest chama report. Check the downloaded image for details.");
-        window.open(`https://web.whatsapp.com/send?text=${message}`, '_blank');
-        showToast("Report ready! Share the downloaded image on WhatsApp");
-    }
-}
-
-async function exportToPDF() {
-    showLoading();
-    var image = await captureScreenshot();
-    if (image) {
-        var printWindow = window.open('', '_blank');
-        printWindow.document.write(`
-            <html>
-                <head><title>ChamaEase Report</title></head>
-                <body style="text-align:center; padding:20px;">
-                    <img src="${image}" style="max-width:100%; height:auto;">
-                    <script>window.onload = function() { window.print(); setTimeout(function() { window.close(); }, 1000); }<\/script>
-                </body>
-            </html>
-        `);
-        printWindow.document.close();
-        hideLoading();
-        showToast("PDF ready for printing");
-    } else {
-        hideLoading();
-    }
-}
-
 function exportToExcel() {
-    var csvRows = [];
-    csvRows.push(["CHAMA REPORTS - " + new Date().toLocaleString()]);
-    csvRows.push([]);
-    csvRows.push(["MEMBER", "TOTAL CONTRIBUTIONS", "TOTAL LOANS", "TOTAL PENALTIES", "ACTIVE MONTHS"]);
+    var rankings = getMemberRankings();
+    var stats = getSummaryStats();
     
-    for (var i = 0; i < allMembers.length; i++) {
-        var member = allMembers[i];
-        var memberRecords = allRecords.filter(function(r) { return r.member_id === member.id; });
-        
-        var totalContributions = 0;
-        var totalLoan = 0;
-        var totalPenalties = 0;
-        
-        for (var j = 0; j < memberRecords.length; j++) {
-            totalContributions += safeValue(memberRecords[j].monthly_contribution);
-            totalLoan += safeValue(memberRecords[j].loan);
-            totalPenalties += safeValue(memberRecords[j].penalties);
-        }
-        
-        csvRows.push([
-            member.name,
-            "KES " + formatNumber(totalContributions),
-            "KES " + formatNumber(totalLoan),
-            "KES " + formatNumber(totalPenalties),
-            memberRecords.length
-        ]);
+    var csvRows = [];
+    csvRows.push(["CHAMA REPORT - " + new Date().toLocaleString()]);
+    csvRows.push([]);
+    csvRows.push(["SUMMARY"]);
+    csvRows.push(["Total Members", stats.totalMembers]);
+    csvRows.push(["Total Contributions", "KES " + formatNumber(stats.totalContributions)]);
+    csvRows.push(["Total Loans", "KES " + formatNumber(stats.totalLoan)]);
+    csvRows.push(["Outstanding Balance", "KES " + formatNumber(stats.totalLoanBalance)]);
+    csvRows.push([]);
+    csvRows.push(["MEMBER RANKINGS"]);
+    csvRows.push(["RANK", "MEMBER", "CONTRIBUTIONS", "LOANS", "ACTIVE MONTHS"]);
+    
+    for (var i = 0; i < rankings.length; i++) {
+        var m = rankings[i];
+        csvRows.push([i + 1, m.name, "KES " + formatNumber(m.contributions), "KES " + formatNumber(m.loans), m.months]);
     }
     
     var csv = "";
@@ -866,103 +555,76 @@ function exportToExcel() {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-    showToast("Excel file exported!");
+    showMessage("Report exported as Excel!");
 }
 
-function renderReportsPage() {
+function shareToWhatsApp() {
+    var stats = getSummaryStats();
+    var rankings = getMemberRankings();
+    
+    var message = "🏦 *CHAMA REPORT*\n";
+    message += "📅 " + new Date().toLocaleDateString() + "\n\n";
+    message += "📊 *SUMMARY*\n";
+    message += "👥 Members: " + stats.totalMembers + "\n";
+    message += "💰 Total Contributions: KES " + formatNumber(stats.totalContributions) + "\n";
+    message += "🏦 Total Loans: KES " + formatNumber(stats.totalLoan) + "\n";
+    message += "⚖️ Outstanding: KES " + formatNumber(stats.totalLoanBalance) + "\n\n";
+    
+    message += "🏆 *TOP MEMBERS*\n";
+    for (var i = 0; i < Math.min(5, rankings.length); i++) {
+        var m = rankings[i];
+        message += (i + 1) + ". " + m.name + " - KES " + formatNumber(m.contributions) + "\n";
+    }
+    
+    var encodedMessage = encodeURIComponent(message);
+    window.open("https://web.whatsapp.com/send?text=" + encodedMessage, "_blank");
+    showMessage("Opening WhatsApp...");
+}
+
+function printReport() {
+    window.print();
+}
+
+function renderReports() {
     var container = document.getElementById("app-root");
     
     var html = `
         <div class="hero-report">
-            <div class="hero-title">📊 Reports & Analytics</div>
-            <div class="hero-subtitle">Comprehensive insights into your chama's financial health</div>
+            <div class="hero-title">📊 Chama Reports</div>
+            <div class="hero-subtitle">View your chama's financial performance</div>
         </div>
         
         ${renderStatsCards()}
         
-        <div class="share-panel">
-            <div class="share-header">
-                <div class="share-title">📤 Share Report</div>
-                <div class="share-buttons">
-                    <button class="share-btn share-btn-wa" id="shareWABtn">📱 Share on WhatsApp</button>
-                    <button class="share-btn share-btn-pdf" id="sharePDFBtn">📄 Download as PDF</button>
-                    <button class="share-btn share-btn-excel" id="shareExcelBtn">📊 Export to Excel</button>
-                </div>
-            </div>
-            <div class="share-options">
-                <div class="share-option">
-                    <input type="checkbox" id="includeStats" ${selectedShareItems.stats ? 'checked' : ''}>
-                    <label for="includeStats">Include Statistics</label>
-                </div>
-                <div class="share-option">
-                    <input type="checkbox" id="includeCharts" ${selectedShareItems.charts ? 'checked' : ''}>
-                    <label for="includeCharts">Include Charts</label>
-                </div>
-                <div class="share-option">
-                    <input type="checkbox" id="includeTable" ${selectedShareItems.table ? 'checked' : ''}>
-                    <label for="includeTable">Include Member Details</label>
-                </div>
-            </div>
+        <div class="report-actions">
+            <button class="action-btn action-btn-wa" id="shareWABtn">📱 Share on WhatsApp</button>
+            <button class="action-btn action-btn-excel" id="exportExcelBtn">📊 Export to Excel</button>
+            <button class="action-btn action-btn-pdf" id="printBtn">🖨️ Print Report</button>
         </div>
         
-        <div class="charts-grid">
-            <div class="chart-card">
-                <div class="chart-title">📈 Monthly Trends</div>
-                <div class="chart-container">
-                    <canvas id="contributionsChart"></canvas>
-                </div>
-            </div>
-            <div class="chart-card">
-                <div class="chart-title">🏆 Top Contributors</div>
-                <div class="chart-container">
-                    <canvas id="topMembersChart"></canvas>
-                </div>
+        <div class="chart-card">
+            <div class="chart-title">📈 Monthly Trends (Contributions vs Loans)</div>
+            <div class="chart-container">
+                <canvas id="trendsChart"></canvas>
             </div>
         </div>
         
         <div class="card">
             <div class="flex-between">
-                <h3>👥 Member Performance Details</h3>
-                <button id="toggleTableBtn" class="btn-outline btn-sm">Show/Hide Table</button>
+                <h3>🏆 Member Rankings</h3>
+                <span style="font-size:0.7rem; color:#6c757d;">Sorted by contributions</span>
             </div>
-            <div id="memberTableSection">
-                ${renderMemberTable()}
-            </div>
+            ${renderMemberTable()}
         </div>
     `;
     
     container.innerHTML = html;
     
-    // Create charts
-    createCharts();
+    createChart();
     
-    // Bind events
     document.getElementById("shareWABtn").addEventListener("click", shareToWhatsApp);
-    document.getElementById("sharePDFBtn").addEventListener("click", exportToPDF);
-    document.getElementById("shareExcelBtn").addEventListener("click", exportToExcel);
-    
-    document.getElementById("includeStats").addEventListener("change", function(e) {
-        selectedShareItems.stats = e.target.checked;
-    });
-    document.getElementById("includeCharts").addEventListener("change", function(e) {
-        selectedShareItems.charts = e.target.checked;
-    });
-    document.getElementById("includeTable").addEventListener("change", function(e) {
-        selectedShareItems.table = e.target.checked;
-    });
-    
-    var tableVisible = true;
-    document.getElementById("toggleTableBtn").addEventListener("click", function() {
-        var tableSection = document.getElementById("memberTableSection");
-        if (tableVisible) {
-            tableSection.style.display = "none";
-            this.textContent = "Show Table";
-        } else {
-            tableSection.style.display = "block";
-            this.textContent = "Hide Table";
-        }
-        tableVisible = !tableVisible;
-    });
+    document.getElementById("exportExcelBtn").addEventListener("click", exportToExcel);
+    document.getElementById("printBtn").addEventListener("click", printReport);
 }
 
 // Initialize
