@@ -8,60 +8,252 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
     <style>
-        .member-header {
-            background: linear-gradient(135deg, var(--primary), #3b9b62);
-            color: white;
+        /* Member History Page Styles */
+        .member-profile-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 24px;
             padding: 1.5rem;
-            border-radius: var(--radius-card);
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
         }
         
-        .member-header h1 {
+        .member-profile-header::before {
+            content: "👤";
+            position: absolute;
+            right: -20px;
+            bottom: -20px;
+            font-size: 100px;
+            opacity: 0.1;
+            pointer-events: none;
+        }
+        
+        .back-nav {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 40px;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.8rem;
+        }
+        
+        .back-nav:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .member-name-large {
             font-size: 1.5rem;
+            font-weight: 700;
             margin-bottom: 0.5rem;
         }
         
-        .member-header p {
+        .member-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
             opacity: 0.9;
-            font-size: 0.85rem;
         }
         
-        .summary-cards {
+        .member-details span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        /* Summary Cards */
+        .summary-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 1rem;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.8rem;
             margin-bottom: 1.5rem;
+        }
+        
+        @media (min-width: 768px) {
+            .summary-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
         }
         
         .summary-card {
             background: white;
-            border-radius: 12px;
+            border-radius: 20px;
             padding: 1rem;
             text-align: center;
             border: 1px solid var(--gray-border);
-            box-shadow: var(--shadow-sm);
+            transition: all 0.2s;
         }
         
-        .summary-card h4 {
-            font-size: 0.7rem;
-            color: #6c757d;
-            text-transform: uppercase;
+        .summary-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
+        
+        .summary-icon {
+            font-size: 1.5rem;
             margin-bottom: 0.5rem;
         }
         
-        .summary-card .value {
-            font-size: 1.4rem;
-            font-weight: 700;
+        .summary-value {
+            font-size: 1.3rem;
+            font-weight: 800;
             color: var(--primary);
         }
         
-        .summary-card .sub {
-            font-size: 0.7rem;
+        .summary-label {
+            font-size: 0.65rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .summary-sub {
+            font-size: 0.6rem;
             color: #6c757d;
             margin-top: 0.25rem;
         }
         
-        .history-table-container {
+        /* Filter Bar */
+        .filter-bar {
+            background: white;
+            border-radius: 20px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--gray-border);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        .filter-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            color: #1e2a3e;
+            display: block;
+        }
+        
+        .filter-select, .filter-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--gray-border);
+            border-radius: 12px;
+            font-size: 0.8rem;
+            background: white;
+            cursor: pointer;
+        }
+        
+        .filter-select:focus, .filter-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .filter-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn-filter {
+            background: var(--primary-light);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            cursor: pointer;
+            color: var(--primary);
+        }
+        
+        .btn-filter:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-reset {
+            background: #f1f5f9;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            cursor: pointer;
+            color: #64748b;
+        }
+        
+        .btn-reset:hover {
+            background: #e2e8f0;
+        }
+        
+        /* Records Table */
+        .records-container {
+            background: white;
+            border-radius: 20px;
+            border: 1px solid var(--gray-border);
+            overflow: hidden;
+        }
+        
+        .records-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--gray-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            background: #fafbfc;
+        }
+        
+        .records-title {
+            font-size: 1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .record-count {
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+        }
+        
+        .export-btns {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn-icon {
+            background: none;
+            border: 1px solid var(--gray-border);
+            padding: 8px 14px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .btn-icon:hover {
+            background: var(--primary-light);
+            border-color: var(--primary);
+        }
+        
+        .history-table-wrapper {
             overflow-x: auto;
         }
         
@@ -73,14 +265,16 @@
         
         .history-table th,
         .history-table td {
-            border: 1px solid var(--gray-border);
-            padding: 10px 8px;
+            padding: 12px 10px;
             text-align: left;
+            border-bottom: 1px solid var(--gray-border);
         }
         
         .history-table th {
             background: #f8fafc;
             font-weight: 600;
+            position: sticky;
+            top: 0;
         }
         
         .history-table tr:hover {
@@ -89,11 +283,21 @@
         
         .month-badge {
             display: inline-block;
-            padding: 3px 10px;
             background: var(--primary-light);
             color: var(--primary);
+            padding: 4px 12px;
             border-radius: 20px;
             font-size: 0.7rem;
+            font-weight: 600;
+        }
+        
+        .amount-positive {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .amount-negative {
+            color: var(--danger);
             font-weight: 600;
         }
         
@@ -103,41 +307,62 @@
             color: #6c757d;
         }
         
-        .back-btn {
+        .no-data-icon {
+            font-size: 3rem;
             margin-bottom: 1rem;
-            display: inline-flex;
+            opacity: 0.5;
+        }
+        
+        /* Year Selector Dropdown */
+        .year-selector {
+            display: flex;
+            gap: 0.5rem;
             align-items: center;
-            gap: 8px;
         }
         
-        .contribution-positive {
-            color: var(--primary);
-            font-weight: 600;
-        }
-        
-        .penalty-negative {
-            color: var(--danger);
-            font-weight: 600;
-        }
-        
+        /* Mobile Responsive */
         @media (max-width: 768px) {
-            .summary-cards {
-                grid-template-columns: repeat(2, 1fr);
+            .member-name-large {
+                font-size: 1.2rem;
+            }
+            
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-buttons {
+                justify-content: stretch;
+            }
+            
+            .filter-buttons button {
+                flex: 1;
+            }
+            
+            .records-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .export-btns {
+                justify-content: stretch;
+            }
+            
+            .btn-icon {
+                flex: 1;
+                justify-content: center;
             }
             
             .history-table th,
             .history-table td {
-                padding: 6px 4px;
+                padding: 8px 6px;
                 font-size: 0.7rem;
-            }
-            
-            .member-header h1 {
-                font-size: 1.2rem;
             }
         }
         
+        /* Print Styles */
         @media print {
-            .sidebar, .top-bar, .back-btn, .action-buttons, footer {
+            .sidebar, .top-bar, .filter-bar, .export-btns, .back-nav, footer, .btn-icon {
                 display: none !important;
             }
             
@@ -145,7 +370,7 @@
                 margin-left: 0 !important;
             }
             
-            .member-header {
+            .member-profile-header {
                 background: var(--primary);
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
@@ -165,6 +390,7 @@
         <nav class="sidebar-nav">
             <a href="dashboard.html" class="nav-item"><span class="icon">📊</span><span class="label">DASHBOARD</span></a>
             <a href="members.html" class="nav-item"><span class="icon">👥</span><span class="label">MEMBERS</span></a>
+            <a href="member-history.html" class="nav-item active"><span class="icon">📜</span><span class="label">MEMBER HISTORY</span></a>
             <a href="monthly-records.html" class="nav-item"><span class="icon">📅</span><span class="label">MONTHLY RECORDS</span></a>
             <a href="reports.html" class="nav-item"><span class="icon">📈</span><span class="label">REPORTS</span></a>
             <a href="settings.html" class="nav-item"><span class="icon">⚙️</span><span class="label">SETTINGS</span></a>
@@ -194,8 +420,13 @@
 // Using supabaseClient from supabase-config.js
 let memberId = null;
 let memberName = null;
-let memberRecords = [];
 let memberInfo = null;
+let allRecords = [];
+let filteredRecords = [];
+let currentFilter = {
+    year: 'all',
+    month: 'all'
+};
 
 // Sidebar functions
 function openSidebar() {
@@ -216,12 +447,11 @@ document.getElementById("logoutBtn").addEventListener("click", async function() 
     window.location.href = "index.html";
 });
 
-function showToast(message, type = 'success') {
+function showToast(message, isError = false) {
     const toast = document.createElement('div');
-    toast.className = `toast-notification ${type}`;
-    toast.innerHTML = (type === 'success' ? '✓ ' : '⚠️ ') + message;
+    toast.className = `toast-success ${isError ? 'toast-error' : ''}`;
+    toast.textContent = isError ? '⚠️ ' + message : '✓ ' + message;
     document.body.appendChild(toast);
-    
     setTimeout(() => {
         toast.style.opacity = '0';
         setTimeout(() => toast.remove(), 300);
@@ -243,63 +473,128 @@ function formatNumber(num) {
     return num.toLocaleString('en-KE');
 }
 
+async function loadAllMembersForSelector() {
+    try {
+        const { data, error } = await supabaseClient
+            .from("members")
+            .select("id, name")
+            .order("name");
+        
+        if (error) throw error;
+        return data || [];
+    } catch (error) {
+        console.error("Error loading members:", error);
+        return [];
+    }
+}
+
 async function loadMemberData() {
     const container = document.getElementById("app-root");
     
     try {
-        // Get member ID from URL
+        // Check if we have a member ID from URL
         const urlParams = new URLSearchParams(window.location.search);
         memberId = urlParams.get('id');
-        memberName = urlParams.get('name');
         
-        if (!memberId) {
-            container.innerHTML = `
-                <div class="card" style="text-align:center; padding: 3rem;">
-                    <h3>⚠️ No member selected</h3>
-                    <p>Please go back to the members page and select a member.</p>
-                    <a href="members.html" class="btn">← Back to Members</a>
-                </div>
-            `;
+        if (memberId) {
+            // Load specific member
+            const { data: memberData, error: memberError } = await supabaseClient
+                .from("members")
+                .select("*")
+                .eq("id", memberId)
+                .single();
+            
+            if (memberError) throw memberError;
+            memberInfo = memberData;
+            memberName = memberInfo.name;
+            
+            // Load records for this member
+            await loadMemberRecords();
+        } else {
+            // No member selected - show member selector
+            await showMemberSelector();
             return;
         }
-        
-        // Get member info
-        const { data: memberData, error: memberError } = await supabaseClient
-            .from("members")
-            .select("*")
-            .eq("id", memberId)
-            .single();
-        
-        if (memberError) throw memberError;
-        memberInfo = memberData;
-        if (!memberName) memberName = memberInfo.name;
-        
-        // Get member records
-        const { data: records, error: recordsError } = await supabaseClient
-            .from("monthly_records")
-            .select("*")
-            .eq("member_id", memberId)
-            .order("year", { ascending: false })
-            .order("month", { ascending: false });
-        
-        if (recordsError) throw recordsError;
-        memberRecords = records || [];
-        
-        renderHistory();
     } catch (error) {
         console.error("Error loading member data:", error);
         container.innerHTML = `
-            <div class="card" style="text-align:center; padding: 3rem;">
-                <h3>⚠️ Error loading data</h3>
+            <div class="empty-state" style="text-align:center; padding:3rem;">
+                <div class="no-data-icon">⚠️</div>
+                <h3>Error Loading Data</h3>
                 <p>${error.message}</p>
-                <button class="btn" onclick="location.reload()">Retry</button>
-                <a href="members.html" class="btn-outline btn" style="margin-left: 0.5rem;">← Back</a>
+                <button class="btn-primary" onclick="location.reload()">Retry</button>
             </div>
         `;
     }
 }
 
-function renderHistory() {
+async function showMemberSelector() {
+    const members = await loadAllMembersForSelector();
+    
+    let membersHtml = '';
+    if (members.length === 0) {
+        membersHtml = `
+            <div class="empty-state" style="text-align:center; padding:3rem;">
+                <div class="no-data-icon">👥</div>
+                <h3>No Members Found</h3>
+                <p>Please add members first to view their history.</p>
+                <a href="members.html" class="btn-primary" style="display:inline-block; margin-top:1rem;">Go to Members</a>
+            </div>
+        `;
+    } else {
+        membersHtml = `
+            <div class="hero-section" style="background: linear-gradient(135deg, var(--primary), var(--primary-dark));">
+                <div class="member-name-large">Select a Member</div>
+                <div class="member-details">Choose a member to view their contribution history</div>
+            </div>
+            <div class="members-grid" style="display: flex; flex-direction: column; gap: 0.8rem;">
+        `;
+        
+        for (var i = 0; i < members.length; i++) {
+            var m = members[i];
+            var avatarLetter = m.name.charAt(0).toUpperCase();
+            membersHtml += `
+                <div class="member-card" onclick="window.location.href='member-history.html?id=${m.id}'" style="cursor:pointer;">
+                    <div class="member-card-header">
+                        <div class="member-avatar-large" style="width: 45px; height: 45px; font-size: 1.1rem;">${avatarLetter}</div>
+                        <div class="member-info-large">
+                            <div class="member-name-large" style="font-size: 1rem;">${escapeHtml(m.name)}</div>
+                            <div class="member-contact" style="font-size: 0.7rem;">Click to view history →</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        membersHtml += `</div>`;
+    }
+    
+    document.getElementById("app-root").innerHTML = membersHtml;
+}
+
+async function loadMemberRecords() {
+    const { data: records, error } = await supabaseClient
+        .from("monthly_records")
+        .select("*")
+        .eq("member_id", memberId)
+        .order("year", { ascending: false })
+        .order("month", { ascending: false });
+    
+    if (error) throw error;
+    allRecords = records || [];
+    filteredRecords = [...allRecords];
+    renderHistoryPage();
+}
+
+function applyFilters() {
+    filteredRecords = allRecords.filter(function(record) {
+        if (currentFilter.year !== 'all' && record.year != currentFilter.year) return false;
+        if (currentFilter.month !== 'all' && record.month != currentFilter.month) return false;
+        return true;
+    });
+    renderHistoryPage();
+}
+
+function renderHistoryPage() {
     const container = document.getElementById("app-root");
     
     // Calculate summary statistics
@@ -308,101 +603,137 @@ function renderHistory() {
     let totalLoanBalance = 0;
     let totalContributions = 0;
     let totalPenalties = 0;
-    let monthsWithData = 0;
+    let monthsWithData = filteredRecords.length;
     
-    for (var i = 0; i < memberRecords.length; i++) {
-        var r = memberRecords[i];
+    for (var i = 0; i < filteredRecords.length; i++) {
+        var r = filteredRecords[i];
         totalLoan += (r.loan || 0);
         totalLoanDeductions += (r.loan_deductions || 0);
         totalLoanBalance += (r.loan_balance || 0);
         totalContributions += (r.monthly_contribution || 0);
         totalPenalties += (r.penalties || 0);
-        monthsWithData++;
     }
     
+    // Get unique years and months for filters
+    var years = ['all'];
+    var months = [{ value: 'all', name: 'All Months' }];
+    var yearSet = new Set();
     var monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
     
+    for (var i = 0; i < allRecords.length; i++) {
+        yearSet.add(allRecords[i].year);
+    }
+    var sortedYears = Array.from(yearSet).sort((a, b) => b - a);
+    years.push(...sortedYears);
+    
+    for (var i = 1; i <= 12; i++) {
+        months.push({ value: i, name: monthNames[i - 1] });
+    }
+    
+    // Build table rows
     var tableRows = "";
-    if (memberRecords.length === 0) {
-        tableRows = `<tr><td colspan="7" class="no-data">📭 No monthly records found for this member. Add records from the Monthly Records page.</td></tr>`;
+    if (filteredRecords.length === 0) {
+        tableRows = `<tr><td colspan="7" class="no-data"><div class="no-data-icon">📭</div>No records found for the selected filter</td></tr>`;
     } else {
-        for (var i = 0; i < memberRecords.length; i++) {
-            var r = memberRecords[i];
+        for (var i = 0; i < filteredRecords.length; i++) {
+            var r = filteredRecords[i];
             var monthName = monthNames[r.month - 1];
-            var hasContribution = r.monthly_contribution > 0;
-            var hasPenalty = r.penalties > 0;
             
             tableRows += `<tr>`;
             tableRows += `<td><span class="month-badge">${monthName} ${r.year}</span></td>`;
-            tableRows += `<td class="${r.loan > 0 ? 'contribution-positive' : ''}">KES ${formatNumber(r.loan)}</td>`;
+            tableRows += `<td class="${r.loan > 0 ? 'amount-positive' : ''}">KES ${formatNumber(r.loan)}</td>`;
             tableRows += `<td>KES ${formatNumber(r.loan_deductions)}</td>`;
-            tableRows += `<td class="${r.loan_balance > 0 ? 'contribution-positive' : ''}">KES ${formatNumber(r.loan_balance)}</td>`;
-            tableRows += `<td class="${hasContribution ? 'contribution-positive' : ''}">KES ${formatNumber(r.monthly_contribution)}</td>`;
-            tableRows += `<td class="${hasPenalty ? 'penalty-negative' : ''}">KES ${formatNumber(r.penalties)}</td>`;
-            tableRows += `<td>`;
-            if (r.created_at) {
-                var date = new Date(r.created_at);
-                tableRows += `<small>${date.toLocaleDateString()}</small>`;
-            } else {
-                tableRows += `—`;
-            }
-            tableRows += `</td>`;
+            tableRows += `<td class="${r.loan_balance > 0 ? 'amount-positive' : ''}">KES ${formatNumber(r.loan_balance)}</td>`;
+            tableRows += `<td class="${r.monthly_contribution > 0 ? 'amount-positive' : ''}">KES ${formatNumber(r.monthly_contribution)}</td>`;
+            tableRows += `<td class="${r.penalties > 0 ? 'amount-negative' : ''}">KES ${formatNumber(r.penalties)}</td>`;
+            tableRows += `<td><small>${r.created_at ? new Date(r.created_at).toLocaleDateString() : '—'}</small></td>`;
             tableRows += `</tr>`;
         }
     }
     
+    // Build year options
+    var yearOptions = '';
+    for (var i = 0; i < years.length; i++) {
+        var selected = (currentFilter.year == years[i]) ? 'selected' : '';
+        var displayYear = years[i] === 'all' ? 'All Years' : years[i];
+        yearOptions += `<option value="${years[i]}" ${selected}>${displayYear}</option>`;
+    }
+    
+    // Build month options
+    var monthOptions = '';
+    for (var i = 0; i < months.length; i++) {
+        var selected = (currentFilter.month == months[i].value) ? 'selected' : '';
+        monthOptions += `<option value="${months[i].value}" ${selected}>${months[i].name}</option>`;
+    }
+    
     var html = `
-        <a href="members.html" class="btn-outline btn back-btn">← Back to Members</a>
-        
-        <div class="member-header">
-            <h1>👤 ${escapeHtml(memberName)}</h1>
-            <p>📧 ${memberInfo?.email || 'No email provided'} &nbsp;|&nbsp; 📞 ${memberInfo?.phone || 'No phone provided'}</p>
-            <p>🆔 Member since: ${memberInfo?.created_at ? new Date(memberInfo.created_at).toLocaleDateString() : 'N/A'}</p>
-        </div>
-        
-        <div class="summary-cards">
-            <div class="summary-card">
-                <h4>Total Contributions</h4>
-                <div class="value">KES ${formatNumber(totalContributions)}</div>
-                <div class="sub">over ${monthsWithData} month(s)</div>
+        <div class="member-profile-header">
+            <div class="back-nav" onclick="goBackToMembers()">
+                ← Back to Members
             </div>
-            <div class="summary-card">
-                <h4>Total Loans</h4>
-                <div class="value">KES ${formatNumber(totalLoan)}</div>
-                <div class="sub">loans taken</div>
-            </div>
-            <div class="summary-card">
-                <h4>Loan Balance</h4>
-                <div class="value">KES ${formatNumber(totalLoanBalance)}</div>
-                <div class="sub">remaining to pay</div>
-            </div>
-            <div class="summary-card">
-                <h4>Total Penalties</h4>
-                <div class="value">KES ${formatNumber(totalPenalties)}</div>
-                <div class="sub">late fees</div>
-            </div>
-            <div class="summary-card">
-                <h4>Loan Repayments</h4>
-                <div class="value">KES ${formatNumber(totalLoanDeductions)}</div>
-                <div class="sub">paid towards loans</div>
-            </div>
-            <div class="summary-card">
-                <h4>Net Position</h4>
-                <div class="value">KES ${formatNumber(totalContributions - totalLoanBalance)}</div>
-                <div class="sub">contributions minus debt</div>
+            <div class="member-name-large">👤 ${escapeHtml(memberName)}</div>
+            <div class="member-details">
+                <span>📧 ${memberInfo?.email || 'No email'}</span>
+                <span>📞 ${memberInfo?.phone || 'No phone'}</span>
+                <span>🆔 Member since: ${memberInfo?.created_at ? new Date(memberInfo.created_at).toLocaleDateString() : 'N/A'}</span>
             </div>
         </div>
         
-        <div class="card">
-            <div class="flex-between" style="margin-bottom: 1rem;">
-                <h3>📋 Monthly Transaction History</h3>
-                <div class="action-buttons">
-                    <button id="exportHistoryBtn" class="btn-outline btn-sm">📎 Export CSV</button>
-                    <button id="printHistoryBtn" class="btn-outline btn-sm">🖨️ Print</button>
+        <div class="summary-grid">
+            <div class="summary-card">
+                <div class="summary-icon">💰</div>
+                <div class="summary-value">KES ${formatNumber(totalContributions)}</div>
+                <div class="summary-label">Total Contributions</div>
+                <div class="summary-sub">over ${monthsWithData} month(s)</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-icon">🏦</div>
+                <div class="summary-value">KES ${formatNumber(totalLoan)}</div>
+                <div class="summary-label">Total Loans</div>
+                <div class="summary-sub">loans taken</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-icon">⚖️</div>
+                <div class="summary-value">KES ${formatNumber(totalLoanBalance)}</div>
+                <div class="summary-label">Outstanding Balance</div>
+                <div class="summary-sub">remaining to pay</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-icon">⚠️</div>
+                <div class="summary-value">KES ${formatNumber(totalPenalties)}</div>
+                <div class="summary-label">Total Penalties</div>
+                <div class="summary-sub">late fees</div>
+            </div>
+        </div>
+        
+        <div class="filter-bar">
+            <div class="filter-group">
+                <label class="filter-label">📅 Filter by Year</label>
+                <select id="yearFilter" class="filter-select">${yearOptions}</select>
+            </div>
+            <div class="filter-group">
+                <label class="filter-label">📆 Filter by Month</label>
+                <select id="monthFilter" class="filter-select">${monthOptions}</select>
+            </div>
+            <div class="filter-buttons">
+                <button class="btn-filter" id="applyFilterBtn">Apply Filter</button>
+                <button class="btn-reset" id="resetFilterBtn">Reset</button>
+            </div>
+        </div>
+        
+        <div class="records-container">
+            <div class="records-header">
+                <div class="records-title">
+                    📋 Transaction History
+                    <span class="record-count">${filteredRecords.length} records</span>
+                </div>
+                <div class="export-btns">
+                    <button class="btn-icon" id="exportCsvBtn">📎 Export CSV</button>
+                    <button class="btn-icon" id="printBtn">🖨️ Print</button>
                 </div>
             </div>
-            <div class="history-table-container">
-                <table class="history-table" id="history-table">
+            <div class="history-table-wrapper">
+                <table class="history-table" id="historyTable">
                     <thead>
                         <tr>
                             <th>Period</th>
@@ -421,23 +752,44 @@ function renderHistory() {
             </div>
         </div>
         
-        <div class="card">
-            <h3>💡 Summary Insights</h3>
-            <ul style="margin-top: 0.8rem; margin-left: 1.2rem; font-size: 0.8rem; line-height: 1.6;">
-                <li>💰 <strong>Average monthly contribution:</strong> KES ${monthsWithData > 0 ? formatNumber(Math.round(totalContributions / monthsWithData)) : 0}</li>
-                <li>📊 <strong>Total value to chama:</strong> KES ${formatNumber(totalContributions + totalLoanDeductions)}</li>
-                <li>⚖️ <strong>Financial health score:</strong> ${totalLoanBalance === 0 ? '✅ Debt Free' : (totalLoanBalance < totalContributions ? '⚠️ Some debt' : '🔴 High debt')}</li>
-            </ul>
+        <div class="records-container" style="margin-top: 1rem;">
+            <div class="records-header">
+                <div class="records-title">📊 Summary Insights</div>
+            </div>
+            <div style="padding: 1rem;">
+                <ul style="margin-left: 1.2rem; font-size: 0.8rem; line-height: 1.8;">
+                    <li>💰 <strong>Average monthly contribution:</strong> KES ${monthsWithData > 0 ? formatNumber(Math.round(totalContributions / monthsWithData)) : 0}</li>
+                    <li>📈 <strong>Total value to chama:</strong> KES ${formatNumber(totalContributions + totalLoanDeductions)}</li>
+                    <li>⚖️ <strong>Financial health:</strong> ${totalLoanBalance === 0 ? '✅ Debt Free' : (totalLoanBalance < totalContributions ? '⚠️ Some debt' : '🔴 High debt')}</li>
+                    <li>⭐ <strong>Member status:</strong> ${monthsWithData > 0 ? 'Active contributor' : 'No contributions yet'}</li>
+                </ul>
+            </div>
         </div>
     `;
     
     container.innerHTML = html;
     
-    document.getElementById("exportHistoryBtn").addEventListener("click", exportHistory);
-    document.getElementById("printHistoryBtn").addEventListener("click", function() { window.print(); });
+    // Bind filter events
+    document.getElementById("yearFilter").addEventListener("change", function(e) {
+        currentFilter.year = e.target.value;
+    });
+    document.getElementById("monthFilter").addEventListener("change", function(e) {
+        currentFilter.month = e.target.value;
+    });
+    document.getElementById("applyFilterBtn").addEventListener("click", applyFilters);
+    document.getElementById("resetFilterBtn").addEventListener("click", function() {
+        currentFilter = { year: 'all', month: 'all' };
+        applyFilters();
+    });
+    document.getElementById("exportCsvBtn").addEventListener("click", exportToCSV);
+    document.getElementById("printBtn").addEventListener("click", function() { window.print(); });
 }
 
-function exportHistory() {
+function goBackToMembers() {
+    window.location.href = "members.html";
+}
+
+function exportToCSV() {
     var monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
     
     var csvRows = [];
@@ -446,8 +798,8 @@ function exportHistory() {
     csvRows.push([]);
     csvRows.push(["PERIOD", "LOAN", "LOAN DEDUCTIONS", "LOAN BALANCE", "MONTHLY CONTRIBUTION", "PENALTIES", "DATE ADDED"]);
     
-    for (var i = 0; i < memberRecords.length; i++) {
-        var r = memberRecords[i];
+    for (var i = 0; i < filteredRecords.length; i++) {
+        var r = filteredRecords[i];
         csvRows.push([
             monthNames[r.month - 1] + " " + r.year,
             "KES " + formatNumber(r.loan),
