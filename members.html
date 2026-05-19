@@ -4,425 +4,88 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
     <title>ChamaEase | Members</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: system-ui, 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
-        }
-
-        body {
-            background: #f4f7fb;
-            color: #1e2a3e;
-        }
-
-        :root {
-            --primary: #2c7a4d;
-            --primary-light: #eaf5ef;
-            --primary-dark: #1f5a3a;
-            --danger: #dc4c4c;
-            --warning: #f59e0b;
-            --gray-border: #e2e8f0;
-            --shadow-sm: 0 4px 12px rgba(0,0,0,0.04);
-            --radius-card: 16px;
-            --radius-btn: 32px;
-            --sidebar-width: 280px;
-        }
-
-        .app-wrapper {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        .sidebar {
-            width: var(--sidebar-width);
-            background: white;
-            border-right: 1px solid var(--gray-border);
-            position: fixed;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            overflow-y: auto;
-            transition: transform 0.3s ease;
-            z-index: 1000;
-            box-shadow: var(--shadow-sm);
-            transform: translateX(0);
-        }
-
-        .sidebar-header {
-            padding: 1rem;
-            border-bottom: 1px solid var(--gray-border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .sidebar-logo {
-            font-weight: 800;
-            font-size: 1.2rem;
-            background: linear-gradient(135deg, var(--primary), #3b9b62);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        .sidebar-close {
-            background: none;
-            border: none;
-            font-size: 1.3rem;
-            cursor: pointer;
-            color: #94a3b8;
-            display: none;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .sidebar-close:hover {
-            background: #fee2e2;
-            color: var(--danger);
-        }
-
-        .sidebar-nav {
-            padding: 0.8rem 0;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 0.7rem 1rem;
-            margin: 0.2rem 0.8rem;
-            border-radius: 12px;
-            text-decoration: none;
-            color: #4a5568;
-            transition: all 0.2s;
-            cursor: pointer;
-        }
-
-        .nav-item:hover {
-            background: var(--primary-light);
-            color: var(--primary);
-        }
-
-        .nav-item.active {
-            background: var(--primary);
-            color: white;
-        }
-
-        .nav-item .icon {
-            font-size: 1.1rem;
-            width: 26px;
-            text-align: center;
-        }
-
-        .nav-item .label {
-            font-weight: 500;
-            font-size: 0.85rem;
-        }
-
-        .main-content {
-            flex: 1;
-            margin-left: var(--sidebar-width);
-            transition: margin-left 0.3s ease;
-            width: calc(100% - var(--sidebar-width));
-        }
-
-        .top-bar {
-            background: white;
-            padding: 0.7rem 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--gray-border);
-            box-shadow: var(--shadow-sm);
-            position: sticky;
-            top: 0;
-            z-index: 99;
-        }
-
-        .menu-toggle {
-            background: none;
-            border: none;
-            font-size: 1.3rem;
-            cursor: pointer;
-            color: var(--primary);
-            padding: 6px;
-            border-radius: 50%;
-        }
-
-        .page-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #1e2a3e;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-        }
-
-        .user-email {
-            font-size: 0.7rem;
-            color: #5b6e8c;
-            display: none;
-        }
-
-        @media (min-width: 480px) {
-            .user-email {
-                display: inline;
-            }
-        }
-
-        .logout-btn {
-            background: transparent;
-            border: 1px solid #dc2626;
-            color: #dc2626;
-            padding: 0.35rem 0.7rem;
-            border-radius: 2rem;
-            cursor: pointer;
-            font-size: 0.7rem;
-        }
-
-        .logout-btn:hover {
-            background: #dc2626;
-            color: white;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 1rem;
-            width: 100%;
-            min-height: 70vh;
-        }
-
-        .card {
-            background: white;
-            border-radius: var(--radius-card);
-            box-shadow: var(--shadow-sm);
-            padding: 1rem;
-            margin-bottom: 1rem;
-            border: 1px solid var(--gray-border);
-        }
-
-        .btn {
-            border: none;
-            background: var(--primary);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: var(--radius-btn);
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 0.75rem;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--primary);
-            color: var(--primary);
-        }
-
-        .btn-sm {
-            padding: 0.25rem 0.6rem;
-            font-size: 0.65rem;
-        }
-
-        .btn-danger {
-            background: var(--danger);
-            border-color: var(--danger);
-            color: white;
-        }
-
-        .btn-danger-outline {
-            background: transparent;
-            border: 1px solid var(--danger);
-            color: var(--danger);
-        }
-
-        .btn-warning {
-            background: var(--warning);
-            border-color: var(--warning);
-            color: white;
-        }
-
-        .flex-between {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 0.6rem;
-            margin-bottom: 1rem;
-        }
-
-        .search-bar {
-            padding: 0.5rem 1rem;
-            border-radius: 40px;
-            border: 1px solid var(--gray-border);
-            background: white;
-            width: 100%;
-            max-width: 260px;
-            font-size: 0.8rem;
-        }
-
-        input, select, textarea {
-            padding: 0.5rem;
-            border-radius: 1rem;
-            border: 1px solid #cbd5e1;
-            width: 100%;
-            font-size: 0.8rem;
-        }
-
-        footer {
-            text-align: center;
-            padding: 0.8rem;
-            font-size: 0.65rem;
-            color: #6c757d;
-            border-top: 1px solid var(--gray-border);
-            margin-top: 1rem;
-        }
-
-        .table-wrapper {
-            width: 100%;
-            overflow-x: auto;
+        /* Additional members-specific styles */
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
         }
         
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.8rem;
-        }
-
-        th, td {
-            text-align: left;
-            padding: 0.7rem 0.5rem;
-            border-bottom: 1px solid var(--gray-border);
-        }
-
-        th {
-            background: #f8fafc;
-            font-weight: 600;
-        }
-
-        .loading-spinner {
-            display: inline-block;
-            width: 30px;
-            height: 30px;
-            border: 3px solid #e2e8f0;
-            border-radius: 50%;
-            border-top-color: var(--primary);
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1001;
-        }
-
-        .modal-content {
+        .stat-box {
             background: white;
-            border-radius: 1rem;
-            padding: 1.2rem;
-            max-width: 90%;
-            width: 400px;
+            border-radius: 12px;
+            padding: 0.8rem;
+            text-align: center;
+            border: 1px solid var(--gray-border);
+            box-shadow: var(--shadow-sm);
         }
-
-        .form-group {
-            margin-bottom: 0.8rem;
+        
+        .stat-box h4 {
+            font-size: 0.7rem;
+            color: #6c757d;
+            margin-bottom: 0.3rem;
         }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.2rem;
-            font-weight: 600;
-            font-size: 0.75rem;
+        
+        .stat-box .number {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary);
         }
-
-        .sidebar-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 999;
-        }
-
-        .sidebar-overlay.active {
-            display: block;
-        }
-
-        .action-group {
+        
+        .action-buttons-cell {
             display: flex;
             gap: 6px;
             flex-wrap: wrap;
         }
-
-        .stats-badge {
-            display: inline-block;
-            background: var(--primary-light);
-            color: var(--primary);
-            padding: 2px 8px;
-            border-radius: 20px;
+        
+        .btn-icon {
+            padding: 5px 10px;
             font-size: 0.7rem;
-            font-weight: 600;
-            margin-left: 8px;
         }
-
+        
+        .member-avatar {
+            width: 32px;
+            height: 32px;
+            background: var(--primary-light);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 8px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .member-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .export-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
         @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
+            .stats-summary {
+                grid-template-columns: repeat(2, 1fr);
             }
-            .sidebar.open {
-                transform: translateX(0);
-            }
-            .main-content {
-                margin-left: 0;
-                width: 100%;
-            }
-            .sidebar-close {
-                display: flex;
-            }
-            .container {
-                padding: 0.8rem;
-            }
-            .flex-between {
+            
+            .action-buttons-cell {
                 flex-direction: column;
-                align-items: stretch;
             }
-            .search-bar {
-                max-width: 100%;
-            }
-            .btn {
+            
+            .btn-icon {
+                width: 100%;
                 text-align: center;
-            }
-            th, td {
-                padding: 0.5rem 0.3rem;
-                font-size: 0.7rem;
             }
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="supabase-config.js"></script>
 </head>
 <body>
 <div class="app-wrapper">
@@ -431,7 +94,7 @@
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">ChamaEase</div>
-            <button class="sidebar-close" id="sidebarClose">X</button>
+            <button class="sidebar-close" id="sidebarClose">✕</button>
         </div>
         <nav class="sidebar-nav">
             <a href="dashboard.html" class="nav-item"><span class="icon">📊</span><span class="label">DASHBOARD</span></a>
@@ -445,7 +108,7 @@
     <main class="main-content">
         <div class="top-bar">
             <button class="menu-toggle" id="menuToggle">☰</button>
-            <div class="page-title">MEMBERS</div>
+            <div class="page-title">👥 MEMBERS</div>
             <div class="user-info">
                 <span class="user-email" id="userEmail"></span>
                 <button id="logoutBtn" class="logout-btn">LOGOUT</button>
@@ -466,6 +129,7 @@
 let allMembers = [];
 let searchTerm = "";
 let memberStats = {};
+let currentUser = null;
 
 // Sidebar functions
 function openSidebar() {
@@ -486,6 +150,19 @@ document.getElementById("logoutBtn").addEventListener("click", async function() 
     window.location.href = "index.html";
 });
 
+// Toast notification
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `toast-notification ${type}`;
+    toast.innerHTML = (type === 'success' ? '✓ ' : '⚠️ ') + message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
 function escapeHtml(str) {
     if (!str) return "";
     return str.replace(/[&<>]/g, function(m) {
@@ -496,16 +173,19 @@ function escapeHtml(str) {
     });
 }
 
+function formatNumber(num) {
+    if (num === null || num === undefined) return "0";
+    return num.toLocaleString('en-KE');
+}
+
 async function loadMemberStats() {
     try {
-        // Get total contributions per member
         const { data: records, error } = await supabaseClient
             .from("monthly_records")
-            .select("member_id, monthly_contribution, loan, penalties");
+            .select("member_id, monthly_contribution, loan, penalties, loan_balance");
         
         if (error) throw error;
         
-        // Calculate stats for each member
         memberStats = {};
         for (var i = 0; i < records.length; i++) {
             var record = records[i];
@@ -513,12 +193,21 @@ async function loadMemberStats() {
                 memberStats[record.member_id] = {
                     total_contributions: 0,
                     total_loans: 0,
-                    total_penalties: 0
+                    total_penalties: 0,
+                    current_balance: 0,
+                    months_active: new Set()
                 };
             }
             memberStats[record.member_id].total_contributions += (record.monthly_contribution || 0);
             memberStats[record.member_id].total_loans += (record.loan || 0);
             memberStats[record.member_id].total_penalties += (record.penalties || 0);
+            memberStats[record.member_id].current_balance += (record.loan_balance || 0);
+            memberStats[record.member_id].months_active.add(record.year + '-' + record.month);
+        }
+        
+        // Convert months_active Set to count
+        for (var id in memberStats) {
+            memberStats[id].months_active = memberStats[id].months_active.size;
         }
     } catch (error) {
         console.error("Error loading stats:", error);
@@ -535,13 +224,8 @@ async function loadMembers() {
         await loadMemberStats();
         renderMembersList();
     } catch (error) {
-        container.innerHTML = "<div class='card'><h3>Error</h3><p>" + error.message + "</p><button class='btn' onclick='location.reload()'>Retry</button></div>";
+        container.innerHTML = "<div class='card'><h3>⚠️ Error</h3><p>" + error.message + "</p><button class='btn' onclick='location.reload()'>Retry</button></div>";
     }
-}
-
-function formatNumber(num) {
-    if (num === null || num === undefined) return "0";
-    return num.toLocaleString('en-KE');
 }
 
 function renderMembersList() {
@@ -555,51 +239,105 @@ function renderMembersList() {
         });
     }
     
+    // Calculate summary stats
+    let totalContributions = 0;
+    let totalLoans = 0;
+    let totalBalance = 0;
+    let activeMembers = 0;
+    
+    for (var i = 0; i < filtered.length; i++) {
+        var stats = memberStats[filtered[i].id] || { total_contributions: 0, total_loans: 0, current_balance: 0, months_active: 0 };
+        totalContributions += stats.total_contributions;
+        totalLoans += stats.total_loans;
+        totalBalance += stats.current_balance;
+        if (stats.months_active > 0) activeMembers++;
+    }
+    
     let tableRows = "";
     for (var i = 0; i < filtered.length; i++) {
         var m = filtered[i];
-        var stats = memberStats[m.id] || { total_contributions: 0, total_loans: 0, total_penalties: 0 };
+        var stats = memberStats[m.id] || { total_contributions: 0, total_loans: 0, total_penalties: 0, months_active: 0 };
+        var avatarLetter = m.name.charAt(0).toUpperCase();
         
         tableRows += "<tr>";
-        tableRows += "<td data-label='MEMBER'><strong>" + escapeHtml(m.name) + "</strong>";
+        tableRows += "<td>";
+        tableRows += "<div class='member-info'>";
+        tableRows += "<div class='member-avatar'>" + avatarLetter + "</div>";
+        tableRows += "<div><strong>" + escapeHtml(m.name) + "</strong>";
         if (m.email) tableRows += "<br><small style='color:#6c757d'>" + escapeHtml(m.email) + "</small>";
+        tableRows += "</div></div>";
         tableRows += "</td>";
-        tableRows += "<td data-label='PHONE'>" + (m.phone ? escapeHtml(m.phone) : "-") + "</td>";
-        tableRows += "<td data-label='TOTAL CONTRIBUTIONS' style='color:var(--primary); font-weight:600;'>KES " + formatNumber(stats.total_contributions) + "</td>";
-        tableRows += "<td data-label='ACTIONS' class='action-group'>";
-        tableRows += "<button class='btn-sm btn-outline edit-member' data-id='" + m.id + "' data-name='" + escapeHtml(m.name) + "' data-phone='" + escapeHtml(m.phone || "") + "' data-email='" + escapeHtml(m.email || "") + "'>✏️ EDIT</button>";
-        tableRows += "<button class='btn-sm btn-danger-outline delete-member' data-id='" + m.id + "' data-name='" + escapeHtml(m.name) + "'>🗑️ DEL</button>";
-        tableRows += "<button class='btn-sm btn-warning view-history' data-id='" + m.id + "' data-name='" + escapeHtml(m.name) + "'>📜 HISTORY</button>";
+        tableRows += "<td>" + (m.phone ? escapeHtml(m.phone) : "—") + "</td>";
+        tableRows += "<td style='color:var(--primary); font-weight:600;'>KES " + formatNumber(stats.total_contributions) + "</td>";
+        tableRows += "<td>KES " + formatNumber(stats.total_loans) + "</td>";
+        tableRows += "<td>" + stats.months_active + " month(s)</td>";
+        tableRows += "<td class='action-buttons-cell'>";
+        tableRows += "<button class='btn-sm btn-outline edit-member' data-id='" + m.id + "' data-name='" + escapeHtml(m.name) + "' data-phone='" + escapeHtml(m.phone || "") + "' data-email='" + escapeHtml(m.email || "") + "'>✏️ Edit</button>";
+        tableRows += "<button class='btn-sm btn-danger-outline delete-member' data-id='" + m.id + "' data-name='" + escapeHtml(m.name) + "'>🗑️ Del</button>";
+        tableRows += "<button class='btn-sm btn-warning view-history' data-id='" + m.id + "' data-name='" + escapeHtml(m.name) + "'>📜 History</button>";
         tableRows += "</td>";
         tableRows += "</tr>";
     }
     
     if (filtered.length === 0) {
-        tableRows = "<tr><td colspan='5' style='text-align:center; padding: 2rem;'>No members found. Click 'ADD MEMBER' to get started.</td></tr>";
+        tableRows = "<tr><td colspan='6' style='text-align:center; padding: 2rem;'>👥 No members found. Click 'ADD MEMBER' to get started.</td></tr>";
     }
     
-    var totalContributions = 0;
-    for (var i = 0; i < filtered.length; i++) {
-        var stats = memberStats[filtered[i].id] || { total_contributions: 0 };
-        totalContributions += stats.total_contributions;
-    }
-    
-    var html = "";
-    html += "<div class='flex-between'>";
-    html += "<div><h2>👥 MEMBERS</h2><span class='stats-badge'>Total Members: " + allMembers.length + "</span></div>";
-    html += "<button class='btn' id='addMemberBtn'>+ ADD MEMBER</button>";
-    html += "</div>";
-    html += "<div class='flex-between'>";
-    html += "<input type='text' id='searchMemberInput' class='search-bar' placeholder='🔍 Search by name, email or phone...' value='" + escapeHtml(searchTerm) + "'>";
-    html += "<div style='font-size:0.75rem; color:#6c757d'>💰 Total Contributions: KES " + formatNumber(totalContributions) + "</div>";
-    html += "</div>";
-    html += "<div class='card'>";
-    html += "<div class='table-wrapper'>";
-    html += "<table>";
-    html += "<thead><tr><th>MEMBER</th><th>PHONE</th><th>TOTAL CONTRIBUTIONS</th><th>ACTIONS</th></thead>";
-    html += "<tbody>" + tableRows + "</tbody>";
-    html += "</table>";
-    html += "</div></div>";
+    var html = `
+        <div class="stats-summary">
+            <div class="stat-box">
+                <h4>Total Members</h4>
+                <div class="number">${allMembers.length}</div>
+            </div>
+            <div class="stat-box">
+                <h4>Active Members</h4>
+                <div class="number">${activeMembers}</div>
+            </div>
+            <div class="stat-box">
+                <h4>Total Contributions</h4>
+                <div class="number">KES ${(totalContributions/1000).toFixed(0)}k</div>
+                <small>KES ${formatNumber(totalContributions)}</small>
+            </div>
+            <div class="stat-box">
+                <h4>Total Loans</h4>
+                <div class="number">KES ${(totalLoans/1000).toFixed(0)}k</div>
+                <small>KES ${formatNumber(totalLoans)}</small>
+            </div>
+        </div>
+        
+        <div class="flex-between">
+            <div>
+                <h2>👥 MEMBERS DIRECTORY</h2>
+            </div>
+            <div class="export-buttons">
+                <button class="btn" id="addMemberBtn">+ ADD MEMBER</button>
+                <button class="btn-outline" id="exportMembersBtn">📎 Export</button>
+            </div>
+        </div>
+        
+        <div class="flex-between">
+            <input type="text" id="searchMemberInput" class="search-bar" placeholder="🔍 Search by name, email or phone..." value="${escapeHtml(searchTerm)}">
+            <div style="font-size:0.75rem; color:#6c757d">💰 Total Balance: KES ${formatNumber(totalBalance)}</div>
+        </div>
+        
+        <div class="card">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>MEMBER</th>
+                            <th>PHONE</th>
+                            <th>TOTAL CONTRIBUTIONS</th>
+                            <th>TOTAL LOANS</th>
+                            <th>ACTIVE MONTHS</th>
+                            <th>ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody>${tableRows}</tbody>
+                </table>
+            </div>
+        </div>
+    `;
     
     container.innerHTML = html;
     
@@ -609,6 +347,7 @@ function renderMembersList() {
     });
     
     document.getElementById("addMemberBtn").addEventListener("click", showAddMemberModal);
+    document.getElementById("exportMembersBtn").addEventListener("click", exportMembersToCSV);
     
     var editBtns = document.querySelectorAll(".edit-member");
     for (var i = 0; i < editBtns.length; i++) {
@@ -627,21 +366,73 @@ function renderMembersList() {
     var historyBtns = document.querySelectorAll(".view-history");
     for (var i = 0; i < historyBtns.length; i++) {
         historyBtns[i].addEventListener("click", function() {
-            showMemberHistory(this.dataset.id, this.dataset.name);
+            window.location.href = "member-history.html?id=" + this.dataset.id + "&name=" + encodeURIComponent(this.dataset.name);
         });
     }
+}
+
+function exportMembersToCSV() {
+    var csvRows = [];
+    csvRows.push(["CHAMA MEMBERS LIST"]);
+    csvRows.push(["Generated:", new Date().toLocaleString()]);
+    csvRows.push([]);
+    csvRows.push(["NAME", "EMAIL", "PHONE", "TOTAL CONTRIBUTIONS", "TOTAL LOANS", "TOTAL PENALTIES", "ACTIVE MONTHS"]);
+    
+    for (var i = 0; i < allMembers.length; i++) {
+        var m = allMembers[i];
+        var stats = memberStats[m.id] || { total_contributions: 0, total_loans: 0, total_penalties: 0, months_active: 0 };
+        csvRows.push([
+            m.name,
+            m.email || "",
+            m.phone || "",
+            "KES " + formatNumber(stats.total_contributions),
+            "KES " + formatNumber(stats.total_loans),
+            "KES " + formatNumber(stats.total_penalties),
+            stats.months_active
+        ]);
+    }
+    
+    var csv = "";
+    for (var i = 0; i < csvRows.length; i++) {
+        csv += csvRows[i].join(",") + "\n";
+    }
+    
+    var blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    var link = document.createElement("a");
+    var url = URL.createObjectURL(blob);
+    link.href = url;
+    link.setAttribute("download", "chama_members_" + new Date().toISOString().slice(0,10) + ".csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    showToast("Members list exported!");
 }
 
 function showAddMemberModal() {
     var modal = document.createElement("div");
     modal.className = "modal";
-    modal.innerHTML = '<div class="modal-content">' +
-        '<h3>➕ ADD NEW MEMBER</h3>' +
-        '<div class="form-group"><label>MEMBER NAME *</label><input type="text" id="memberName" placeholder="Enter full name"></div>' +
-        '<div class="form-group"><label>EMAIL ADDRESS</label><input type="email" id="memberEmail" placeholder="member@example.com"></div>' +
-        '<div class="form-group"><label>PHONE NUMBER</label><input type="tel" id="memberPhone" placeholder="0712345678"></div>' +
-        '<div style="display:flex; gap:10px; margin-top:1rem;"><button id="confirmAddBtn" class="btn">✅ ADD MEMBER</button><button id="cancelModalBtn" class="btn-outline btn">❌ CANCEL</button></div>' +
-        '</div>';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <h3>➕ ADD NEW MEMBER</h3>
+            <div class="form-group">
+                <label>MEMBER NAME *</label>
+                <input type="text" id="memberName" placeholder="Enter full name" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label>EMAIL ADDRESS</label>
+                <input type="email" id="memberEmail" placeholder="member@example.com">
+            </div>
+            <div class="form-group">
+                <label>PHONE NUMBER</label>
+                <input type="tel" id="memberPhone" placeholder="0712345678">
+            </div>
+            <div style="display:flex; gap:10px; margin-top:1rem;">
+                <button id="confirmAddBtn" class="btn">✅ ADD MEMBER</button>
+                <button id="cancelModalBtn" class="btn-outline btn">❌ CANCEL</button>
+            </div>
+        </div>
+    `;
     document.body.appendChild(modal);
     
     document.getElementById("confirmAddBtn").onclick = async function() {
@@ -650,7 +441,7 @@ function showAddMemberModal() {
         var phone = document.getElementById("memberPhone").value.trim();
         
         if (!name) { 
-            alert("Please enter member name"); 
+            showToast("Please enter member name", "error");
             return; 
         }
         
@@ -660,12 +451,12 @@ function showAddMemberModal() {
         
         var response = await supabaseClient.from("members").insert([newMember]);
         if (response.error) { 
-            alert("Error: " + response.error.message); 
+            showToast(response.error.message, "error");
             return; 
         }
         modal.remove();
         await loadMembers();
-        alert("✅ Member added successfully!");
+        showToast("✅ Member added successfully!");
     };
     document.getElementById("cancelModalBtn").onclick = function() { modal.remove(); };
 }
@@ -673,13 +464,27 @@ function showAddMemberModal() {
 function showEditMemberModal(id, name, phone, email) {
     var modal = document.createElement("div");
     modal.className = "modal";
-    modal.innerHTML = '<div class="modal-content">' +
-        '<h3>✏️ EDIT MEMBER</h3>' +
-        '<div class="form-group"><label>MEMBER NAME *</label><input type="text" id="memberName" value="' + escapeHtml(name) + '"></div>' +
-        '<div class="form-group"><label>EMAIL ADDRESS</label><input type="email" id="memberEmail" value="' + escapeHtml(email || "") + '"></div>' +
-        '<div class="form-group"><label>PHONE NUMBER</label><input type="tel" id="memberPhone" value="' + escapeHtml(phone || "") + '"></div>' +
-        '<div style="display:flex; gap:10px; margin-top:1rem;"><button id="confirmEditBtn" class="btn">💾 SAVE CHANGES</button><button id="cancelModalBtn" class="btn-outline btn">❌ CANCEL</button></div>' +
-        '</div>';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <h3>✏️ EDIT MEMBER</h3>
+            <div class="form-group">
+                <label>MEMBER NAME *</label>
+                <input type="text" id="memberName" value="${escapeHtml(name)}">
+            </div>
+            <div class="form-group">
+                <label>EMAIL ADDRESS</label>
+                <input type="email" id="memberEmail" value="${escapeHtml(email || "")}">
+            </div>
+            <div class="form-group">
+                <label>PHONE NUMBER</label>
+                <input type="tel" id="memberPhone" value="${escapeHtml(phone || "")}">
+            </div>
+            <div style="display:flex; gap:10px; margin-top:1rem;">
+                <button id="confirmEditBtn" class="btn">💾 SAVE CHANGES</button>
+                <button id="cancelModalBtn" class="btn-outline btn">❌ CANCEL</button>
+            </div>
+        </div>
+    `;
     document.body.appendChild(modal);
     
     document.getElementById("confirmEditBtn").onclick = async function() {
@@ -688,24 +493,22 @@ function showEditMemberModal(id, name, phone, email) {
         var newPhone = document.getElementById("memberPhone").value.trim();
         
         if (!newName) { 
-            alert("Please enter member name"); 
+            showToast("Please enter member name", "error");
             return; 
         }
         
         var updateData = { name: newName };
-        if (newEmail) updateData.email = newEmail;
-        else updateData.email = null;
-        if (newPhone) updateData.phone = newPhone;
-        else updateData.phone = null;
+        updateData.email = newEmail || null;
+        updateData.phone = newPhone || null;
         
         var response = await supabaseClient.from("members").update(updateData).eq("id", id);
         if (response.error) { 
-            alert("Error: " + response.error.message); 
+            showToast(response.error.message, "error");
             return; 
         }
         modal.remove();
         await loadMembers();
-        alert("✅ Member updated successfully!");
+        showToast("✅ Member updated successfully!");
     };
     document.getElementById("cancelModalBtn").onclick = function() { modal.remove(); };
 }
@@ -716,68 +519,12 @@ function confirmDeleteMember(id, name) {
     (async function() {
         var response = await supabaseClient.from("members").delete().eq("id", id);
         if (response.error) { 
-            alert("Error: " + response.error.message); 
+            showToast(response.error.message, "error");
             return; 
         }
         await loadMembers();
-        alert("✅ Member deleted successfully!");
+        showToast("✅ Member deleted successfully!");
     })();
-}
-
-async function showMemberHistory(memberId, memberName) {
-    try {
-        const { data: records, error } = await supabaseClient
-            .from("monthly_records")
-            .select("*")
-            .eq("member_id", memberId)
-            .order("year", { ascending: false })
-            .order("month", { ascending: false });
-        
-        if (error) throw error;
-        
-        var modal = document.createElement("div");
-        modal.className = "modal";
-        
-        var historyHtml = '<div class="modal-content" style="max-width: 600px; max-height: 80vh; overflow-y: auto;">';
-        historyHtml += '<h3>📜 HISTORY: ' + escapeHtml(memberName) + '</h3>';
-        historyHtml += '<hr style="margin: 10px 0;">';
-        
-        if (!records || records.length === 0) {
-            historyHtml += '<p style="text-align:center; padding: 2rem;">No records found for this member.</p>';
-        } else {
-            historyHtml += '<table style="width:100%; font-size:0.75rem;">';
-            historyHtml += '<thead><tr><th>Month/Year</th><th>Loan</th><th>Deductions</th><th>Balance</th><th>Contribution</th><th>Penalties</th></tr></thead>';
-            historyHtml += '<tbody>';
-            
-            var monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
-            
-            for (var i = 0; i < records.length; i++) {
-                var r = records[i];
-                historyHtml += '<tr>';
-                historyHtml += '<td>' + monthNames[r.month - 1] + ' ' + r.year + '</td>';
-                historyHtml += '<td>KES ' + (r.loan || 0).toLocaleString() + '</td>';
-                historyHtml += '<td>KES ' + (r.loan_deductions || 0).toLocaleString() + '</td>';
-                historyHtml += '<td>KES ' + (r.loan_balance || 0).toLocaleString() + '</td>';
-                historyHtml += '<td>KES ' + (r.monthly_contribution || 0).toLocaleString() + '</td>';
-                historyHtml += '<td>KES ' + (r.penalties || 0).toLocaleString() + '</td>';
-                historyHtml += '</tr>';
-            }
-            
-            historyHtml += '</tbody></table>';
-        }
-        
-        historyHtml += '<div style="display:flex; gap:10px; margin-top:1rem; justify-content:flex-end;">';
-        historyHtml += '<button id="closeHistoryBtn" class="btn">CLOSE</button>';
-        historyHtml += '</div></div>';
-        
-        modal.innerHTML = historyHtml;
-        document.body.appendChild(modal);
-        
-        document.getElementById("closeHistoryBtn").onclick = function() { modal.remove(); };
-        
-    } catch (error) {
-        alert("Error loading history: " + error.message);
-    }
 }
 
 // Initialize
