@@ -220,6 +220,12 @@
             text-align: center;
             box-shadow: var(--shadow-sm);
             border: 1px solid var(--gray-border);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.1);
         }
 
         .stat-card h4 {
@@ -234,6 +240,12 @@
             font-size: 1.3rem;
             font-weight: 800;
             color: var(--primary);
+        }
+
+        .stat-full {
+            font-size: 0.7rem;
+            color: #6c757d;
+            margin-top: 4px;
         }
 
         .card {
@@ -256,12 +268,21 @@
             font-size: 0.75rem;
             text-decoration: none;
             display: inline-block;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
         }
 
         .btn-outline {
             background: transparent;
             border: 1px solid var(--primary);
             color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-light);
         }
 
         .flex-between {
@@ -322,6 +343,21 @@
             display: block;
         }
 
+        .recent-activity {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .activity-item {
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--gray-border);
+            font-size: 0.75rem;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -342,6 +378,7 @@
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
 </head>
 <body>
 <div class="app-wrapper">
@@ -353,17 +390,17 @@
             <button class="sidebar-close" id="sidebarClose">X</button>
         </div>
         <nav class="sidebar-nav">
-            <a href="dashboard.html" class="nav-item active"><span class="icon">DASH</span><span class="label">DASHBOARD</span></a>
-            <a href="members.html" class="nav-item"><span class="icon">MEM</span><span class="label">MEMBERS</span></a>
-            <a href="contributions.html" class="nav-item"><span class="icon">REC</span><span class="label">MONTHLY RECORDS</span></a>
-            <a href="reports.html" class="nav-item"><span class="icon">RPT</span><span class="label">REPORTS</span></a>
-            <a href="settings.html" class="nav-item"><span class="icon">SET</span><span class="label">SETTINGS</span></a>
+            <a href="dashboard.html" class="nav-item active"><span class="icon">📊</span><span class="label">DASHBOARD</span></a>
+            <a href="members.html" class="nav-item"><span class="icon">👥</span><span class="label">MEMBERS</span></a>
+            <a href="monthly-records.html" class="nav-item"><span class="icon">📅</span><span class="label">MONTHLY RECORDS</span></a>
+            <a href="reports.html" class="nav-item"><span class="icon">📈</span><span class="label">REPORTS</span></a>
+            <a href="settings.html" class="nav-item"><span class="icon">⚙️</span><span class="label">SETTINGS</span></a>
         </nav>
     </aside>
 
     <main class="main-content">
         <div class="top-bar">
-            <button class="menu-toggle" id="menuToggle">MENU</button>
+            <button class="menu-toggle" id="menuToggle">☰</button>
             <div class="page-title">DASHBOARD</div>
             <div class="user-info">
                 <span class="user-email" id="userEmail"></span>
@@ -380,86 +417,190 @@
     </main>
 </div>
 
-<script src="supabase-config.js"></script>
 <script>
-    const menuToggle = document.getElementById("menuToggle");
-    const sidebar = document.getElementById("sidebar");
-    const sidebarClose = document.getElementById("sidebarClose");
-    const sidebarOverlay = document.getElementById("sidebarOverlay");
-    
-    function openSidebar() { 
-        sidebar.classList.add("open"); 
-        sidebarOverlay.classList.add("active"); 
+// Using supabaseClient from supabase-config.js
+
+const menuToggle = document.getElementById("menuToggle");
+const sidebar = document.getElementById("sidebar");
+const sidebarClose = document.getElementById("sidebarClose");
+const sidebarOverlay = document.getElementById("sidebarOverlay");
+
+function openSidebar() { 
+    sidebar.classList.add("open"); 
+    sidebarOverlay.classList.add("active"); 
+}
+
+function closeSidebar() { 
+    sidebar.classList.remove("open"); 
+    sidebarOverlay.classList.remove("active"); 
+}
+
+if (menuToggle) menuToggle.addEventListener("click", openSidebar);
+if (sidebarClose) sidebarClose.addEventListener("click", closeSidebar);
+if (sidebarOverlay) sidebarOverlay.addEventListener("click", closeSidebar);
+
+window.addEventListener("resize", function() { 
+    if (window.innerWidth > 768) closeSidebar(); 
+});
+
+// Helper functions
+function formatNumber(num) {
+    return (num || 0).toLocaleString("en-KE");
+}
+
+function safeValue(value) {
+    if (value === null || value === undefined || isNaN(value)) {
+        return 0;
     }
-    
-    function closeSidebar() { 
-        sidebar.classList.remove("open"); 
-        sidebarOverlay.classList.remove("active"); 
-    }
-    
-    if (menuToggle) menuToggle.addEventListener("click", openSidebar);
-    if (sidebarClose) sidebarClose.addEventListener("click", closeSidebar);
-    if (sidebarOverlay) sidebarOverlay.addEventListener("click", closeSidebar);
-    
-    window.addEventListener("resize", function() { 
-        if (window.innerWidth > 768) closeSidebar(); 
-    });
+    return parseFloat(value);
+}
 
-    (async function() {
-        const isAuth = await protectPage();
-        if (!isAuth) return;
-        const user = await getCurrentUser();
-        if (user) document.getElementById("userEmail").textContent = user.email || "Admin";
-        await loadDashboardData();
-    })();
-
-    document.getElementById("logoutBtn").addEventListener("click", async function() {
-        await logoutUser();
-        window.location.href = "index.html";
-    });
-
-    async function loadDashboardData() {
-        const container = document.getElementById("app-root");
-        try {
-            const membersRes = await supabaseClient.from("members").select("*");
-            const recordsRes = await supabaseClient.from("monthly_records").select("*");
-            
-            if (membersRes.error) throw membersRes.error;
-            if (recordsRes.error) throw recordsRes.error;
-            
-            const members = membersRes.data || [];
-            const records = recordsRes.data || [];
-            
-            const totalMembers = members.length;
-            let totalLoan = 0;
-            let totalMonthlyContribution = 0;
-            let totalPenalties = 0;
-            
-            for (var i = 0; i < records.length; i++) {
-                totalLoan += records[i].loan || 0;
-                totalMonthlyContribution += records[i].monthly_contribution || 0;
-                totalPenalties += records[i].penalties || 0;
-            }
-            
-            function formatNumber(num) {
-                return (num || 0).toLocaleString("en-KE");
-            }
-            
-            var html = "";
-            html += "<div class='welcome-card card'><h1>CHAMA DASHBOARD</h1><p>Overview of your chama records</p></div>";
-            html += "<div class='stats-grid'>";
-            html += "<div class='stat-card'><h4>TOTAL MEMBERS</h4><div class='stat-number'>" + totalMembers + "</div></div>";
-            html += "<div class='stat-card'><h4>TOTAL LOAN</h4><div class='stat-number'>KES " + (totalLoan/1000).toFixed(0) + "k</div><div class='stat-full'>" + formatNumber(totalLoan) + "</div></div>";
-            html += "<div class='stat-card'><h4>TOTAL CONTRIBUTIONS</h4><div class='stat-number'>KES " + (totalMonthlyContribution/1000).toFixed(0) + "k</div><div class='stat-full'>" + formatNumber(totalMonthlyContribution) + "</div></div>";
-            html += "<div class='stat-card'><h4>TOTAL PENALTIES</h4><div class='stat-number'>KES " + (totalPenalties/1000).toFixed(0) + "k</div><div class='stat-full'>" + formatNumber(totalPenalties) + "</div></div>";
-            html += "</div>";
-            html += "<div class='flex-between'><a href='members.html' class='btn'>MANAGE MEMBERS</a><a href='monthly-records.html' class='btn-outline btn'>VIEW RECORDS</a><a href='reports.html' class='btn-outline btn'>EXPORT REPORTS</a></div>";
-            
-            container.innerHTML = html;
-        } catch (error) {
-            container.innerHTML = "<div class='card'><h3>ERROR</h3><p>" + error.message + "</p><button class='btn' onclick='location.reload()'>RETRY</button></div>";
+async function loadDashboardData() {
+    const container = document.getElementById("app-root");
+    try {
+        // Get members
+        const membersRes = await supabaseClient.from("members").select("*");
+        if (membersRes.error) throw membersRes.error;
+        const members = membersRes.data || [];
+        const totalMembers = members.length;
+        
+        // Get all records
+        const recordsRes = await supabaseClient.from("monthly_records").select("*");
+        if (recordsRes.error) throw recordsRes.error;
+        const records = recordsRes.data || [];
+        
+        // Calculate totals
+        let totalLoan = 0;
+        let totalLoanBalance = 0;
+        let totalMonthlyContribution = 0;
+        let totalPenalties = 0;
+        let totalLoanDeductions = 0;
+        
+        for (var i = 0; i < records.length; i++) {
+            totalLoan += safeValue(records[i].loan);
+            totalLoanBalance += safeValue(records[i].loan_balance);
+            totalMonthlyContribution += safeValue(records[i].monthly_contribution);
+            totalPenalties += safeValue(records[i].penalties);
+            totalLoanDeductions += safeValue(records[i].loan_deductions);
         }
+        
+        // Calculate total collected (contributions + loan repayments)
+        const totalCollected = totalMonthlyContribution + (totalLoan - totalLoanBalance);
+        
+        // Get recent activity (last 5 records)
+        const recentRecords = [...records].sort(function(a, b) {
+            return new Date(b.created_at) - new Date(a.created_at);
+        }).slice(0, 5);
+        
+        // Get member names for recent activity
+        const memberMap = {};
+        for (var i = 0; i < members.length; i++) {
+            memberMap[members[i].id] = members[i].name;
+        }
+        
+        // Build recent activity HTML
+        let recentHtml = "";
+        if (recentRecords.length === 0) {
+            recentHtml = "<div class='activity-item'>No recent activity</div>";
+        } else {
+            for (var i = 0; i < recentRecords.length; i++) {
+                var record = recentRecords[i];
+                var memberName = memberMap[record.member_id] || "Unknown";
+                var monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+                var monthName = monthNames[record.month - 1];
+                var date = monthName + " " + record.year;
+                
+                recentHtml += "<div class='activity-item'>";
+                recentHtml += "<strong>" + escapeHtml(memberName) + "</strong> - ";
+                recentHtml += "Contribution: KES " + formatNumber(record.monthly_contribution) + " | ";
+                recentHtml += "Loan: KES " + formatNumber(record.loan) + " | ";
+                recentHtml += "<small>" + date + "</small>";
+                recentHtml += "</div>";
+            }
+        }
+        
+        // Calculate growth metrics
+        const currentYear = new Date().getFullYear();
+        const currentMonth = new Date().getMonth() + 1;
+        
+        let thisYearContributions = 0;
+        let lastYearContributions = 0;
+        
+        for (var i = 0; i < records.length; i++) {
+            if (records[i].year === currentYear) {
+                thisYearContributions += safeValue(records[i].monthly_contribution);
+            } else if (records[i].year === currentYear - 1) {
+                lastYearContributions += safeValue(records[i].monthly_contribution);
+            }
+        }
+        
+        const growth = lastYearContributions > 0 
+            ? ((thisYearContributions - lastYearContributions) / lastYearContributions * 100).toFixed(1)
+            : 0;
+        
+        var html = "";
+        html += "<div class='welcome-card card'>";
+        html += "<h1>🏦 CHAMA DASHBOARD</h1>";
+        html += "<p>Overview of your chama financial records</p>";
+        html += "</div>";
+        
+        html += "<div class='stats-grid'>";
+        html += "<div class='stat-card'><h4>TOTAL MEMBERS</h4><div class='stat-number'>" + totalMembers + "</div></div>";
+        html += "<div class='stat-card'><h4>TOTAL LOANS</h4><div class='stat-number'>KES " + (totalLoan/1000).toFixed(0) + "k</div><div class='stat-full'>KES " + formatNumber(totalLoan) + "</div></div>";
+        html += "<div class='stat-card'><h4>LOAN BALANCE</h4><div class='stat-number'>KES " + (totalLoanBalance/1000).toFixed(0) + "k</div><div class='stat-full'>KES " + formatNumber(totalLoanBalance) + "</div></div>";
+        html += "<div class='stat-card'><h4>TOTAL CONTRIBUTIONS</h4><div class='stat-number'>KES " + (totalMonthlyContribution/1000).toFixed(0) + "k</div><div class='stat-full'>KES " + formatNumber(totalMonthlyContribution) + "</div></div>";
+        html += "<div class='stat-card'><h4>TOTAL PENALTIES</h4><div class='stat-number'>KES " + (totalPenalties/1000).toFixed(0) + "k</div><div class='stat-full'>KES " + formatNumber(totalPenalties) + "</div></div>";
+        html += "<div class='stat-card'><h4>TOTAL COLLECTED</h4><div class='stat-number'>KES " + (totalCollected/1000).toFixed(0) + "k</div><div class='stat-full'>KES " + formatNumber(totalCollected) + "</div></div>";
+        html += "<div class='stat-card'><h4>YEARLY GROWTH</h4><div class='stat-number'>" + (growth >= 0 ? "+" : "") + growth + "%</div><div class='stat-full'>vs last year</div></div>";
+        html += "<div class='stat-card'><h4>ACTIVE RECORDS</h4><div class='stat-number'>" + records.length + "</div><div class='stat-full'>total entries</div></div>";
+        html += "</div>";
+        
+        html += "<div class='flex-between'>";
+        html += "<a href='members.html' class='btn'>👥 MANAGE MEMBERS</a>";
+        html += "<a href='monthly-records.html' class='btn-outline btn'>📅 VIEW RECORDS</a>";
+        html += "<a href='reports.html' class='btn-outline btn'>📊 EXPORT REPORTS</a>";
+        html += "</div>";
+        
+        html += "<div class='card'>";
+        html += "<h3>📋 Recent Activity</h3>";
+        html += "<div class='recent-activity'>";
+        html += recentHtml;
+        html += "</div>";
+        html += "</div>";
+        
+        container.innerHTML = html;
+        
+    } catch (error) {
+        console.error("Dashboard error:", error);
+        container.innerHTML = "<div class='card'><h3>⚠️ ERROR</h3><p>" + error.message + "</p><button class='btn' onclick='location.reload()'>RETRY</button></div>";
     }
+}
+
+function escapeHtml(str) {
+    if (!str) return "";
+    return String(str).replace(/[&<>]/g, function(m) {
+        if (m === "&") return "&amp;";
+        if (m === "<") return "&lt;";
+        if (m === ">") return "&gt;";
+        return m;
+    });
+}
+
+// Initialize page
+(async function() {
+    const isAuth = await protectPage();
+    if (!isAuth) return;
+    const user = await getCurrentUser();
+    if (user && document.getElementById("userEmail")) {
+        document.getElementById("userEmail").textContent = user.email || "Admin";
+    }
+    await loadDashboardData();
+})();
+
+document.getElementById("logoutBtn").addEventListener("click", async function() {
+    await logoutUser();
+    window.location.href = "index.html";
+});
 </script>
 </body>
 </html>
