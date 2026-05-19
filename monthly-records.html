@@ -9,7 +9,7 @@
     <script src="supabase-config.js"></script>
     <style>
         /* Additional styles for monthly records */
-        .filter-section {
+        .records-header-section {
             background: white;
             border-radius: 20px;
             padding: 1rem;
@@ -17,25 +17,17 @@
             border: 1px solid var(--gray-border);
         }
         
-        .filter-title {
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid var(--primary);
-            display: inline-block;
-        }
-        
-        .filter-controls {
+        .filter-row {
             display: flex;
             flex-wrap: wrap;
             gap: 1rem;
             align-items: flex-end;
+            margin-bottom: 1rem;
         }
         
-        .filter-group {
+        .filter-item {
             flex: 1;
-            min-width: 120px;
+            min-width: 140px;
         }
         
         .filter-label {
@@ -51,7 +43,7 @@
             padding: 10px 12px;
             border: 1px solid var(--gray-border);
             border-radius: 12px;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             background: white;
             cursor: pointer;
         }
@@ -61,72 +53,66 @@
             border-color: var(--primary);
         }
         
-        .filter-buttons {
-            display: flex;
-            gap: 0.5rem;
-        }
-        
         .btn-apply {
             background: var(--primary);
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 10px 24px;
             border-radius: 12px;
             cursor: pointer;
-            font-weight: 500;
-            font-size: 0.75rem;
+            font-weight: 600;
+            font-size: 0.8rem;
+            transition: all 0.2s;
         }
         
-        .btn-reset {
-            background: #f1f5f9;
-            color: #64748b;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 0.75rem;
+        .btn-apply:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
         }
         
-        .active-filter-badge {
-            display: inline-block;
+        .active-period-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
             background: var(--primary-light);
             color: var(--primary);
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            margin-top: 0.8rem;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 600;
         }
         
-        .action-buttons-container {
+        .action-buttons-row {
             display: flex;
-            gap: 1rem;
-            justify-content: center;
-            margin-bottom: 1.5rem;
+            gap: 0.8rem;
+            justify-content: flex-end;
             flex-wrap: wrap;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--gray-border);
         }
         
-        .action-btn-clean {
-            padding: 12px 24px;
+        .action-btn {
+            padding: 8px 18px;
             border-radius: 40px;
             border: none;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             font-weight: 600;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             transition: all 0.2s;
         }
         
-        .btn-whatsapp {
+        .btn-wa {
             background: #25D366;
             color: white;
         }
         
-        .btn-whatsapp:hover {
+        .btn-wa:hover {
             background: #128C7E;
-            transform: translateY(-2px);
+            transform: translateY(-1px);
         }
         
         .btn-excel {
@@ -136,7 +122,7 @@
         
         .btn-excel:hover {
             background: #059669;
-            transform: translateY(-2px);
+            transform: translateY(-1px);
         }
         
         .btn-pdf {
@@ -146,7 +132,7 @@
         
         .btn-pdf:hover {
             background: #b91c1c;
-            transform: translateY(-2px);
+            transform: translateY(-1px);
         }
         
         .btn-save {
@@ -156,24 +142,56 @@
         
         .btn-save:hover {
             background: #2563eb;
-            transform: translateY(-2px);
+            transform: translateY(-1px);
         }
         
-        @media (max-width: 640px) {
-            .filter-controls {
+        .saving-status {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .saving-status.saving {
+            color: var(--primary);
+        }
+        
+        .pending-badge {
+            background: #f59e0b;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 10px;
+            margin-left: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            .filter-row {
                 flex-direction: column;
             }
-            .filter-buttons {
+            .filter-item {
                 width: 100%;
             }
-            .btn-apply, .btn-reset {
+            .btn-apply {
+                width: 100%;
+            }
+            .action-buttons-row {
+                justify-content: stretch;
+            }
+            .action-btn {
                 flex: 1;
-            }
-            .action-buttons-container {
-                flex-direction: column;
-            }
-            .action-btn-clean {
                 justify-content: center;
+            }
+        }
+        
+        @media print {
+            .records-header-section,
+            .action-buttons-row,
+            .sidebar,
+            .top-bar,
+            footer {
+                display: none;
             }
         }
     </style>
@@ -248,21 +266,17 @@ document.getElementById("logoutBtn").addEventListener("click", async function() 
     window.location.href = "index.html";
 });
 
-// Toast notification function
-function showToast(message, type = 'success') {
+function showToast(message, isError = false) {
     const toast = document.createElement('div');
-    toast.className = `toast-notification ${type}`;
-    toast.innerHTML = type === 'success' ? '✓ ' : '⚠️ ';
-    toast.innerHTML += message;
+    toast.className = `toast-notification ${isError ? 'toast-error' : ''}`;
+    toast.textContent = isError ? '⚠️ ' + message : '✓ ' + message;
     document.body.appendChild(toast);
-    
     setTimeout(() => {
         toast.style.opacity = '0';
         setTimeout(() => toast.remove(), 300);
     }, 3000);
 }
 
-// Helper functions
 function safeValue(value) {
     if (value === null || value === undefined || value === '' || isNaN(value)) {
         return 0;
@@ -285,64 +299,6 @@ function escapeHtml(str) {
     });
 }
 
-function showSavedIndicator(success, message = null) {
-    const indicator = document.getElementById("saving-indicator");
-    if (indicator) {
-        if (success) {
-            indicator.textContent = message || "✓ Saved";
-            indicator.style.color = "#2c7a4d";
-        } else {
-            indicator.textContent = message || "✗ Error";
-            indicator.style.color = "#dc2626";
-        }
-        setTimeout(function() {
-            indicator.textContent = "";
-        }, 2000);
-    }
-}
-
-// Save all pending changes
-async function saveAllChanges() {
-    if (pendingSaves.size === 0) {
-        showToast("No pending changes to save", "warning");
-        return;
-    }
-    
-    const saveBtn = document.getElementById("saveAllBtn");
-    if (saveBtn) {
-        saveBtn.disabled = true;
-        saveBtn.innerHTML = '<span class="loading-spinner" style="width:16px;height:16px;"></span> Saving...';
-    }
-    
-    let successCount = 0;
-    let errorCount = 0;
-    
-    for (const [key, change] of pendingSaves) {
-        try {
-            await updateRecordValue(change.memberId, change.field, change.value, true);
-            successCount++;
-            pendingSaves.delete(key);
-        } catch (error) {
-            errorCount++;
-            console.error("Save failed:", error);
-        }
-    }
-    
-    if (saveBtn) {
-        saveBtn.disabled = false;
-        saveBtn.innerHTML = '💾 Save All Changes';
-    }
-    
-    if (successCount > 0) {
-        showToast(`Saved ${successCount} change${successCount > 1 ? 's' : ''} successfully`);
-        showSavedIndicator(true, `Saved ${successCount} item(s)`);
-    }
-    if (errorCount > 0) {
-        showToast(`Failed to save ${errorCount} item(s)`, "error");
-    }
-}
-
-// Data functions
 async function loadData() {
     try {
         const { data: membersData, error: membersError } = await supabaseClient
@@ -365,8 +321,12 @@ async function loadData() {
         for (var i = 0; i < allRecords.length; i++) {
             yearsSet.add(allRecords[i].year);
         }
-        // Also add current year
-        yearsSet.add(new Date().getFullYear());
+        // Add current year and next year
+        var currentYearNum = new Date().getFullYear();
+        yearsSet.add(currentYearNum - 1);
+        yearsSet.add(currentYearNum);
+        yearsSet.add(currentYearNum + 1);
+        
         availableYears = Array.from(yearsSet).sort((a, b) => b - a);
         
         renderSpreadsheet();
@@ -435,15 +395,13 @@ async function updateRecordValue(memberId, field, value, isBulkSave = false) {
         }
         updateTotalsRow();
         if (!isBulkSave) {
-            showSavedIndicator(true);
             showToast("Saved successfully");
         }
         return true;
     } catch (error) {
         console.error("Update error:", error);
         if (!isBulkSave) {
-            showSavedIndicator(false);
-            showToast(error.message, "error");
+            showToast(error.message, true);
         }
         return false;
     }
@@ -478,33 +436,81 @@ function updateTotalsRow() {
     }
 }
 
-// Handle cell change with pending saves tracking
+async function saveAllChanges() {
+    if (pendingSaves.size === 0) {
+        showToast("No pending changes to save", true);
+        return;
+    }
+    
+    var saveBtn = document.getElementById("saveAllBtn");
+    if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '⏳ Saving...';
+    }
+    
+    var successCount = 0;
+    var errorCount = 0;
+    
+    for (var [key, change] of pendingSaves) {
+        try {
+            await updateRecordValue(change.memberId, change.field, change.value, true);
+            successCount++;
+            pendingSaves.delete(key);
+        } catch (error) {
+            errorCount++;
+        }
+    }
+    
+    if (saveBtn) {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = '💾 Save All Changes';
+    }
+    
+    var pendingSpan = document.getElementById("pendingCount");
+    if (pendingSpan) {
+        pendingSpan.style.display = 'none';
+        pendingSpan.textContent = '0';
+    }
+    
+    if (successCount > 0) {
+        showToast("Saved " + successCount + " change(s)");
+    }
+    if (errorCount > 0) {
+        showToast("Failed to save " + errorCount + " item(s)", true);
+    }
+}
+
 window.handleCellChange = function(memberId, field, event) {
     var newValue = event.target.value;
-    var indicator = document.getElementById("saving-indicator");
-    if (indicator) {
-        indicator.textContent = "Pending...";
-        indicator.style.color = "#f59e0b";
+    var savingSpan = document.getElementById("savingStatus");
+    if (savingSpan) {
+        savingSpan.innerHTML = "⏳ Pending...";
+        savingSpan.className = "saving-status saving";
     }
     
     var changeKey = memberId + '_' + field;
     pendingSaves.set(changeKey, { memberId, field, value: newValue });
     
-    var pendingCountSpan = document.getElementById("pendingCount");
-    if (pendingCountSpan) {
-        pendingCountSpan.textContent = pendingSaves.size;
-        pendingCountSpan.style.display = pendingSaves.size > 0 ? 'inline' : 'none';
+    var pendingSpan = document.getElementById("pendingCount");
+    if (pendingSpan) {
+        pendingSpan.textContent = pendingSaves.size;
+        pendingSpan.style.display = pendingSaves.size > 0 ? 'inline-block' : 'none';
     }
     
     if (saveTimeout) clearTimeout(saveTimeout);
     saveTimeout = setTimeout(function() {
         if (pendingSaves.size > 0) {
             saveAllChanges();
+            if (savingSpan) {
+                savingSpan.innerHTML = "✓ Saved";
+                setTimeout(function() {
+                    if (savingSpan) savingSpan.innerHTML = "";
+                }, 2000);
+            }
         }
-    }, 2000);
+    }, 1500);
 };
 
-// Export functions
 function exportToExcel() {
     var monthName = monthNames[currentMonth - 1];
     
@@ -512,17 +518,17 @@ function exportToExcel() {
     csvRows.push(["CHAMA RECORDS - " + monthName + " " + currentYear]);
     csvRows.push(["Generated:", new Date().toLocaleString()]);
     csvRows.push([]);
-    csvRows.push(["MEMBER", "LOAN", "LOAN DEDUCTIONS", "LOAN BALANCE", "MONTHLY CONTRIBUTION", "PENALTIES"]);
+    csvRows.push(["MEMBER", "LOAN (KES)", "LOAN DEDUCTIONS (KES)", "LOAN BALANCE (KES)", "MONTHLY CONTRIBUTION (KES)", "PENALTIES (KES)"]);
     
     for (var i = 0; i < allMembers.length; i++) {
         var member = allMembers[i];
         csvRows.push([
             member.name,
-            "KES " + safeValue(getRecordValue(member.id, "loan")),
-            "KES " + safeValue(getRecordValue(member.id, "loan_deductions")),
-            "KES " + safeValue(getRecordValue(member.id, "loan_balance")),
-            "KES " + safeValue(getRecordValue(member.id, "monthly_contribution")),
-            "KES " + safeValue(getRecordValue(member.id, "penalties"))
+            formatNumber(safeValue(getRecordValue(member.id, "loan"))),
+            formatNumber(safeValue(getRecordValue(member.id, "loan_deductions"))),
+            formatNumber(safeValue(getRecordValue(member.id, "loan_balance"))),
+            formatNumber(safeValue(getRecordValue(member.id, "monthly_contribution"))),
+            formatNumber(safeValue(getRecordValue(member.id, "penalties")))
         ]);
     }
     
@@ -535,7 +541,7 @@ function exportToExcel() {
         totalMonthlyContribution += safeValue(getRecordValue(member.id, "monthly_contribution"));
         totalPenalties += safeValue(getRecordValue(member.id, "penalties"));
     }
-    csvRows.push(["TOTAL", "KES " + formatNumber(totalLoan), "KES " + formatNumber(totalLoanDeductions), "KES " + formatNumber(totalLoanBalance), "KES " + formatNumber(totalMonthlyContribution), "KES " + formatNumber(totalPenalties)]);
+    csvRows.push(["TOTAL", formatNumber(totalLoan), formatNumber(totalLoanDeductions), formatNumber(totalLoanBalance), formatNumber(totalMonthlyContribution), formatNumber(totalPenalties)]);
     
     var csv = "";
     for (var i = 0; i < csvRows.length; i++) {
@@ -577,7 +583,6 @@ function exportToPDF() {
     showToast("PDF ready for printing");
 }
 
-// WhatsApp Share - Opens WhatsApp App Directly
 function shareToWhatsApp() {
     var monthName = monthNames[currentMonth - 1];
     
@@ -591,7 +596,6 @@ function shareToWhatsApp() {
         var monthlyContribution = safeValue(getRecordValue(member.id, "monthly_contribution"));
         var penalties = safeValue(getRecordValue(member.id, "penalties"));
         
-        // Only show members with any activity
         if (loan > 0 || loanDeductions > 0 || loanBalance > 0 || monthlyContribution > 0 || penalties > 0) {
             message += "*" + member.name + "*\n";
             if (loan > 0) message += "💰 Loan: KES " + formatNumber(loan) + "\n";
@@ -603,7 +607,6 @@ function shareToWhatsApp() {
         }
     }
     
-    // Add totals
     var totalLoan = 0, totalLoanBalance = 0, totalMonthlyContribution = 0, totalPenalties = 0;
     for (var i = 0; i < allMembers.length; i++) {
         var member = allMembers[i];
@@ -617,7 +620,6 @@ function shareToWhatsApp() {
     message += "⚖️ Outstanding Balance: KES " + formatNumber(totalLoanBalance) + "\n";
     message += "📋 Total Contributions: KES " + formatNumber(totalMonthlyContribution) + "\n";
     message += "⚠️ Total Penalties: KES " + formatNumber(totalPenalties) + "\n";
-    message += "\n📅 Generated by ChamaEase";
     
     var encodedMessage = encodeURIComponent(message);
     var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
@@ -637,14 +639,14 @@ function shareToWhatsApp() {
 function renderSpreadsheet() {
     var container = document.getElementById("app-root");
     
-    // Build month options for filter
+    // Build month options
     var monthOptions = '';
     for (var i = 1; i <= 12; i++) {
         var selected = (currentMonth === i) ? 'selected' : '';
         monthOptions += '<option value="' + i + '" ' + selected + '>' + monthNames[i - 1] + '</option>';
     }
     
-    // Build year options for filter
+    // Build year options
     var yearOptions = '';
     for (var i = 0; i < availableYears.length; i++) {
         var selected = (currentYear === availableYears[i]) ? 'selected' : '';
@@ -661,18 +663,18 @@ function renderSpreadsheet() {
         var monthlyContribution = safeValue(getRecordValue(member.id, "monthly_contribution"));
         var penalties = safeValue(getRecordValue(member.id, "penalties"));
         
-        tableRows += "<tr>";
-        tableRows += "<td class=\"member-name-cell\"><strong>" + escapeHtml(member.name) + "</strong></td>";
-        tableRows += "<td><input type=\"number\" value=\"" + loan + "\" step=\"any\" onchange=\"handleCellChange('" + member.id + "', 'loan', event)\" placeholder=\"0\"></td>";
-        tableRows += "<td><input type=\"number\" value=\"" + loanDeductions + "\" step=\"any\" onchange=\"handleCellChange('" + member.id + "', 'loan_deductions', event)\" placeholder=\"0\"></td>";
-        tableRows += "<td><input type=\"number\" value=\"" + loanBalance + "\" step=\"any\" onchange=\"handleCellChange('" + member.id + "', 'loan_balance', event)\" placeholder=\"0\"></td>";
-        tableRows += "<td><input type=\"number\" value=\"" + monthlyContribution + "\" step=\"any\" onchange=\"handleCellChange('" + member.id + "', 'monthly_contribution', event)\" placeholder=\"0\"></td>";
-        tableRows += "<td><input type=\"number\" value=\"" + penalties + "\" step=\"any\" onchange=\"handleCellChange('" + member.id + "', 'penalties', event)\" placeholder=\"0\"></td>";
-        tableRows += "</tr>";
+        tableRows += `<tr>
+            <td class="member-name-cell"><strong>${escapeHtml(member.name)}</strong></td>
+            <td><input type="number" value="${loan}" step="any" onchange="handleCellChange('${member.id}', 'loan', event)" placeholder="0"></td>
+            <td><input type="number" value="${loanDeductions}" step="any" onchange="handleCellChange('${member.id}', 'loan_deductions', event)" placeholder="0"></td>
+            <td><input type="number" value="${loanBalance}" step="any" onchange="handleCellChange('${member.id}', 'loan_balance', event)" placeholder="0"></td>
+            <td><input type="number" value="${monthlyContribution}" step="any" onchange="handleCellChange('${member.id}', 'monthly_contribution', event)" placeholder="0"></td>
+            <td><input type="number" value="${penalties}" step="any" onchange="handleCellChange('${member.id}', 'penalties', event)" placeholder="0"></td>
+        </tr>`;
     }
     
     if (allMembers.length === 0) {
-        tableRows = "<tr><td colspan=\"6\" style=\"text-align:center; padding: 2rem;\">👥 No members found. Please <a href=\"members.html\">add members</a> first.侧</td></tr>";
+        tableRows = `<tr><td colspan="6" style="text-align:center; padding: 2rem;">👥 No members found. Please <a href="members.html">add members</a> first.</td></tr>`;
     }
     
     var totalLoan = 0, totalLoanDeductions = 0, totalLoanBalance = 0, totalMonthlyContribution = 0, totalPenalties = 0;
@@ -687,41 +689,43 @@ function renderSpreadsheet() {
     }
     
     var html = `
-        <!-- Filter Section -->
-        <div class="filter-section">
-            <div class="filter-title">📅 Select Period</div>
-            <div class="filter-controls">
-                <div class="filter-group">
-                    <label class="filter-label">Select Month</label>
-                    <select id="monthFilter" class="filter-select">${monthOptions}</select>
+        <div class="records-header-section">
+            <!-- Filter Row - Positioned at top near table -->
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label class="filter-label">📅 Select Month</label>
+                    <select id="monthSelect" class="filter-select">${monthOptions}</select>
                 </div>
-                <div class="filter-group">
-                    <label class="filter-label">Select Year</label>
-                    <select id="yearFilter" class="filter-select">${yearOptions}</select>
+                <div class="filter-item">
+                    <label class="filter-label">📆 Select Year</label>
+                    <select id="yearSelect" class="filter-select">${yearOptions}</select>
                 </div>
-                <div class="filter-buttons">
-                    <button class="btn-apply" id="applyFilterBtn">Apply Filter</button>
+                <div class="filter-item">
+                    <button id="applyFilterBtn" class="btn-apply">Apply Filter</button>
+                </div>
+                <div class="filter-item">
+                    <div class="active-period-badge">
+                        📍 Showing: <strong>${monthNames[currentMonth - 1]} ${currentYear}</strong>
+                    </div>
                 </div>
             </div>
-            <div class="active-filter-badge">
-                📅 Showing: <strong>${monthNames[currentMonth - 1]} ${currentYear}</strong>
+            
+            <!-- Action Buttons Row -->
+            <div class="action-buttons-row">
+                <span id="savingStatus" class="saving-status"></span>
+                <button class="action-btn btn-save" id="saveAllBtn">
+                    💾 Save All Changes <span id="pendingCount" class="pending-badge" style="display:none;">0</span>
+                </button>
+                <button class="action-btn btn-excel" id="exportExcelBtn">
+                    📊 Export Excel
+                </button>
+                <button class="action-btn btn-pdf" id="exportPDFBtn">
+                    📄 Export PDF
+                </button>
+                <button class="action-btn btn-wa" id="shareWABtn">
+                    📱 Share
+                </button>
             </div>
-        </div>
-        
-        <!-- Action Buttons -->
-        <div class="action-buttons-container">
-            <button class="action-btn-clean btn-whatsapp" id="shareWABtn">
-                📱 Share on WhatsApp
-            </button>
-            <button class="action-btn-clean btn-excel" id="exportExcelBtn">
-                📊 Export to Excel
-            </button>
-            <button class="action-btn-clean btn-pdf" id="exportPDFBtn">
-                📄 Export to PDF
-            </button>
-            <button class="action-btn-clean btn-save" id="saveAllBtn">
-                💾 Save All Changes <span id="pendingCount" style="display:none; background:#f59e0b; color:white; border-radius:50%; padding:2px 6px; margin-left:5px; font-size:10px;"></span>
-            </button>
         </div>
         
         <!-- Records Table -->
@@ -730,43 +734,53 @@ function renderSpreadsheet() {
                 <thead>
                     <tr>
                         <th style="min-width:140px;">👤 MEMBER</th>
-                        <th style="min-width:110px;">💰 LOAN</th>
-                        <th style="min-width:140px;">📉 LOAN DEDUCTIONS</th>
-                        <th style="min-width:130px;">⚖️ LOAN BALANCE</th>
-                        <th style="min-width:160px;">📋 MONTHLY CONTRIBUTION</th>
-                        <th style="min-width:110px;">⚠️ PENALTIES</th>
+                        <th style="min-width:120px;">💰 LOAN (KES)</th>
+                        <th style="min-width:150px;">📉 LOAN DEDUCTIONS (KES)</th>
+                        <th style="min-width:140px;">⚖️ LOAN BALANCE (KES)</th>
+                        <th style="min-width:170px;">📋 MONTHLY CONTRIBUTION (KES)</th>
+                        <th style="min-width:120px;">⚠️ PENALTIES (KES)</th>
                     </tr>
                 </thead>
                 <tbody>
                     ${tableRows}
                     <tr id="totals-row" class="totals-row">
-                        <td><strong>📊 TOTAL</strong>侧
-                        <td><strong>KES ${formatNumber(totalLoan)}</strong>侧
-                        <td><strong>KES ${formatNumber(totalLoanDeductions)}</strong>侧
-                        <td><strong>KES ${formatNumber(totalLoanBalance)}</strong>侧
-                        <td><strong>KES ${formatNumber(totalMonthlyContribution)}</strong>侧
-                        <td><strong>KES ${formatNumber(totalPenalties)}</strong>侧
+                        <td><strong>📊 TOTAL</strong></td>
+                        <td><strong>KES ${formatNumber(totalLoan)}</strong></td>
+                        <td><strong>KES ${formatNumber(totalLoanDeductions)}</strong></td>
+                        <td><strong>KES ${formatNumber(totalLoanBalance)}</strong></td>
+                        <td><strong>KES ${formatNumber(totalMonthlyContribution)}</strong></td>
+                        <td><strong>KES ${formatNumber(totalPenalties)}</strong></td>
                     </tr>
                 </tbody>
             </table>
         </div>
         
         <div style="margin-top: 1rem; padding: 0.8rem; background: var(--primary-light); border-radius: 12px; text-align: center; font-size: 0.75rem; color: var(--primary);">
-            💡 <strong>Tip:</strong> Click any cell to edit. Changes auto-save after 2 seconds or use "Save All Changes" button.
+            💡 <strong>Tip:</strong> Click any cell to edit. Changes auto-save after 1.5 seconds or use "Save All Changes" button.
         </div>
     `;
     
     container.innerHTML = html;
     
-    // Bind filter events
-    document.getElementById("applyFilterBtn").addEventListener("click", function() {
-        if (pendingSaves.size > 0) {
-            if (confirm("You have unsaved changes. Save before changing period?")) {
-                saveAllChanges();
-            }
+    // Bind events
+    document.getElementById("monthSelect").addEventListener("change", function() {
+        if (pendingSaves.size > 0 && confirm("You have unsaved changes. Apply filter anyway?")) {
+            saveAllChanges();
         }
-        currentMonth = parseInt(document.getElementById("monthFilter").value);
-        currentYear = parseInt(document.getElementById("yearFilter").value);
+    });
+    
+    document.getElementById("yearSelect").addEventListener("change", function() {
+        if (pendingSaves.size > 0 && confirm("You have unsaved changes. Apply filter anyway?")) {
+            saveAllChanges();
+        }
+    });
+    
+    document.getElementById("applyFilterBtn").addEventListener("click", function() {
+        if (pendingSaves.size > 0 && !confirm("You have unsaved changes. Apply filter anyway?")) {
+            return;
+        }
+        currentMonth = parseInt(document.getElementById("monthSelect").value);
+        currentYear = parseInt(document.getElementById("yearSelect").value);
         renderSpreadsheet();
     });
     
