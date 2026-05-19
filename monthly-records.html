@@ -4,373 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
     <title>ChamaEase | Monthly Records</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: system-ui, 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
-        }
-
-        body {
-            background: #f4f7fb;
-            color: #1e2a3e;
-        }
-
-        :root {
-            --primary: #2c7a4d;
-            --primary-light: #eaf5ef;
-            --primary-dark: #1f5a3a;
-            --danger: #dc4c4c;
-            --gray-border: #e2e8f0;
-            --shadow-sm: 0 4px 12px rgba(0,0,0,0.04);
-            --radius-card: 16px;
-            --radius-btn: 32px;
-            --sidebar-width: 280px;
-        }
-
-        .app-wrapper {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        .sidebar {
-            width: var(--sidebar-width);
-            background: white;
-            border-right: 1px solid var(--gray-border);
-            position: fixed;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            overflow-y: auto;
-            transition: transform 0.3s ease;
-            z-index: 1000;
-            box-shadow: var(--shadow-sm);
-            transform: translateX(0);
-        }
-
-        .sidebar-header {
-            padding: 1rem;
-            border-bottom: 1px solid var(--gray-border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .sidebar-logo {
-            font-weight: 800;
-            font-size: 1.2rem;
-            background: linear-gradient(135deg, var(--primary), #3b9b62);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        .sidebar-close {
-            background: none;
-            border: none;
-            font-size: 1.3rem;
-            cursor: pointer;
-            color: #94a3b8;
-            display: none;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .sidebar-close:hover {
-            background: #fee2e2;
-            color: var(--danger);
-        }
-
-        .sidebar-nav {
-            padding: 0.8rem 0;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 0.7rem 1rem;
-            margin: 0.2rem 0.8rem;
-            border-radius: 12px;
-            text-decoration: none;
-            color: #4a5568;
-            transition: all 0.2s;
-            cursor: pointer;
-        }
-
-        .nav-item:hover {
-            background: var(--primary-light);
-            color: var(--primary);
-        }
-
-        .nav-item.active {
-            background: var(--primary);
-            color: white;
-        }
-
-        .nav-item .icon {
-            font-size: 1.1rem;
-            width: 26px;
-            text-align: center;
-        }
-
-        .nav-item .label {
-            font-weight: 500;
-            font-size: 0.85rem;
-        }
-
-        .main-content {
-            flex: 1;
-            margin-left: var(--sidebar-width);
-            transition: margin-left 0.3s ease;
-            width: calc(100% - var(--sidebar-width));
-        }
-
-        .top-bar {
-            background: white;
-            padding: 0.7rem 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--gray-border);
-            box-shadow: var(--shadow-sm);
-            position: sticky;
-            top: 0;
-            z-index: 99;
-        }
-
-        .menu-toggle {
-            background: none;
-            border: none;
-            font-size: 1.3rem;
-            cursor: pointer;
-            color: var(--primary);
-            padding: 6px;
-            border-radius: 50%;
-        }
-
-        .page-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #1e2a3e;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-        }
-
-        .user-email {
-            font-size: 0.7rem;
-            color: #5b6e8c;
-            display: none;
-        }
-
-        @media (min-width: 480px) {
-            .user-email {
-                display: inline;
-            }
-        }
-
-        .logout-btn {
-            background: transparent;
-            border: 1px solid #dc2626;
-            color: #dc2626;
-            padding: 0.35rem 0.7rem;
-            border-radius: 2rem;
-            cursor: pointer;
-            font-size: 0.7rem;
-        }
-
-        .logout-btn:hover {
-            background: #dc2626;
-            color: white;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 1rem;
-            width: 100%;
-            min-height: 70vh;
-        }
-
-        .btn {
-            border: none;
-            background: var(--primary);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: var(--radius-btn);
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 0.75rem;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--primary);
-            color: var(--primary);
-        }
-
-        .spreadsheet-container {
-            overflow-x: auto;
-            border-radius: 12px;
-            border: 1px solid var(--gray-border);
-            background: white;
-        }
-
-        .spreadsheet-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.8rem;
-            min-width: 800px;
-        }
-
-        .spreadsheet-table th,
-        .spreadsheet-table td {
-            border: 1px solid var(--gray-border);
-            padding: 10px 8px;
-            text-align: left;
-            vertical-align: middle;
-        }
-
-        .spreadsheet-table th {
-            background: #f8fafc;
-            font-weight: 600;
-        }
-
-        .spreadsheet-table td input {
-            width: 100%;
-            padding: 6px 8px;
-            border: 1px solid transparent;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            background: transparent;
-        }
-
-        .spreadsheet-table td input:focus {
-            outline: none;
-            border-color: var(--primary);
-            background: #fff;
-        }
-
-        .member-name-cell {
-            font-weight: 600;
-            background: #f8fafc;
-        }
-
-        .totals-row {
-            background: #f1f5f9;
-            font-weight: 600;
-        }
-
-        .totals-row td {
-            border-top: 2px solid var(--primary);
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 1rem;
-        }
-
-        .month-year-selector {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-            flex-wrap: wrap;
-            margin-bottom: 1rem;
-        }
-
-        .month-year-selector select {
-            padding: 0.5rem 1rem;
-            border-radius: 40px;
-            border: 1px solid var(--gray-border);
-            background: white;
-            font-size: 0.85rem;
-        }
-
-        .saving-indicator {
-            font-size: 0.7rem;
-            color: #94a3b8;
-            display: inline-block;
-            margin-left: 1rem;
-        }
-
-        .saving {
-            color: var(--primary);
-        }
-
-        footer {
-            text-align: center;
-            padding: 0.8rem;
-            font-size: 0.65rem;
-            color: #6c757d;
-            border-top: 1px solid var(--gray-border);
-            margin-top: 1rem;
-        }
-
-        .sidebar-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 999;
-        }
-
-        .sidebar-overlay.active {
-            display: block;
-        }
-
-        .loading-spinner {
-            display: inline-block;
-            width: 30px;
-            height: 30px;
-            border: 3px solid #e2e8f0;
-            border-radius: 50%;
-            border-top-color: var(--primary);
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-            .sidebar.open {
-                transform: translateX(0);
-            }
-            .main-content {
-                margin-left: 0;
-                width: 100%;
-            }
-            .sidebar-close {
-                display: flex;
-            }
-            .container {
-                padding: 0.8rem;
-            }
-            .spreadsheet-table th,
-            .spreadsheet-table td {
-                padding: 6px 4px;
-                font-size: 0.7rem;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
 </head>
@@ -381,7 +15,7 @@
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">ChamaEase</div>
-            <button class="sidebar-close" id="sidebarClose">X</button>
+            <button class="sidebar-close" id="sidebarClose">✕</button>
         </div>
         <nav class="sidebar-nav">
             <a href="dashboard.html" class="nav-item"><span class="icon">📊</span><span class="label">DASHBOARD</span></a>
@@ -395,7 +29,7 @@
     <main class="main-content">
         <div class="top-bar">
             <button class="menu-toggle" id="menuToggle">☰</button>
-            <div class="page-title">MONTHLY RECORDS</div>
+            <div class="page-title">📅 MONTHLY RECORDS</div>
             <div class="user-info">
                 <span class="user-email" id="userEmail"></span>
                 <button id="logoutBtn" class="logout-btn">LOGOUT</button>
@@ -418,7 +52,7 @@ let allRecords = [];
 let currentMonth = new Date().getMonth() + 1;
 let currentYear = new Date().getFullYear();
 let saveTimeout = null;
-let currentUser = null;
+let pendingSaves = new Map(); // Track pending saves
 
 // Sidebar functions
 function openSidebar() {
@@ -438,6 +72,20 @@ document.getElementById("logoutBtn").addEventListener("click", async function() 
     await logoutUser();
     window.location.href = "index.html";
 });
+
+// Toast notification function
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `toast-notification ${type}`;
+    toast.innerHTML = type === 'success' ? '✓ ' : '⚠️ ';
+    toast.innerHTML += message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
 
 // Helper functions
 function safeValue(value) {
@@ -462,13 +110,60 @@ function escapeHtml(str) {
     });
 }
 
-function showSavedIndicator(success) {
+function showSavedIndicator(success, message = null) {
     const indicator = document.getElementById("saving-indicator");
     if (indicator) {
-        indicator.textContent = success ? "✓ Saved" : "✗ Error";
+        if (success) {
+            indicator.textContent = message || "✓ Saved";
+            indicator.style.color = "#2c7a4d";
+        } else {
+            indicator.textContent = message || "✗ Error";
+            indicator.style.color = "#dc2626";
+        }
         setTimeout(function() {
             indicator.textContent = "";
-        }, 1500);
+        }, 2000);
+    }
+}
+
+// Save all pending changes
+async function saveAllChanges() {
+    if (pendingSaves.size === 0) {
+        showToast("No pending changes to save", "warning");
+        return;
+    }
+    
+    const saveBtn = document.getElementById("saveAllBtn");
+    if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<span class="loading-spinner" style="width:16px;height:16px;"></span> Saving...';
+    }
+    
+    let successCount = 0;
+    let errorCount = 0;
+    
+    for (const [key, change] of pendingSaves) {
+        try {
+            await updateRecordValue(change.memberId, change.field, change.value, true);
+            successCount++;
+            pendingSaves.delete(key);
+        } catch (error) {
+            errorCount++;
+            console.error("Save failed:", error);
+        }
+    }
+    
+    if (saveBtn) {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = '💾 Save All Changes';
+    }
+    
+    if (successCount > 0) {
+        showToast(`Saved ${successCount} change${successCount > 1 ? 's' : ''} successfully`);
+        showSavedIndicator(true, `Saved ${successCount} item(s)`);
+    }
+    if (errorCount > 0) {
+        showToast(`Failed to save ${errorCount} item(s)`, "error");
     }
 }
 
@@ -492,7 +187,7 @@ async function loadData() {
         
         renderSpreadsheet();
     } catch (error) {
-        document.getElementById("app-root").innerHTML = '<div style="padding:2rem;text-align:center"><h3>Error</h3><p>' + error.message + '</p><button class="btn" onclick="location.reload()">Retry</button></div>';
+        document.getElementById("app-root").innerHTML = '<div style="padding:2rem;text-align:center"><h3>⚠️ Error</h3><p>' + error.message + '</p><button class="btn" onclick="location.reload()">Retry</button></div>';
     }
 }
 
@@ -514,7 +209,7 @@ function getRecordValue(memberId, field) {
     return 0;
 }
 
-async function updateRecordValue(memberId, field, value) {
+async function updateRecordValue(memberId, field, value, isBulkSave = false) {
     var record = getRecordForMember(memberId);
     var numValue = safeValue(value);
     
@@ -555,10 +250,18 @@ async function updateRecordValue(memberId, field, value) {
             }
         }
         updateTotalsRow();
-        showSavedIndicator(true);
+        if (!isBulkSave) {
+            showSavedIndicator(true);
+            showToast("Saved successfully");
+        }
+        return true;
     } catch (error) {
         console.error("Update error:", error);
-        showSavedIndicator(false);
+        if (!isBulkSave) {
+            showSavedIndicator(false);
+            showToast(error.message, "error");
+        }
+        return false;
     }
 }
 
@@ -591,17 +294,33 @@ function updateTotalsRow() {
     }
 }
 
+// Handle cell change with pending saves tracking
 window.handleCellChange = function(memberId, field, event) {
     var newValue = event.target.value;
     var indicator = document.getElementById("saving-indicator");
     if (indicator) {
-        indicator.textContent = "Saving...";
+        indicator.textContent = "Pending...";
+        indicator.style.color = "#f59e0b";
     }
     
+    // Track pending change
+    var changeKey = memberId + '_' + field;
+    pendingSaves.set(changeKey, { memberId, field, value: newValue });
+    
+    // Update pending count display
+    var pendingCountSpan = document.getElementById("pendingCount");
+    if (pendingCountSpan) {
+        pendingCountSpan.textContent = pendingSaves.size;
+        pendingCountSpan.style.display = pendingSaves.size > 0 ? 'inline' : 'none';
+    }
+    
+    // Auto-save after 2 seconds of no changes
     if (saveTimeout) clearTimeout(saveTimeout);
     saveTimeout = setTimeout(function() {
-        updateRecordValue(memberId, field, newValue);
-    }, 500);
+        if (pendingSaves.size > 0) {
+            saveAllChanges();
+        }
+    }, 2000);
 };
 
 // Export functions
@@ -611,6 +330,7 @@ function exportToExcel() {
     
     var csvRows = [];
     csvRows.push(["CHAMA RECORDS - " + monthName + " " + currentYear]);
+    csvRows.push(["Generated:", new Date().toLocaleString()]);
     csvRows.push([]);
     csvRows.push(["MEMBER", "LOAN", "LOAN DEDUCTIONS", "LOAN BALANCE", "MONTHLY CONTRIBUTION", "PENALTIES"]);
     
@@ -618,11 +338,11 @@ function exportToExcel() {
         var member = allMembers[i];
         csvRows.push([
             member.name,
-            safeValue(getRecordValue(member.id, "loan")),
-            safeValue(getRecordValue(member.id, "loan_deductions")),
-            safeValue(getRecordValue(member.id, "loan_balance")),
-            safeValue(getRecordValue(member.id, "monthly_contribution")),
-            safeValue(getRecordValue(member.id, "penalties"))
+            "KES " + safeValue(getRecordValue(member.id, "loan")),
+            "KES " + safeValue(getRecordValue(member.id, "loan_deductions")),
+            "KES " + safeValue(getRecordValue(member.id, "loan_balance")),
+            "KES " + safeValue(getRecordValue(member.id, "monthly_contribution")),
+            "KES " + safeValue(getRecordValue(member.id, "penalties"))
         ]);
     }
     
@@ -635,20 +355,23 @@ function exportToExcel() {
         totalMonthlyContribution += safeValue(getRecordValue(member.id, "monthly_contribution"));
         totalPenalties += safeValue(getRecordValue(member.id, "penalties"));
     }
-    csvRows.push(["TOTAL", totalLoan, totalLoanDeductions, totalLoanBalance, totalMonthlyContribution, totalPenalties]);
+    csvRows.push(["TOTAL", "KES " + formatNumber(totalLoan), "KES " + formatNumber(totalLoanDeductions), "KES " + formatNumber(totalLoanBalance), "KES " + formatNumber(totalMonthlyContribution), "KES " + formatNumber(totalPenalties)]);
     
     var csv = "";
     for (var i = 0; i < csvRows.length; i++) {
         csv += csvRows[i].join(",") + "\n";
     }
     
-    var blob = new Blob([csv], { type: "application/vnd.ms-excel" });
+    var blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     var link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "chama_" + monthName + "_" + currentYear + ".xls";
+    var url = URL.createObjectURL(blob);
+    link.href = url;
+    link.setAttribute("download", "chama_" + monthName + "_" + currentYear + ".csv");
+    document.body.appendChild(link);
     link.click();
-    URL.revokeObjectURL(link.href);
-    alert("Excel file downloaded!");
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    showToast("Excel file downloaded!");
 }
 
 function exportToPDF() {
@@ -659,16 +382,20 @@ function exportToPDF() {
     var printWindow = window.open("", "_blank");
     printWindow.document.write("<html><head><title>ChamaEase Report</title>");
     printWindow.document.write("<style>");
-    printWindow.document.write("table { border-collapse: collapse; width: 100%; }");
+    printWindow.document.write("body { font-family: Arial, sans-serif; padding: 20px; }");
+    printWindow.document.write("table { border-collapse: collapse; width: 100%; margin-top: 20px; }");
     printWindow.document.write("th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }");
     printWindow.document.write("th { background: #2c7a4d; color: white; }");
+    printWindow.document.write("h2 { color: #2c7a4d; }");
     printWindow.document.write("</style>");
     printWindow.document.write("</head><body>");
-    printWindow.document.write("<h2>CHAMA RECORDS - " + monthName + " " + currentYear + "</h2>");
+    printWindow.document.write("<h2>🏦 CHAMA RECORDS - " + monthName + " " + currentYear + "</h2>");
+    printWindow.document.write("<p>Generated: " + new Date().toLocaleString() + "</p>");
     printWindow.document.write(printContents);
     printWindow.document.write("</body></html>");
     printWindow.document.close();
     printWindow.print();
+    showToast("PDF ready for printing");
 }
 
 function shareToWhatsApp() {
@@ -686,15 +413,31 @@ function shareToWhatsApp() {
         var penalties = safeValue(getRecordValue(member.id, "penalties"));
         
         message += "*" + member.name + "*\n";
-        message += "💰 Loan: KES " + formatNumber(loan) + "\n";
-        message += "📉 Loan Deductions: KES " + formatNumber(loanDeductions) + "\n";
-        message += "⚖️ Loan Balance: KES " + formatNumber(loanBalance) + "\n";
-        message += "📋 Contribution: KES " + formatNumber(monthlyContribution) + "\n";
-        message += "⚠️ Penalties: KES " + formatNumber(penalties) + "\n\n";
+        if (loan > 0) message += "💰 Loan: KES " + formatNumber(loan) + "\n";
+        if (loanDeductions > 0) message += "📉 Deductions: KES " + formatNumber(loanDeductions) + "\n";
+        if (loanBalance > 0) message += "⚖️ Balance: KES " + formatNumber(loanBalance) + "\n";
+        if (monthlyContribution > 0) message += "📋 Contribution: KES " + formatNumber(monthlyContribution) + "\n";
+        if (penalties > 0) message += "⚠️ Penalties: KES " + formatNumber(penalties) + "\n";
+        message += "\n";
     }
     
+    // Add totals
+    var totalLoan = 0, totalMonthlyContribution = 0, totalPenalties = 0;
+    for (var i = 0; i < allMembers.length; i++) {
+        var member = allMembers[i];
+        totalLoan += safeValue(getRecordValue(member.id, "loan"));
+        totalMonthlyContribution += safeValue(getRecordValue(member.id, "monthly_contribution"));
+        totalPenalties += safeValue(getRecordValue(member.id, "penalties"));
+    }
+    message += "📊 *TOTALS*\n";
+    message += "💰 Total Loans: KES " + formatNumber(totalLoan) + "\n";
+    message += "📋 Total Contributions: KES " + formatNumber(totalMonthlyContribution) + "\n";
+    message += "⚠️ Total Penalties: KES " + formatNumber(totalPenalties) + "\n";
+    
     var encodedMessage = encodeURIComponent(message);
-    window.open("https://wa.me/?text=" + encodedMessage, "_blank");
+    // Use WhatsApp Web URL which works on both mobile and desktop
+    window.open("https://web.whatsapp.com/send?text=" + encodedMessage, "_blank");
+    showToast("Opening WhatsApp...");
 }
 
 function renderSpreadsheet() {
@@ -742,16 +485,16 @@ function renderSpreadsheet() {
         
         tableRows += "<tr>";
         tableRows += "<td class=\"member-name-cell\"><strong>" + escapeHtml(member.name) + "</strong></td>";
-        tableRows += "<td><input type=\"number\" value=\"" + loan + "\" step=\"any\" onchange=\"handleCellChange('" + member.id + "', 'loan', event)\"></td>";
-        tableRows += "<td><input type=\"number\" value=\"" + loanDeductions + "\" step=\"any\" onchange=\"handleCellChange('" + member.id + "', 'loan_deductions', event)\"></td>";
-        tableRows += "<td><input type=\"number\" value=\"" + loanBalance + "\" step=\"any\" onchange=\"handleCellChange('" + member.id + "', 'loan_balance', event)\"></td>";
-        tableRows += "<td><input type=\"number\" value=\"" + monthlyContribution + "\" step=\"any\" onchange=\"handleCellChange('" + member.id + "', 'monthly_contribution', event)\"></td>";
-        tableRows += "<td><input type=\"number\" value=\"" + penalties + "\" step=\"any\" onchange=\"handleCellChange('" + member.id + "', 'penalties', event)\"></td>";
+        tableRows += "<td><input type=\"number\" value=\"" + loan + "\" step=\"any\" onchange=\"handleCellChange('" + member.id + "', 'loan', event)\" placeholder=\"0\"></td>";
+        tableRows += "<td><input type=\"number\" value=\"" + loanDeductions + "\" step=\"any\" onchange=\"handleCellChange('" + member.id + "', 'loan_deductions', event)\" placeholder=\"0\"></td>";
+        tableRows += "<td><input type=\"number\" value=\"" + loanBalance + "\" step=\"any\" onchange=\"handleCellChange('" + member.id + "', 'loan_balance', event)\" placeholder=\"0\"></td>";
+        tableRows += "<td><input type=\"number\" value=\"" + monthlyContribution + "\" step=\"any\" onchange=\"handleCellChange('" + member.id + "', 'monthly_contribution', event)\" placeholder=\"0\"></td>";
+        tableRows += "<td><input type=\"number\" value=\"" + penalties + "\" step=\"any\" onchange=\"handleCellChange('" + member.id + "', 'penalties', event)\" placeholder=\"0\"></td>";
         tableRows += "</tr>";
     }
     
     if (allMembers.length === 0) {
-        tableRows = "<tr><td colspan=\"6\" style=\"text-align:center;\">No members found. Please add members first.</td></tr>";
+        tableRows = "<tr><td colspan=\"6\" style=\"text-align:center; padding: 2rem;\">👥 No members found. Please <a href=\"members.html\">add members</a> first.</td></tr>";
     }
     
     var totalLoan = 0, totalLoanDeductions = 0, totalLoanBalance = 0, totalMonthlyContribution = 0, totalPenalties = 0;
@@ -767,10 +510,11 @@ function renderSpreadsheet() {
     
     var html = `
         <div class="action-buttons">
-            <a href="members.html" class="btn">MANAGE MEMBERS</a>
-            <button id="exportExcelBtn" class="btn-outline btn">EXPORT EXCEL</button>
-            <button id="exportPDFBtn" class="btn-outline btn">EXPORT PDF</button>
-            <button id="shareWhatsAppBtn" class="btn-outline btn">SHARE</button>
+            <a href="members.html" class="btn">👥 MANAGE MEMBERS</a>
+            <button id="saveAllBtn" class="btn">💾 Save All Changes <span id="pendingCount" style="display:none; background:#f59e0b; color:white; border-radius:50%; padding:2px 6px; margin-left:5px; font-size:10px;"></span></button>
+            <button id="exportExcelBtn" class="btn-outline btn">📊 EXPORT EXCEL</button>
+            <button id="exportPDFBtn" class="btn-outline btn">📄 EXPORT PDF</button>
+            <button id="shareWhatsAppBtn" class="btn-outline btn">📱 SHARE</button>
         </div>
         
         <div class="month-year-selector">
@@ -783,18 +527,18 @@ function renderSpreadsheet() {
             <table class="spreadsheet-table" id="data-table">
                 <thead>
                     <tr>
-                        <th style="min-width:120px;">MEMBER</th>
-                        <th style="min-width:100px;">LOAN</th>
-                        <th style="min-width:130px;">LOAN DEDUCTIONS</th>
-                        <th style="min-width:120px;">LOAN BALANCE</th>
-                        <th style="min-width:150px;">MONTHLY CONTRIBUTION</th>
-                        <th style="min-width:100px;">PENALTIES</th>
+                        <th style="min-width:140px;">👤 MEMBER</th>
+                        <th style="min-width:110px;">💰 LOAN</th>
+                        <th style="min-width:140px;">📉 LOAN DEDUCTIONS</th>
+                        <th style="min-width:130px;">⚖️ LOAN BALANCE</th>
+                        <th style="min-width:160px;">📋 MONTHLY CONTRIBUTION</th>
+                        <th style="min-width:110px;">⚠️ PENALTIES</th>
                     </tr>
                 </thead>
                 <tbody>
                     ${tableRows}
                     <tr id="totals-row" class="totals-row">
-                        <td><strong>TOTAL</strong></td>
+                        <td><strong>📊 TOTAL</strong></td>
                         <td><strong>KES ${formatNumber(totalLoan)}</strong></td>
                         <td><strong>KES ${formatNumber(totalLoanDeductions)}</strong></td>
                         <td><strong>KES ${formatNumber(totalLoanBalance)}</strong></td>
@@ -804,20 +548,35 @@ function renderSpreadsheet() {
                 </tbody>
             </table>
         </div>
+        
+        <div style="margin-top: 1rem; padding: 0.8rem; background: var(--primary-light); border-radius: 12px; text-align: center; font-size: 0.75rem; color: var(--primary);">
+            💡 <strong>Tip:</strong> Click any cell to edit. Changes auto-save after 2 seconds or use "Save All Changes" button.
+        </div>
     `;
     
     container.innerHTML = html;
     
     document.getElementById("monthSelect").addEventListener("change", function(e) {
+        if (pendingSaves.size > 0) {
+            if (confirm("You have unsaved changes. Save before changing month?")) {
+                saveAllChanges();
+            }
+        }
         currentMonth = parseInt(e.target.value);
         renderSpreadsheet();
     });
     
     document.getElementById("yearSelect").addEventListener("change", function(e) {
+        if (pendingSaves.size > 0) {
+            if (confirm("You have unsaved changes. Save before changing year?")) {
+                saveAllChanges();
+            }
+        }
         currentYear = parseInt(e.target.value);
         renderSpreadsheet();
     });
     
+    document.getElementById("saveAllBtn").addEventListener("click", saveAllChanges);
     document.getElementById("exportExcelBtn").addEventListener("click", exportToExcel);
     document.getElementById("exportPDFBtn").addEventListener("click", exportToPDF);
     document.getElementById("shareWhatsAppBtn").addEventListener("click", shareToWhatsApp);
