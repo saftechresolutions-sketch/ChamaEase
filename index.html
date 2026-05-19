@@ -17,7 +17,7 @@
             min-height: 100vh;
             display: flex;
             align-items: center;
-            justifyContent: center;
+            justify-content: center;
             padding: 1.5rem;
         }
 
@@ -93,11 +93,13 @@
 
         .btn:hover {
             background: #1f5a3a;
+            transform: translateY(-1px);
         }
 
         .btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
+            transform: none;
         }
 
         .btn-secondary {
@@ -109,6 +111,7 @@
 
         .btn-secondary:hover {
             background: #eaf5ef;
+            transform: translateY(-1px);
         }
 
         .error-message {
@@ -190,7 +193,6 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Reset Password Modal */
         .modal {
             display: none;
             position: fixed;
@@ -251,7 +253,6 @@
             }
         }
     </style>
-    <!-- Supabase JS Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -267,12 +268,12 @@
             <form id="loginForm">
                 <div class="form-group">
                     <label>📧 Email Address</label>
-                    <input type="email" id="email" placeholder="admin@chama.com" required>
+                    <input type="email" id="email" placeholder="admin@chama.com" required autocomplete="email">
                 </div>
 
                 <div class="form-group">
                     <label>🔒 Password</label>
-                    <input type="password" id="password" placeholder="Enter your password" required>
+                    <input type="password" id="password" placeholder="Enter your password" required autocomplete="current-password">
                 </div>
 
                 <button type="submit" id="loginBtn" class="btn">Login to Dashboard</button>
@@ -288,7 +289,6 @@
         </div>
     </div>
 
-    <!-- Reset Password Modal -->
     <div id="resetModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -298,7 +298,7 @@
             <div id="resetModalMessage"></div>
             <div class="form-group">
                 <label>📧 Email Address</label>
-                <input type="email" id="resetEmail" placeholder="Enter your registered email" required>
+                <input type="email" id="resetEmail" placeholder="Enter your registered email" required autocomplete="email">
             </div>
             <p style="font-size: 0.75rem; color: #5b6e8c; margin-bottom: 1rem;">
                 We'll send you a password reset link to your email.
@@ -307,11 +307,9 @@
         </div>
     </div>
 
-    <!-- Shared Supabase Config -->
     <script src="supabase-config.js"></script>
-
     <script>
-        // DOM Elements
+        // Cache DOM elements
         const loginForm = document.getElementById('loginForm');
         const loginBtn = document.getElementById('loginBtn');
         const emailInput = document.getElementById('email');
@@ -361,125 +359,114 @@
             }
         }
 
-        // Open Reset Modal
         function openResetModal() {
             resetModal.classList.add('active');
             resetEmail.value = '';
             resetModalMessage.innerHTML = '';
         }
 
-        // Close Reset Modal
         function closeResetModal() {
             resetModal.classList.remove('active');
         }
 
-        // Handle Password Reset Request
         async function handlePasswordReset(email) {
-            const { data, error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-                redirectTo: `${window.location.origin}/reset-password.html`
-            });
+            try {
+                const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+                    redirectTo: `${window.location.origin}/reset-password.html`
+                });
 
-            if (error) {
-                console.error("Reset error:", error);
-                if (error.message === 'User not found') {
-                    showModalMessage('No account found with this email address.', 'error');
-                } else {
-                    showModalMessage(error.message, 'error');
+                if (error) {
+                    if (error.message === 'User not found') {
+                        showModalMessage('No account found with this email address.', 'error');
+                    } else {
+                        showModalMessage(error.message, 'error');
+                    }
+                    return false;
                 }
+
+                showModalMessage('✅ Password reset link sent! Please check your email inbox.', 'success');
+                setTimeout(() => closeResetModal(), 2000);
+                return true;
+            } catch (error) {
+                console.error("Reset error:", error);
+                showModalMessage('An error occurred. Please try again.', 'error');
                 return false;
             }
-
-            showModalMessage('✅ Password reset link sent! Please check your email inbox.', 'success');
-            // Close modal after 2 seconds
-            setTimeout(() => {
-                closeResetModal();
-            }, 2000);
-            return true;
         }
 
-        // Handle Login
         async function handleLogin(email, password) {
-            const { data, error } = await supabaseClient.auth.signInWithPassword({
-                email: email,
-                password: password
-            });
+            try {
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
 
-            if (error) {
-                console.error("Login error:", error);
-                if (error.message === 'Invalid login credentials') {
-                    showMessage('Invalid email or password. Please try again. <a href="#" id="inlineResetLink" style="color:#2c7a4d; text-decoration:underline;">Forgot password?</a>', 'error');
-                    // Add event listener to the inline reset link
-                    setTimeout(() => {
-                        const inlineLink = document.getElementById('inlineResetLink');
-                        if (inlineLink) {
-                            inlineLink.addEventListener('click', (e) => {
-                                e.preventDefault();
-                                openResetModal();
-                            });
-                        }
-                    }, 100);
-                } else if (error.message.includes('Email not confirmed')) {
-                    showMessage('Please confirm your email address before logging in. Check your inbox for the confirmation link.', 'info');
-                } else {
-                    showMessage(error.message);
+                if (error) {
+                    if (error.message === 'Invalid login credentials') {
+                        showMessage('Invalid email or password. Please try again.', 'error');
+                    } else if (error.message.includes('Email not confirmed')) {
+                        showMessage('Please confirm your email address before logging in. Check your inbox.', 'info');
+                    } else {
+                        showMessage(error.message, 'error');
+                    }
+                    return false;
                 }
-                return false;
-            }
 
-            if (data.session) {
-                // Check if email is confirmed
-                if (data.user?.email_confirmed_at) {
+                if (data.session && data.user?.email_confirmed_at) {
                     showMessage('Login successful! Redirecting...', 'success');
                     setTimeout(() => {
                         window.location.href = 'dashboard.html';
-                    }, 1500);
+                    }, 1000);
+                    return true;
                 } else {
                     showMessage('Please confirm your email address before logging in.', 'info');
                     await supabaseClient.auth.signOut();
+                    return false;
                 }
-                return true;
-            }
-            return false;
-        }
-
-        // Handle Registration
-        async function handleRegister(email, password) {
-            const { data, error } = await supabaseClient.auth.signUp({
-                email: email,
-                password: password,
-                options: {
-                    data: {
-                        role: 'admin',
-                        full_name: 'Administrator'
-                    },
-                    emailRedirectTo: `${window.location.origin}/dashboard.html`
-                }
-            });
-
-            if (error) {
-                console.error("Registration error:", error);
-                showMessage(error.message);
+            } catch (error) {
+                console.error("Login error:", error);
+                showMessage('Network error. Please check your connection.', 'error');
                 return false;
             }
-
-            if (data.user) {
-                if (data.user.identities && data.user.identities.length === 0) {
-                    showMessage('This email is already registered. Please login instead.', 'info');
-                } else {
-                    showMessage('✅ Registration successful! Please check your email to confirm your account before logging in.', 'success');
-                }
-                // Switch back to login mode
-                isRegisterMode = false;
-                loginBtn.textContent = 'Login to Dashboard';
-                showRegisterLink.textContent = 'Register now';
-                emailInput.value = '';
-                passwordInput.value = '';
-                emailInput.value = email;
-            }
-            return true;
         }
 
-        // Login Form Submit
+        async function handleRegister(email, password) {
+            try {
+                const { data, error } = await supabaseClient.auth.signUp({
+                    email: email,
+                    password: password,
+                    options: {
+                        data: {
+                            full_name: 'Administrator'
+                        }
+                    }
+                });
+
+                if (error) {
+                    showMessage(error.message, 'error');
+                    return false;
+                }
+
+                if (data.user) {
+                    if (data.user.identities && data.user.identities.length === 0) {
+                        showMessage('This email is already registered. Please login instead.', 'info');
+                    } else {
+                        showMessage('✅ Registration successful! Please check your email to confirm your account.', 'success');
+                    }
+                    isRegisterMode = false;
+                    loginBtn.textContent = 'Login to Dashboard';
+                    showRegisterLink.textContent = 'Create now';
+                    emailInput.value = '';
+                    passwordInput.value = '';
+                }
+                return true;
+            } catch (error) {
+                console.error("Registration error:", error);
+                showMessage('Network error. Please try again.', 'error');
+                return false;
+            }
+        }
+
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -488,6 +475,11 @@
 
             if (!email || !password) {
                 showMessage('Please fill in all fields');
+                return;
+            }
+
+            if (password.length < 6) {
+                showMessage('Password must be at least 6 characters');
                 return;
             }
 
@@ -502,7 +494,6 @@
             setLoading(false);
         });
 
-        // Register Link Click
         showRegisterLink.addEventListener('click', (e) => {
             e.preventDefault();
             isRegisterMode = !isRegisterMode;
@@ -513,17 +504,16 @@
                 showMessage('Create a new admin account. You will receive a confirmation email.', 'info');
             } else {
                 loginBtn.textContent = 'Login to Dashboard';
-                showRegisterLink.textContent = 'Register now';
+                showRegisterLink.textContent = 'Create now';
+                messageArea.innerHTML = '';
             }
         });
 
-        // Reset Password Link Click
         showResetLink.addEventListener('click', (e) => {
             e.preventDefault();
             openResetModal();
         });
 
-        // Send Reset Button Click
         sendResetBtn.addEventListener('click', async () => {
             const email = resetEmail.value.trim();
 
@@ -537,58 +527,62 @@
             setResetLoading(false);
         });
 
-        // Close Modal Events
         closeModalBtn.addEventListener('click', closeResetModal);
         resetModal.addEventListener('click', (e) => {
             if (e.target === resetModal) closeResetModal();
         });
 
-        // Press Enter in reset email field
         resetEmail.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                sendResetBtn.click();
-            }
+            if (e.key === 'Enter') sendResetBtn.click();
         });
 
-        // Check if already logged in
         async function checkExistingSession() {
-            const isAuth = await isUserAuthenticated();
-            if (isAuth) {
-                const user = await getCurrentUser();
-                if (user?.email_confirmed_at) {
-                    window.location.href = 'dashboard.html';
-                } else {
-                    await logoutUser();
-                    showMessage('Please confirm your email address before logging in.', 'info');
+            try {
+                const isAuth = await isUserAuthenticated();
+                if (isAuth) {
+                    const user = await getCurrentUser();
+                    if (user?.email_confirmed_at) {
+                        window.location.href = 'dashboard.html';
+                    } else if (user) {
+                        await logoutUser();
+                        showMessage('Please confirm your email address before logging in.', 'info');
+                    }
                 }
+            } catch (error) {
+                console.error("Session check error:", error);
             }
         }
         checkExistingSession();
 
-        // Check URL for password reset hash (for when user clicks reset link from email)
-        async function checkForPasswordReset() {
+        function checkForPasswordReset() {
             const hash = window.location.hash;
             if (hash && hash.includes('access_token') && hash.includes('type=recovery')) {
-                // Extract tokens from hash
                 const params = new URLSearchParams(hash.substring(1));
                 const accessToken = params.get('access_token');
                 const refreshToken = params.get('refresh_token');
                 
                 if (accessToken) {
-                    // Set session with the recovery tokens
-                    const { error } = await supabaseClient.auth.setSession({
+                    supabaseClient.auth.setSession({
                         access_token: accessToken,
                         refresh_token: refreshToken
-                    });
-                    
-                    if (!error) {
-                        // Redirect to password reset page
-                        window.location.href = 'reset-password.html';
-                    }
+                    }).then(({ error }) => {
+                        if (!error) {
+                            window.location.href = 'reset-password.html';
+                        }
+                    }).catch(console.error);
                 }
             }
         }
         checkForPasswordReset();
+
+        // Preload dashboard data in background after login (optimization)
+        window.addEventListener('load', () => {
+            if (document.hidden !== undefined) {
+                document.addEventListener('visibilitychange', () => {
+                    if (!document.hidden) checkExistingSession();
+                });
+            }
+        });
     </script>
 </body>
 </html>
