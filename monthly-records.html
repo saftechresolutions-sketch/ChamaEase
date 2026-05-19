@@ -651,18 +651,18 @@ function renderSpreadsheet() {
         var monthlyContribution = safeValue(getRecordValue(member.id, "monthly_contribution"));
         var penalties = safeValue(getRecordValue(member.id, "penalties"));
         
-        tableRows += `<tr>
-            <td class="member-name-cell"><strong>${escapeHtml(member.name)}</strong>侧
-            <td><input type="number" value="${loan}" step="any" onchange="handleCellChange('${member.id}', 'loan', event)" placeholder="0">侧
-            <td><input type="number" value="${loanDeductions}" step="any" onchange="handleCellChange('${member.id}', 'loan_deductions', event)" placeholder="0">侧
-            <td><input type="number" value="${loanBalance}" step="any" onchange="handleCellChange('${member.id}', 'loan_balance', event)" placeholder="0">侧
-            <td><input type="number" value="${monthlyContribution}" step="any" onchange="handleCellChange('${member.id}', 'monthly_contribution', event)" placeholder="0">侧
-            <td><input type="number" value="${penalties}" step="any" onchange="handleCellChange('${member.id}', 'penalties', event)" placeholder="0">侧
-        </tr>`;
+        tableRows += '<tr>';
+        tableRows += '<td class="member-name-cell"><strong>' + escapeHtml(member.name) + '</strong></td>';
+        tableRows += '<td><input type="number" value="' + loan + '" step="any" onchange="handleCellChange(\'' + member.id + '\', \'loan\', event)" placeholder="0"></td>';
+        tableRows += '<td><input type="number" value="' + loanDeductions + '" step="any" onchange="handleCellChange(\'' + member.id + '\', \'loan_deductions\', event)" placeholder="0"></td>';
+        tableRows += '<td><input type="number" value="' + loanBalance + '" step="any" onchange="handleCellChange(\'' + member.id + '\', \'loan_balance\', event)" placeholder="0"></td>';
+        tableRows += '<td><input type="number" value="' + monthlyContribution + '" step="any" onchange="handleCellChange(\'' + member.id + '\', \'monthly_contribution\', event)" placeholder="0"></td>';
+        tableRows += '<td><input type="number" value="' + penalties + '" step="any" onchange="handleCellChange(\'' + member.id + '\', \'penalties\', event)" placeholder="0"></td>';
+        tableRows += '</tr>';
     }
     
     if (allMembers.length === 0) {
-        tableRows = `<tr><td colspan="6" style="text-align:center; padding: 2rem;">👥 No members found. Please <a href="members.html">add members</a> first.侧侧</tr>`;
+        tableRows = '<tr><td colspan="6" style="text-align:center; padding: 2rem;">👥 No members found. Please <a href="members.html">add members</a> first.</td></tr>';
     }
     
     var totalLoan = 0, totalLoanDeductions = 0, totalLoanBalance = 0, totalMonthlyContribution = 0, totalPenalties = 0;
@@ -729,12 +729,12 @@ function renderSpreadsheet() {
                 <tbody>
                     ${tableRows}
                     <tr id="totals-row" class="totals-row">
-                        <td><strong>📊 TOTAL</strong>侧
-                        <td><strong>KES ${formatNumber(totalLoan)}</strong>侧
-                        <td><strong>KES ${formatNumber(totalLoanDeductions)}</strong>侧
-                        <td><strong>KES ${formatNumber(totalLoanBalance)}</strong>侧
-                        <td><strong>KES ${formatNumber(totalMonthlyContribution)}</strong>侧
-                        <td><strong>KES ${formatNumber(totalPenalties)}</strong>侧
+                        <td><strong>📊 TOTAL</strong></td>
+                        <td><strong>KES ${formatNumber(totalLoan)}</strong></td>
+                        <td><strong>KES ${formatNumber(totalLoanDeductions)}</strong></td>
+                        <td><strong>KES ${formatNumber(totalLoanBalance)}</strong></td>
+                        <td><strong>KES ${formatNumber(totalMonthlyContribution)}</strong></td>
+                        <td><strong>KES ${formatNumber(totalPenalties)}</strong></td>
                     </tr>
                 </tbody>
             </table>
