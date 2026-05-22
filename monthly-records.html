@@ -250,6 +250,15 @@
             font-weight: 500;
             font-family: monospace;
             text-align: right;
+            cursor: pointer;
+            padding: 4px;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .currency-display:hover {
+            background: #eaf5ef;
+            border-radius: 6px;
         }
 
         .spreadsheet-table td input {
@@ -532,8 +541,7 @@
 <script src="supabase-config.js"></script>
 <script>
 // ============================================
-// MONTHLY RECORDS - SPREADSHEET STYLE
-// All currency values display with 2 decimal places and commas
+// MONTHLY RECORDS - All currency values with 2DP and commas (no KES prefix in cells)
 // ============================================
 
 let allMembers = [];
@@ -614,7 +622,7 @@ function safeValue(value) {
     return parseFloat(value);
 }
 
-// Format currency with 2 decimal places and thousands commas
+// Format currency with 2 decimal places and thousands commas (no currency symbol)
 function formatCurrency(num) {
     if (num === null || num === undefined) return "0.00";
     const numeric = parseFloat(num);
@@ -763,11 +771,11 @@ function updateTotalsRow() {
     if (totalsRow) {
         var cells = totalsRow.getElementsByTagName("td");
         if (cells.length >= 6) {
-            cells[1].innerHTML = "KES " + formatCurrency(totalLoan);
-            cells[2].innerHTML = "KES " + formatCurrency(totalLoanDeductions);
-            cells[3].innerHTML = "KES " + formatCurrency(totalLoanBalance);
-            cells[4].innerHTML = "KES " + formatCurrency(totalMonthlyContribution);
-            cells[5].innerHTML = "KES " + formatCurrency(totalPenalties);
+            cells[1].innerHTML = '<strong>' + formatCurrency(totalLoan) + '</strong>';
+            cells[2].innerHTML = '<strong>' + formatCurrency(totalLoanDeductions) + '</strong>';
+            cells[3].innerHTML = '<strong>' + formatCurrency(totalLoanBalance) + '</strong>';
+            cells[4].innerHTML = '<strong>' + formatCurrency(totalMonthlyContribution) + '</strong>';
+            cells[5].innerHTML = '<strong>' + formatCurrency(totalPenalties) + '</strong>';
         }
     }
 }
@@ -816,7 +824,7 @@ async function saveAllChanges() {
     }
 }
 
-// Generate formatted message with 2DP and commas
+// Generate formatted message with 2DP and commas (no KES symbol in values, but added in text)
 function generateFormattedMessage() {
     var monthName = monthNames[currentMonth - 1];
     var message = "🏦 *CHAMA RECORDS* - " + monthName + " " + currentYear + "\n";
@@ -910,13 +918,17 @@ async function copyTableToClipboard() {
     }
 }
 
-window.handleCellChange = function(memberId, field, event) {
+window.handleCellChange = function(memberId, field, event, displayElement, inputElement) {
     var newValue = event.target.value;
     var savingSpan = document.getElementById("savingStatus");
     if (savingSpan) {
         savingSpan.innerHTML = "⏳ Pending...";
         savingSpan.className = "saving-status saving";
     }
+    
+    // Update display with formatted value
+    var numValue = safeValue(newValue);
+    displayElement.innerHTML = formatCurrency(numValue);
     
     var changeKey = memberId + '_' + field;
     pendingSaves.set(changeKey, { memberId, field, value: newValue });
@@ -940,6 +952,21 @@ window.handleCellChange = function(memberId, field, event) {
         }
     }, 1500);
 };
+
+function startEdit(displayElement, inputElement) {
+    displayElement.style.display = 'none';
+    inputElement.style.display = 'block';
+    inputElement.focus();
+}
+
+function finishEdit(memberId, field, event, displayElement, inputElement) {
+    var newValue = event.target.value;
+    var numValue = safeValue(newValue);
+    displayElement.innerHTML = formatCurrency(numValue);
+    displayElement.style.display = 'block';
+    inputElement.style.display = 'none';
+    handleCellChange(memberId, field, event, displayElement, inputElement);
+}
 
 function exportToExcel() {
     var monthName = monthNames[currentMonth - 1];
@@ -1001,6 +1028,8 @@ function exportToPDF() {
     printWindow.document.write("table { border-collapse: collapse; width: 100%; margin-top: 20px; }");
     printWindow.document.write("th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }");
     printWindow.document.write("th { background: #2c7a4d; color: white; }");
+    printWindow.document.write("td { text-align: right; }");
+    printWindow.document.write("td:first-child { text-align: left; }");
     printWindow.document.write("</style>");
     printWindow.document.write("</head><body>");
     printWindow.document.write("<h2>🏦 CHAMA RECORDS - " + monthName + " " + currentYear + "</h2>");
@@ -1055,7 +1084,7 @@ function renderSpreadsheet() {
         var monthlyContributionRaw = safeValue(getRecordValue(member.id, "monthly_contribution"));
         var penaltiesRaw = safeValue(getRecordValue(member.id, "penalties"));
         
-        // Format for display
+        // Format for display (no KES symbol)
         var loanFormatted = formatCurrency(loanRaw);
         var loanDeductionsFormatted = formatCurrency(loanDeductionsRaw);
         var loanBalanceFormatted = formatCurrency(loanBalanceRaw);
@@ -1064,30 +1093,37 @@ function renderSpreadsheet() {
         
         tableRows += '<tr>';
         tableRows += '<td class="member-name-cell"><strong>' + escapeHtml(member.name) + '</strong></td>';
-        tableRows += '<td style="text-align: right; font-weight: 500;">';
-        tableRows += '<div class="currency-display" style="cursor: pointer; padding: 4px;" onclick="this.style.display=\'none\'; this.nextElementSibling.style.display=\'block\'; this.nextElementSibling.focus();">KES ' + loanFormatted + '</div>';
-        tableRows += '<input type="number" step="any" value="' + loanRaw + '" style="display: none; text-align: right;" onblur="handleCellChange(\'' + member.id + '\', \'loan\', event); this.style.display=\'none\'; this.previousElementSibling.style.display=\'block\'; this.previousElementSibling.innerHTML=\'KES \' + formatCurrency(this.value);" onkeypress="if(event.key===\'Enter\') this.blur();">';
+        
+        // Loan column
+        tableRows += '<td style="text-align: right;">';
+        tableRows += '<div class="currency-display" onclick="startEdit(this, this.nextElementSibling)">' + loanFormatted + '</div>';
+        tableRows += '<input type="number" step="any" value="' + loanRaw + '" style="display: none; text-align: right;" onblur="finishEdit(\'' + member.id + '\', \'loan\', event, this.previousElementSibling, this)" onkeypress="if(event.key===\'Enter\') this.blur();">';
         tableRows += '</td>';
         
-        tableRows += '<td style="text-align: right; font-weight: 500;">';
-        tableRows += '<div class="currency-display" style="cursor: pointer; padding: 4px;" onclick="this.style.display=\'none\'; this.nextElementSibling.style.display=\'block\'; this.nextElementSibling.focus();">KES ' + loanDeductionsFormatted + '</div>';
-        tableRows += '<input type="number" step="any" value="' + loanDeductionsRaw + '" style="display: none; text-align: right;" onblur="handleCellChange(\'' + member.id + '\', \'loan_deductions\', event); this.style.display=\'none\'; this.previousElementSibling.style.display=\'block\'; this.previousElementSibling.innerHTML=\'KES \' + formatCurrency(this.value);" onkeypress="if(event.key===\'Enter\') this.blur();">';
+        // Loan Deductions column
+        tableRows += '<td style="text-align: right;">';
+        tableRows += '<div class="currency-display" onclick="startEdit(this, this.nextElementSibling)">' + loanDeductionsFormatted + '</div>';
+        tableRows += '<input type="number" step="any" value="' + loanDeductionsRaw + '" style="display: none; text-align: right;" onblur="finishEdit(\'' + member.id + '\', \'loan_deductions\', event, this.previousElementSibling, this)" onkeypress="if(event.key===\'Enter\') this.blur();">';
         tableRows += '</td>';
         
-        tableRows += '<td style="text-align: right; font-weight: 500;">';
-        tableRows += '<div class="currency-display" style="cursor: pointer; padding: 4px;" onclick="this.style.display=\'none\'; this.nextElementSibling.style.display=\'block\'; this.nextElementSibling.focus();">KES ' + loanBalanceFormatted + '</div>';
-        tableRows += '<input type="number" step="any" value="' + loanBalanceRaw + '" style="display: none; text-align: right;" onblur="handleCellChange(\'' + member.id + '\', \'loan_balance\', event); this.style.display=\'none\'; this.previousElementSibling.style.display=\'block\'; this.previousElementSibling.innerHTML=\'KES \' + formatCurrency(this.value);" onkeypress="if(event.key===\'Enter\') this.blur();">';
+        // Loan Balance column
+        tableRows += '<td style="text-align: right;">';
+        tableRows += '<div class="currency-display" onclick="startEdit(this, this.nextElementSibling)">' + loanBalanceFormatted + '</div>';
+        tableRows += '<input type="number" step="any" value="' + loanBalanceRaw + '" style="display: none; text-align: right;" onblur="finishEdit(\'' + member.id + '\', \'loan_balance\', event, this.previousElementSibling, this)" onkeypress="if(event.key===\'Enter\') this.blur();">';
         tableRows += '</td>';
         
-        tableRows += '<td style="text-align: right; font-weight: 500;">';
-        tableRows += '<div class="currency-display" style="cursor: pointer; padding: 4px;" onclick="this.style.display=\'none\'; this.nextElementSibling.style.display=\'block\'; this.nextElementSibling.focus();">KES ' + monthlyContributionFormatted + '</div>';
-        tableRows += '<input type="number" step="any" value="' + monthlyContributionRaw + '" style="display: none; text-align: right;" onblur="handleCellChange(\'' + member.id + '\', \'monthly_contribution\', event); this.style.display=\'none\'; this.previousElementSibling.style.display=\'block\'; this.previousElementSibling.innerHTML=\'KES \' + formatCurrency(this.value);" onkeypress="if(event.key===\'Enter\') this.blur();">';
+        // Monthly Contribution column
+        tableRows += '<td style="text-align: right;">';
+        tableRows += '<div class="currency-display" onclick="startEdit(this, this.nextElementSibling)">' + monthlyContributionFormatted + '</div>';
+        tableRows += '<input type="number" step="any" value="' + monthlyContributionRaw + '" style="display: none; text-align: right;" onblur="finishEdit(\'' + member.id + '\', \'monthly_contribution\', event, this.previousElementSibling, this)" onkeypress="if(event.key===\'Enter\') this.blur();">';
         tableRows += '</td>';
         
-        tableRows += '<td style="text-align: right; font-weight: 500;">';
-        tableRows += '<div class="currency-display" style="cursor: pointer; padding: 4px;" onclick="this.style.display=\'none\'; this.nextElementSibling.style.display=\'block\'; this.nextElementSibling.focus();">KES ' + penaltiesFormatted + '</div>';
-        tableRows += '<input type="number" step="any" value="' + penaltiesRaw + '" style="display: none; text-align: right;" onblur="handleCellChange(\'' + member.id + '\', \'penalties\', event); this.style.display=\'none\'; this.previousElementSibling.style.display=\'block\'; this.previousElementSibling.innerHTML=\'KES \' + formatCurrency(this.value);" onkeypress="if(event.key===\'Enter\') this.blur();">';
+        // Penalties column
+        tableRows += '<td style="text-align: right;">';
+        tableRows += '<div class="currency-display" onclick="startEdit(this, this.nextElementSibling)">' + penaltiesFormatted + '</div>';
+        tableRows += '<input type="number" step="any" value="' + penaltiesRaw + '" style="display: none; text-align: right;" onblur="finishEdit(\'' + member.id + '\', \'penalties\', event, this.previousElementSibling, this)" onkeypress="if(event.key===\'Enter\') this.blur();">';
         tableRows += '</td>';
+        
         tableRows += '</tr>';
     }
     
@@ -1162,11 +1198,11 @@ function renderSpreadsheet() {
                     ${tableRows}
                     <tr id="totals-row" class="totals-row">
                         <td><strong>📊 TOTAL</strong></strong></td>
-                        <td style="text-align: right;"><strong>KES ${formatCurrency(totalLoan)}</strong></td>
-                        <td style="text-align: right;"><strong>KES ${formatCurrency(totalLoanDeductions)}</strong></td>
-                        <td style="text-align: right;"><strong>KES ${formatCurrency(totalLoanBalance)}</strong></td>
-                        <td style="text-align: right;"><strong>KES ${formatCurrency(totalMonthlyContribution)}</strong></td>
-                        <td style="text-align: right;"><strong>KES ${formatCurrency(totalPenalties)}</strong></td>
+                        <td style="text-align: right;"><strong>${formatCurrency(totalLoan)}</strong></td>
+                        <td style="text-align: right;"><strong>${formatCurrency(totalLoanDeductions)}</strong></td>
+                        <td style="text-align: right;"><strong>${formatCurrency(totalLoanBalance)}</strong></td>
+                        <td style="text-align: right;"><strong>${formatCurrency(totalMonthlyContribution)}</strong></td>
+                        <td style="text-align: right;"><strong>${formatCurrency(totalPenalties)}</strong></td>
                     </tr>
                 </tbody>
             </table>
@@ -1178,9 +1214,6 @@ function renderSpreadsheet() {
     `;
     
     container.innerHTML = html;
-    
-    // Make formatCurrency available globally for inline handlers
-    window.formatCurrency = formatCurrency;
     
     document.getElementById("monthSelect").addEventListener("change", function() {
         if (pendingSaves.size > 0 && confirm("You have unsaved changes. Change period anyway?")) {
@@ -1210,12 +1243,15 @@ function renderSpreadsheet() {
     document.getElementById("shareWABtn").addEventListener("click", shareToWhatsApp);
 }
 
+// Make functions globally available
+window.startEdit = startEdit;
+window.finishEdit = finishEdit;
+window.handleCellChange = handleCellChange;
+window.formatCurrency = formatCurrency;
+
 // Initialize
 loadSavedPeriod();
 updateFooter();
-
-// Expose formatCurrency globally
-window.formatCurrency = formatCurrency;
 
 (async function() {
     const isAuth = await protectPage();
