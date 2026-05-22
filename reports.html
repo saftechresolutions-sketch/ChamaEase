@@ -4,11 +4,223 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
     <title>ChamaEase | Reports</title>
-    <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="supabase-config.js"></script>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+        }
+
+        body {
+            background: #f4f7fb;
+            color: #1e2a3e;
+        }
+
+        :root {
+            --primary: #2c7a4d;
+            --primary-light: #eaf5ef;
+            --primary-dark: #1f5a3a;
+            --danger: #dc4c4c;
+            --gray-border: #e2e8f0;
+            --shadow-sm: 0 4px 12px rgba(0,0,0,0.04);
+            --radius-card: 16px;
+            --radius-btn: 32px;
+            --sidebar-width: 280px;
+        }
+
+        .app-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            background: white;
+            border-right: 1px solid var(--gray-border);
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            box-shadow: var(--shadow-sm);
+            transform: translateX(0);
+        }
+
+        .sidebar-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--gray-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-logo {
+            font-weight: 800;
+            font-size: 1.2rem;
+            background: linear-gradient(135deg, var(--primary), #3b9b62);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .sidebar-close {
+            background: none;
+            border: none;
+            font-size: 1.3rem;
+            cursor: pointer;
+            color: #94a3b8;
+            display: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar-close:hover {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+
+        .sidebar-nav {
+            padding: 0.8rem 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0.7rem 1rem;
+            margin: 0.2rem 0.8rem;
+            border-radius: 12px;
+            text-decoration: none;
+            color: #4a5568;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .nav-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .nav-item .icon {
+            font-size: 1.1rem;
+            width: 26px;
+            text-align: center;
+        }
+
+        .nav-item .label {
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            transition: margin-left 0.3s ease;
+            width: calc(100% - var(--sidebar-width));
+        }
+
+        .top-bar {
+            background: white;
+            padding: 0.7rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--gray-border);
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 99;
+        }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            font-size: 1.3rem;
+            cursor: pointer;
+            color: var(--primary);
+            padding: 6px;
+            border-radius: 50%;
+        }
+
+        .page-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1e2a3e;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .user-email {
+            font-size: 0.7rem;
+            color: #5b6e8c;
+            display: none;
+        }
+
+        @media (min-width: 480px) {
+            .user-email {
+                display: inline;
+            }
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: 1px solid #dc2626;
+            color: #dc2626;
+            padding: 0.35rem 0.7rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            font-size: 0.7rem;
+        }
+
+        .logout-btn:hover {
+            background: #dc2626;
+            color: white;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem;
+            width: 100%;
+            min-height: 70vh;
+        }
+
+        .btn {
+            border: none;
+            background: var(--primary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-btn);
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.75rem;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
         /* Reports Page Styles */
         .report-header {
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
@@ -29,7 +241,7 @@
             opacity: 0.9;
         }
         
-        /* Filter Section */
+        /* Filter Section - Auto Filter (no apply button) */
         .filter-section {
             background: white;
             border-radius: 20px;
@@ -56,7 +268,7 @@
         
         .filter-group {
             flex: 1;
-            min-width: 120px;
+            min-width: 150px;
         }
         
         .filter-label {
@@ -80,22 +292,6 @@
         .filter-select:focus {
             outline: none;
             border-color: var(--primary);
-        }
-        
-        .filter-buttons {
-            display: flex;
-            gap: 0.5rem;
-        }
-        
-        .btn-apply {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 0.75rem;
         }
         
         .btn-reset {
@@ -184,10 +380,10 @@
         }
         
         .action-btn-clean {
-            padding: 12px 24px;
+            padding: 10px 20px;
             border-radius: 40px;
             border: none;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 600;
             cursor: pointer;
             display: inline-flex;
@@ -196,35 +392,12 @@
             transition: all 0.2s;
         }
         
-        .btn-whatsapp {
-            background: #25D366;
-            color: white;
-        }
-        
-        .btn-whatsapp:hover {
-            background: #128C7E;
-            transform: translateY(-2px);
-        }
-        
-        .btn-excel {
-            background: #10b981;
-            color: white;
-        }
-        
-        .btn-excel:hover {
-            background: #059669;
-            transform: translateY(-2px);
-        }
-        
-        .btn-print {
-            background: #3b82f6;
-            color: white;
-        }
-        
-        .btn-print:hover {
-            background: #2563eb;
-            transform: translateY(-2px);
-        }
+        .btn-whatsapp { background: #25D366; color: white; }
+        .btn-whatsapp:hover { background: #128C7E; transform: translateY(-1px); }
+        .btn-excel { background: #10b981; color: white; }
+        .btn-excel:hover { background: #059669; transform: translateY(-1px); }
+        .btn-print { background: #3b82f6; color: white; }
+        .btn-print:hover { background: #2563eb; transform: translateY(-1px); }
         
         /* Member Rankings Table */
         .rankings-container {
@@ -368,6 +541,35 @@
             margin-top: 1rem;
         }
         
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 3px solid #e2e8f0;
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         .toast-success {
             position: fixed;
             bottom: 20px;
@@ -393,26 +595,31 @@
             }
         }
         
-        @media (max-width: 640px) {
-            .filter-controls {
-                flex-direction: column;
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
             }
-            .filter-buttons {
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
                 width: 100%;
             }
-            .btn-apply, .btn-reset {
-                flex: 1;
+            .sidebar-close {
+                display: flex;
+            }
+            .container {
+                padding: 0.8rem;
+            }
+            .filter-controls {
+                flex-direction: column;
             }
             .action-buttons-container {
                 flex-direction: column;
             }
             .action-btn-clean {
                 justify-content: center;
-            }
-            .rankings-table th,
-            .rankings-table td {
-                padding: 8px 6px;
-                font-size: 0.7rem;
             }
         }
         
@@ -423,9 +630,6 @@
             .top-bar,
             footer {
                 display: none;
-            }
-            .main-content {
-                margin-left: 0;
             }
         }
     </style>
@@ -468,21 +672,25 @@
     </main>
 </div>
 
+<script src="supabase-config.js"></script>
 <script>
-// Using supabaseClient from supabase-config.js
+// ============================================
+// REPORTS PAGE - AUTO FILTER (No Apply Button)
+// Filters update immediately when selection changes
+// ============================================
+
 let allMembers = [];
 let allRecords = [];
 let filteredRecords = [];
 let trendsChart = null;
 let topMembersChart = null;
 
-// Filter state
+// Filter state - saved to localStorage for persistence
 let currentFilter = {
     year: 'all',
     month: 'all'
 };
 
-// Available years and months
 let availableYears = [];
 let monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
 
@@ -538,6 +746,24 @@ function formatNumber(num) {
     return num.toLocaleString('en-KE');
 }
 
+// Save filter selection to localStorage
+function saveFilterSelection() {
+    localStorage.setItem("chama_report_year", currentFilter.year);
+    localStorage.setItem("chama_report_month", currentFilter.month);
+}
+
+// Load saved filter selection
+function loadSavedFilter() {
+    const savedYear = localStorage.getItem("chama_report_year");
+    const savedMonth = localStorage.getItem("chama_report_month");
+    if (savedYear && savedYear !== 'null') {
+        currentFilter.year = savedYear;
+    }
+    if (savedMonth && savedMonth !== 'null') {
+        currentFilter.month = savedMonth;
+    }
+}
+
 async function loadData() {
     try {
         const membersResult = await supabaseClient.from("members").select("*").order("name");
@@ -553,16 +779,23 @@ async function loadData() {
         for (var i = 0; i < allRecords.length; i++) {
             yearsSet.add(allRecords[i].year);
         }
+        // Add current year and surrounding years
+        var currentYearNum = new Date().getFullYear();
+        yearsSet.add(currentYearNum - 1);
+        yearsSet.add(currentYearNum);
+        yearsSet.add(currentYearNum + 1);
+        
         availableYears = Array.from(yearsSet).sort((a, b) => b - a);
         
-        // Apply initial filter
-        applyFilter();
+        // Apply filter and render
+        applyFilterAndRender();
     } catch (error) {
         document.getElementById("app-root").innerHTML = '<div style="padding:2rem;text-align:center"><h3>⚠️ Error</h3><p>' + error.message + '</p><button class="btn" onclick="location.reload()">Retry</button></div>';
     }
 }
 
-function applyFilter() {
+// Apply filter and render - called on page load and when filter changes
+function applyFilterAndRender() {
     if (currentFilter.year === 'all' && currentFilter.month === 'all') {
         filteredRecords = [...allRecords];
     } else {
@@ -575,14 +808,18 @@ function applyFilter() {
     renderReports();
 }
 
+// Called when filter selection changes - auto updates
+function onFilterChange() {
+    saveFilterSelection();
+    applyFilterAndRender();
+}
+
 function getSummaryStats() {
     var totalMembers = allMembers.length;
     var totalLoan = 0;
     var totalLoanBalance = 0;
     var totalContributions = 0;
     var totalPenalties = 0;
-    
-    // Get unique members in filtered records
     var membersInFilter = new Set();
     
     for (var i = 0; i < filteredRecords.length; i++) {
@@ -600,8 +837,7 @@ function getSummaryStats() {
         totalLoan: totalLoan,
         totalLoanBalance: totalLoanBalance,
         totalContributions: totalContributions,
-        totalPenalties: totalPenalties,
-        totalCollected: totalContributions + (totalLoan - totalLoanBalance)
+        totalPenalties: totalPenalties
     };
 }
 
@@ -686,97 +922,101 @@ function createCharts() {
     if (topMembersChart) topMembersChart.destroy();
     
     // Trends Chart
-    var ctx1 = document.getElementById('trendsChart').getContext('2d');
-    trendsChart = new Chart(ctx1, {
-        type: 'line',
-        data: {
-            labels: trends.labels,
-            datasets: [
-                {
-                    label: 'Monthly Contributions',
-                    data: trends.contributions,
-                    borderColor: '#2c7a4d',
-                    backgroundColor: 'rgba(44, 122, 77, 0.1)',
-                    borderWidth: 2,
-                    tension: 0.3,
-                    fill: true,
-                    pointBackgroundColor: '#2c7a4d',
-                    pointBorderColor: 'white',
-                    pointRadius: 4,
-                    pointHoverRadius: 6
-                },
-                {
-                    label: 'Loans Given',
-                    data: trends.loans,
-                    borderColor: '#f59e0b',
-                    backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                    borderWidth: 2,
-                    tension: 0.3,
-                    fill: true,
-                    pointBackgroundColor: '#f59e0b',
-                    pointBorderColor: 'white',
-                    pointRadius: 4,
-                    pointHoverRadius: 6
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { position: 'bottom', labels: { font: { size: 10 } } },
-                tooltip: { 
-                    callbacks: { 
-                        label: function(context) { 
-                            return context.dataset.label + ': KES ' + context.raw.toLocaleString(); 
-                        } 
-                    } 
-                }
+    var ctx1 = document.getElementById('trendsChart');
+    if (ctx1) {
+        trendsChart = new Chart(ctx1.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: trends.labels,
+                datasets: [
+                    {
+                        label: 'Monthly Contributions',
+                        data: trends.contributions,
+                        borderColor: '#2c7a4d',
+                        backgroundColor: 'rgba(44, 122, 77, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true,
+                        pointBackgroundColor: '#2c7a4d',
+                        pointBorderColor: 'white',
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    },
+                    {
+                        label: 'Loans Given',
+                        data: trends.loans,
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true,
+                        pointBackgroundColor: '#f59e0b',
+                        pointBorderColor: 'white',
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }
+                ]
             },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: { callback: function(value) { return 'KES ' + (value/1000).toFixed(0) + 'k'; } }
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { font: { size: 10 } } },
+                    tooltip: { 
+                        callbacks: { 
+                            label: function(context) { 
+                                return context.dataset.label + ': KES ' + context.raw.toLocaleString(); 
+                            } 
+                        } 
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { callback: function(value) { return 'KES ' + (value/1000).toFixed(0) + 'k'; } }
+                    }
                 }
             }
-        }
-    });
+        });
+    }
     
     // Top Contributors Bar Chart
-    var ctx2 = document.getElementById('topMembersChart').getContext('2d');
-    topMembersChart = new Chart(ctx2, {
-        type: 'bar',
-        data: {
-            labels: topContributors.names,
-            datasets: [{
-                label: 'Total Contributions (KES)',
-                data: topContributors.amounts,
-                backgroundColor: '#2c7a4d',
-                borderRadius: 8,
-                barPercentage: 0.7
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { position: 'bottom', labels: { font: { size: 10 } } },
-                tooltip: { 
-                    callbacks: { 
-                        label: function(context) { 
-                            return 'KES ' + context.raw.toLocaleString(); 
-                        } 
-                    } 
-                }
+    var ctx2 = document.getElementById('topMembersChart');
+    if (ctx2) {
+        topMembersChart = new Chart(ctx2.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: topContributors.names,
+                datasets: [{
+                    label: 'Total Contributions (KES)',
+                    data: topContributors.amounts,
+                    backgroundColor: '#2c7a4d',
+                    borderRadius: 8,
+                    barPercentage: 0.7
+                }]
             },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: { callback: function(value) { return 'KES ' + (value/1000).toFixed(0) + 'k'; } }
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { font: { size: 10 } } },
+                    tooltip: { 
+                        callbacks: { 
+                            label: function(context) { 
+                                return 'KES ' + context.raw.toLocaleString(); 
+                            } 
+                        } 
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { callback: function(value) { return 'KES ' + (value/1000).toFixed(0) + 'k'; } }
+                    }
                 }
             }
-        }
-    });
+        });
+    }
 }
 
 function shareToWhatsApp() {
@@ -910,7 +1150,7 @@ function renderReports() {
     }
     
     if (rankings.length === 0) {
-        tableRows = `<tr><td colspan="4" style="text-align:center; padding:2rem;">No records found for selected period<td</tr>`;
+        tableRows = `<tr><td colspan="4" style="text-align:center; padding:2rem;">No records found for selected period</td></tr>`;
     }
     
     var html = `
@@ -919,7 +1159,7 @@ function renderReports() {
             <p>Generated on ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}</p>
         </div>
         
-        <!-- Filter Section -->
+        <!-- Filter Section - Auto updates, no Apply button needed -->
         <div class="filter-section">
             <div class="filter-title">🔍 Filter Reports</div>
             <div class="filter-controls">
@@ -931,9 +1171,8 @@ function renderReports() {
                     <label class="filter-label">Select Month</label>
                     <select id="monthFilter" class="filter-select">${monthOptions}</select>
                 </div>
-                <div class="filter-buttons">
-                    <button class="btn-apply" id="applyFilterBtn">Apply Filter</button>
-                    <button class="btn-reset" id="resetFilterBtn">Reset</button>
+                <div class="filter-group">
+                    <button class="btn-reset" id="resetFilterBtn">Reset Filters</button>
                 </div>
             </div>
             <div class="active-filter-badge">
@@ -1041,20 +1280,26 @@ function renderReports() {
     container.innerHTML = html;
     
     // Create charts
-    createCharts();
+    setTimeout(function() {
+        createCharts();
+    }, 100);
     
-    // Bind filter events
-    document.getElementById("applyFilterBtn").addEventListener("click", function() {
-        currentFilter.year = document.getElementById("yearFilter").value;
-        currentFilter.month = document.getElementById("monthFilter").value;
-        applyFilter();
+    // Bind filter events - AUTO UPDATE (no apply button needed)
+    document.getElementById("yearFilter").addEventListener("change", function() {
+        currentFilter.year = this.value;
+        onFilterChange();
+    });
+    
+    document.getElementById("monthFilter").addEventListener("change", function() {
+        currentFilter.month = this.value;
+        onFilterChange();
     });
     
     document.getElementById("resetFilterBtn").addEventListener("click", function() {
         currentFilter = { year: 'all', month: 'all' };
         document.getElementById("yearFilter").value = 'all';
         document.getElementById("monthFilter").value = 'all';
-        applyFilter();
+        onFilterChange();
     });
     
     document.getElementById("shareWABtn").addEventListener("click", shareToWhatsApp);
@@ -1063,6 +1308,8 @@ function renderReports() {
 }
 
 // Initialize
+loadSavedFilter();
+
 (async function() {
     const isAuth = await protectPage();
     if (isAuth) {
