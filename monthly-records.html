@@ -1,561 +1,4 @@
-<script type="module">
-    import { supabase } from './auth.js';
-    
-    let allShifts = [], allTransactions = [];
-    let isMobile = window.innerWidth <= 768;
-    let currentUser = null;
-    let currentBranchId = null;
-    let currentBranch = null;
-
-    // ==================== SIDEBAR FUNCTIONS ====================
-    window.toggleMenu = () => {
-        document.getElementById('sidebar').classList.toggle('mobile-active');
-        document.getElementById('overlay').classList.toggle('active');
-    };
-
-    // ==================== BRANCH FUNCTIONS ====================
-
-    // Get current user's branch ID from session
-    function getCurrentBranchId() {
-        const session = JSON.parse(localStorage.getItem('pos_session') || '{}');
-        return session.branch?.id || currentBranchId;
-    }
-
-    // Load user profile with branch info
-    async function loadUserProfile() {
-        try {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) {
-                window.location.href = 'index.html';
-                return null;
-            }
-            
-            currentUser = user;
-            
-            // Get profile with branch info
-            const { data: profile, error } = await supabase
-                .from('profiles')
-                .select(`
-                    *,
-                    branches (
-                        id,
-                        name,
-                        code,
-                        location
-                    )
-                `)
-                .eq('id', user.id)
-                .maybeSingle();
-            
-            if (error) throw error;
-            if (!profile) {
-                console.error("No profile found");
-                return null;
-            }
-            
-            currentBranchId = profile.branch_id;
-            currentBranch = profile.branches;
-            
-            const session = {
-                user: user,
-                profile: profile,
-                branch: profile.branches,
-                role: profile.role
-            };
-            localStorage.setItem('pos_session', JSON.stringify(session));
-            
-            // Update sidebar with user's assigned branch
-            const sidebarBranchName = document.querySelector('#sidebarBranchName span');
-            if (profile.branches && sidebarBranchName) {
-                sidebarBranchName.textContent = profile.branches.name;
-            }
-            
-            // Update branch display
-            const branchNameSpan = document.getElementById('branchName');
-            if (branchNameSpan && profile.branches) {
-                branchNameSpan.textContent = profile.branches.name;
-            }
-            
-            return profile;
-        } catch (error) {
-            console.error("Error loading profile:", error);
-            return null;
-        }
-    }
-
-    window.logoutUser = async () => { 
-        localStorage.removeItem('pos_session');
-        await supabase.auth.signOut(); 
-        location.href = 'index.html'; 
-    };
-
-    async function fetchData() {
-        showLoading(true);
-        
-        try {
-            const branchId = getCurrentBranchId();
-            if (!branchId) {
-                console.error("No branch ID found");
-                return;
-            }
-
-            // Fetch shifts with pre-calculated totals
-            const [shiftsRes, transRes] = await Promise.all([
-                supabase.from('daily_shifts')
-                    .select('*')
-                    .eq('branch_id', branchId)
-                    .order('start_time', { ascending: false }),
-                supabase.from('cash_transactions')
-                    .select('shift_id, amount, type')
-                    .eq('branch_id', branchId)
-            ]);
-
-            allShifts = shiftsRes.data || [];
-            allTransactions = transRes.data || [];
-            
-            console.log(`Loaded ${allShifts.length} shifts`);
-            
-            render();
-        } catch (error) {
-            console.error("Error fetching data:", error);
-            alert("Error loading shift data. Please try again.");
-        } finally {
-            showLoading(false);
-        }
-    }
-
-    function showLoading(show) {
-        const loadingEl = document.getElementById('loadingSpinner');
-        const refreshBtn = document.getElementById('refreshBtn');
-        
-        if (loadingEl) loadingEl.style.display = show ? 'flex' : 'none';
-        if (refreshBtn) refreshBtn.disabled = show;
-    }
-
-    function render(data = allShifts) {
-        if (isMobile) {
-            renderMobile(data);
-        } else {
-            renderDesktop(data);
-        }
-        
-        // Show/hide no results message
-        const noResultsEl = document.getElementById('noResults');
-        if (noResultsEl) {
-            noResultsEl.style.display = data.length === 0 ? 'block' : 'none';
-        }
-    }
-
-    function renderDesktop(data = allShifts) {
-        const tbody = document.getElementById('audit-body-desktop');
-        if (!tbody) return;
-        
-        let tableHtml = '';
-
-        data.forEach(sh => {
-            const shiftLogs = allTransactions.filter(t => t.shift_id === sh.id);
-            
-            // Use pre-calculated totals from the shift table
-            const cashSales = sh.total_cash_sales || 0;
-            const kcbPaybillSales = sh.total_kcb_paybill_sales || 0;
-            const totalRevenue = sh.total_sales_amount || 0;
-            
-            // Format the date for the URL (YYYY-MM-DD)
-            const shiftDate = new Date(sh.start_time).toISOString().split('T')[0];
-
-            const moneyIn = shiftLogs.filter(t => t.type === 'Money In').reduce((s, t) => s + (t.amount || 0), 0);
-            const moneyOut = shiftLogs.filter(t => t.type === 'Money Out').reduce((s, t) => s + (t.amount || 0), 0);
-
-            const openTotal = (sh.open_cash||0) + (sh.open_mpesa||0) + (sh.open_kcb||0) + (sh.open_kcb_bank||0) + (sh.open_equity||0);
-            const closeTotal = (sh.close_cash||0) + (sh.close_mpesa||0) + (sh.close_kcb||0) + (sh.close_kcb_bank||0) + (sh.close_equity||0);
-
-            // Fix: Check status correctly (case insensitive)
-            const isClosed = sh.status && sh.status.toLowerCase() === 'closed';
-            
-            const expected = sh.system_expected_total || (openTotal + totalRevenue + moneyIn - moneyOut);
-            
-            // LOGIC FOR VARIANCE DISPLAY
-            let varianceVal = isClosed ? (closeTotal - expected) : 0;
-            let varianceDisplay = '';
-            let varianceClass = '';
-
-            if (!isClosed) {
-                varianceDisplay = 'OPEN';
-                varianceClass = 'status-open';
-            } else {
-                // If closed, check the amount for sign and color
-                if (varianceVal > 0) {
-                    varianceDisplay = '+ ' + varianceVal.toLocaleString();
-                    varianceClass = 'var-positive';
-                } else if (varianceVal < 0) {
-                    varianceDisplay = varianceVal.toLocaleString();
-                    varianceClass = 'var-negative';
-                } else {
-                    varianceDisplay = 'BALANCED';
-                    varianceClass = 'var-balanced';
-                }
-            }
-
-            const startD = new Date(sh.start_time);
-            const endD = sh.end_time ? new Date(sh.end_time) : null;
-            
-            // Build payment methods HTML using pre-calculated totals, wrapped in a link
-            let paymentMethodsHtml = '';
-            
-            // Only show if there are sales
-            if (cashSales > 0 || kcbPaybillSales > 0 || totalRevenue > 0) {
-                if (cashSales > 0) {
-                    paymentMethodsHtml += `
-                        <div class="payment-method-item">
-                            <span class="payment-label">Cash</span>
-                            <span class="payment-amount positive">+${cashSales.toLocaleString()}</span>
-                        </div>
-                    `;
-                }
-                if (kcbPaybillSales > 0) {
-                    paymentMethodsHtml += `
-                        <div class="payment-method-item">
-                            <span class="payment-label">KCB Paybill</span>
-                            <span class="payment-amount positive">+${kcbPaybillSales.toLocaleString()}</span>
-                        </div>
-                    `;
-                }
-            } else {
-                paymentMethodsHtml = '<div class="payment-method-item"><span class="payment-label">No sales recorded</span><span class="payment-amount">0</span></div>';
-            }
-            
-            // Add total revenue at the bottom, wrapped in a link
-            paymentMethodsHtml += `
-                <a href="sales_reports.html?date=${shiftDate}" class="revenue-card" style="display: block; text-decoration: none; margin-top: 8px;">
-                    <div class="payment-method-item" style="margin-top:8px; padding-top:8px; border-top:2px solid var(--border);">
-                        <span class="payment-label" style="font-weight:800;">📊 TOTAL SALES</span>
-                        <span class="payment-amount" style="font-weight:800; color:var(--primary);">+${totalRevenue.toLocaleString()}</span>
-                    </div>
-                    <div style="font-size:0.6rem; color:var(--primary); font-weight:800; margin-top:4px; text-align:right">CLICK TO VIEW ➔</div>
-                </a>
-            `;
-            
-            tableHtml += `
-                <tr>
-                    <td class="date-cell">
-                        <b>${startD.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric'})}</b>
-                        <span class="time-pill">IN: ${startD.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span><br>
-                        <span class="time-pill">${endD ? 'OUT: '+endD.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : 'ACTIVE'}</span>
-                      </td>
-                      <td>
-                        <div class="account-line"><span class="account-label">Cash</span><span class="account-val">${(sh.open_cash||0).toLocaleString()}</span></div>
-                        <div class="account-line"><span class="account-label">Mpesa</span><span class="account-val">${(sh.open_mpesa||0).toLocaleString()}</span></div>
-                        <div class="account-line"><span class="account-label">KCB Float</span><span class="account-val">${(sh.open_kcb||0).toLocaleString()}</span></div>
-                        <div class="account-line"><span class="account-label">Equity</span><span class="account-val">${(sh.open_equity||0).toLocaleString()}</span></div>
-                        <div class="account-line"><span class="account-label">KCB Bank</span><span class="account-val">${(sh.open_kcb_bank||0).toLocaleString()}</span></div>
-                        <div class="total-row">Total: ${openTotal.toLocaleString()}</div>
-                      </td>
-                    <td style="vertical-align: middle;">
-                        <div style="background: #f8fafc; padding: 10px; border-radius: 8px;">
-                            ${paymentMethodsHtml}
-                        </div>
-                    </td>
-                    <td>
-                        <a href="moneyinout.html" class="revenue-card">
-                            <div class="account-line"><span class="account-label">In</span><span class="account-val" style="color:var(--success)">+${moneyIn.toLocaleString()}</span></div>
-                            <div class="account-line"><span class="account-label">Out</span><span class="account-val" style="color:var(--danger)">-${moneyOut.toLocaleString()}</span></div>
-                            <div style="font-size:0.6rem; color:var(--primary); font-weight:800; margin-top:8px; text-align:right">CLICK TO VIEW ➔</div>
-                        </a>
-                    </td>
-                    <td>
-                        <div class="account-line"><span class="account-label">Cash</span><span class="account-val">${(sh.close_cash||0).toLocaleString()}</span></div>
-                        <div class="account-line"><span class="account-label">Mpesa</span><span class="account-val">${(sh.close_mpesa||0).toLocaleString()}</span></div>
-                        <div class="account-line"><span class="account-label">KCB Float</span><span class="account-val">${(sh.close_kcb||0).toLocaleString()}</span></div>
-                        <div class="account-line"><span class="account-label">Equity</span><span class="account-val">${(sh.close_equity||0).toLocaleString()}</span></div>
-                        <div class="account-line"><span class="account-label">KCB Bank</span><span class="account-val">${(sh.close_kcb_bank||0).toLocaleString()}</span></div>
-                        <div class="total-row" style="background:#f0f9ff">Total: ${closeTotal.toLocaleString()}</div>
-                    </td>
-                    <td>
-                        <span class="status-badge ${varianceClass}">
-                            ${varianceDisplay}
-                        </span>
-                        <div style="font-size: 0.65rem; color: var(--text-dim); margin-top: 8px; text-align: center;">
-                            Expected: ${expected.toLocaleString()}
-                        </div>
-                    </td>
-                    <td><div style="max-height: 120px; overflow-y: auto; font-size: 0.8rem; color: var(--text-dim); font-style: italic;">${sh.variance_note || 'No notes added.'}</div></td>
-                </tr>`;
-        });
-
-        tbody.innerHTML = tableHtml || '<tr><td colspan="7" style="text-align:center; padding:50px;">No records found.</td></td>';
-    }
-
-    function renderMobile(data = allShifts) {
-        const mobileContainer = document.getElementById('mobile-shifts-container');
-        if (!mobileContainer) return;
-        
-        let mobileHtml = '';
-
-        data.forEach(sh => {
-            const shiftLogs = allTransactions.filter(t => t.shift_id === sh.id);
-            
-            // Use pre-calculated totals from the shift table
-            const cashSales = sh.total_cash_sales || 0;
-            const kcbPaybillSales = sh.total_kcb_paybill_sales || 0;
-            const totalRevenue = sh.total_sales_amount || 0;
-            
-            // Format the date for the URL (YYYY-MM-DD)
-            const shiftDate = new Date(sh.start_time).toISOString().split('T')[0];
-
-            const moneyIn = shiftLogs.filter(t => t.type === 'Money In').reduce((s, t) => s + (t.amount || 0), 0);
-            const moneyOut = shiftLogs.filter(t => t.type === 'Money Out').reduce((s, t) => s + (t.amount || 0), 0);
-
-            const openTotal = (sh.open_cash||0) + (sh.open_mpesa||0) + (sh.open_kcb||0) + (sh.open_kcb_bank||0) + (sh.open_equity||0);
-            const closeTotal = (sh.close_cash||0) + (sh.close_mpesa||0) + (sh.close_kcb||0) + (sh.close_kcb_bank||0) + (sh.close_equity||0);
-
-            const isClosed = sh.status && sh.status.toLowerCase() === 'closed';
-            
-            const expected = sh.system_expected_total || (openTotal + totalRevenue + moneyIn - moneyOut);
-            const varianceVal = isClosed ? (closeTotal - expected) : 0;
-            
-            const startD = new Date(sh.start_time);
-            const endD = sh.end_time ? new Date(sh.end_time) : null;
-            
-            let statusClass = '';
-            let statusText = '';
-            
-            if (!isClosed) {
-                statusClass = 'status-open';
-                statusText = 'OPEN';
-            } else if (varianceVal > 0) {
-                statusClass = 'var-positive';
-                statusText = `+${varianceVal.toLocaleString()}`;
-            } else if (varianceVal < 0) {
-                statusClass = 'var-negative';
-                statusText = varianceVal.toLocaleString();
-            } else {
-                statusClass = 'var-balanced';
-                statusText = 'BALANCED';
-            }
-            
-            // Build payment methods HTML for mobile using pre-calculated totals, wrapped in a link
-            let paymentMethodsHtml = '';
-            
-            if (cashSales > 0) {
-                paymentMethodsHtml += `
-                    <div class="shift-mobile-detail-line">
-                        <span class="shift-mobile-detail-label">Cash</span>
-                        <span class="shift-mobile-detail-value" style="color:var(--success)">+${cashSales.toLocaleString()}</span>
-                    </div>
-                `;
-            }
-            if (kcbPaybillSales > 0) {
-                paymentMethodsHtml += `
-                    <div class="shift-mobile-detail-line">
-                        <span class="shift-mobile-detail-label">KCB Paybill</span>
-                        <span class="shift-mobile-detail-value" style="color:var(--success)">+${kcbPaybillSales.toLocaleString()}</span>
-                    </div>
-                `;
-            }
-            
-            if (paymentMethodsHtml === '') {
-                paymentMethodsHtml = '<div class="shift-mobile-detail-line"><span class="shift-mobile-detail-label">No sales recorded</span><span class="shift-mobile-detail-value">0</span></div>';
-            }
-            
-            // Add total, wrapped in a link
-            paymentMethodsHtml += `
-                <a href="sales_reports.html?date=${shiftDate}" style="text-decoration: none; display: block;">
-                    <div class="shift-mobile-total" style="margin-top:8px;">
-                        Total Sales: +${totalRevenue.toLocaleString()}
-                        <div style="font-size:0.6rem; color:var(--primary); font-weight:800; margin-top:4px;">➔ CLICK TO VIEW</div>
-                    </div>
-                </a>
-            `;
-            
-            mobileHtml += `
-                <div class="shift-mobile-card">
-                    <div class="shift-mobile-header">
-                        <div class="shift-mobile-date">
-                            ${startD.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric'})}
-                            <small>
-                                ${startD.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}
-                                ${endD ? ` - ${endD.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}` : ''}
-                            </small>
-                        </div>
-                        <div class="shift-mobile-status ${statusClass}">
-                            ${statusText}
-                        </div>
-                    </div>
-                    
-                    <div class="shift-mobile-grid">
-                        <div class="shift-mobile-section">
-                            <div class="shift-mobile-section-title">
-                                <i class="fas fa-wallet"></i> OPENING FLOATS
-                            </div>
-                            <div class="shift-mobile-details">
-                                <div class="shift-mobile-detail-line">
-                                    <span class="shift-mobile-detail-label">Cash</span>
-                                    <span class="shift-mobile-detail-value">${(sh.open_cash||0).toLocaleString()}</span>
-                                </div>
-                                <div class="shift-mobile-detail-line">
-                                    <span class="shift-mobile-detail-label">Mpesa</span>
-                                    <span class="shift-mobile-detail-value">${(sh.open_mpesa||0).toLocaleString()}</span>
-                                </div>
-                                <div class="shift-mobile-detail-line">
-                                    <span class="shift-mobile-detail-label">KCB Float</span>
-                                    <span class="shift-mobile-detail-value">${(sh.open_kcb||0).toLocaleString()}</span>
-                                </div>
-                                <div class="shift-mobile-detail-line">
-                                    <span class="shift-mobile-detail-label">Equity</span>
-                                    <span class="shift-mobile-detail-value">${(sh.open_equity||0).toLocaleString()}</span>
-                                </div>
-                                <div class="shift-mobile-detail-line">
-                                    <span class="shift-mobile-detail-label">KCB Bank</span>
-                                    <span class="shift-mobile-detail-value">${(sh.open_kcb_bank||0).toLocaleString()}</span>
-                                </div>
-                                <div class="shift-mobile-total">
-                                    Total: ${openTotal.toLocaleString()}
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="shift-mobile-section">
-                            <div class="shift-mobile-section-title">
-                                <i class="fas fa-cash-register"></i> PAYMENT METHOD
-                            </div>
-                            <div class="shift-mobile-details">
-                                ${paymentMethodsHtml}
-                            </div>
-                        </div>
-                        
-                        <div class="shift-mobile-section">
-                            <div class="shift-mobile-section-title">
-                                <i class="fas fa-exchange-alt"></i> MONEY IN/OUT
-                            </div>
-                            <div class="shift-mobile-details">
-                                <div class="shift-mobile-detail-line">
-                                    <span class="shift-mobile-detail-label">Money In</span>
-                                    <span class="shift-mobile-detail-value" style="color:var(--success)">+${moneyIn.toLocaleString()}</span>
-                                </div>
-                                <div class="shift-mobile-detail-line">
-                                    <span class="shift-mobile-detail-label">Money Out</span>
-                                    <span class="shift-mobile-detail-value" style="color:var(--danger)">-${moneyOut.toLocaleString()}</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="shift-mobile-section">
-                            <div class="shift-mobile-section-title">
-                                <i class="fas fa-safe"></i> CLOSING FLOATS
-                            </div>
-                            <div class="shift-mobile-details">
-                                <div class="shift-mobile-detail-line">
-                                    <span class="shift-mobile-detail-label">Cash</span>
-                                    <span class="shift-mobile-detail-value">${(sh.close_cash||0).toLocaleString()}</span>
-                                </div>
-                                <div class="shift-mobile-detail-line">
-                                    <span class="shift-mobile-detail-label">Mpesa</span>
-                                    <span class="shift-mobile-detail-value">${(sh.close_mpesa||0).toLocaleString()}</span>
-                                </div>
-                                <div class="shift-mobile-detail-line">
-                                    <span class="shift-mobile-detail-label">KCB Float</span>
-                                    <span class="shift-mobile-detail-value">${(sh.close_kcb||0).toLocaleString()}</span>
-                                </div>
-                                <div class="shift-mobile-detail-line">
-                                    <span class="shift-mobile-detail-label">Equity</span>
-                                    <span class="shift-mobile-detail-value">${(sh.close_equity||0).toLocaleString()}</span>
-                                </div>
-                                <div class="shift-mobile-detail-line">
-                                    <span class="shift-mobile-detail-label">KCB Bank</span>
-                                    <span class="shift-mobile-detail-value">${(sh.close_kcb_bank||0).toLocaleString()}</span>
-                                </div>
-                                <div class="shift-mobile-total" style="background:#f0f9ff">
-                                    Total: ${closeTotal.toLocaleString()}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="shift-mobile-expected">
-                        Expected: ${expected.toLocaleString()}
-                    </div>
-                    
-                    ${sh.variance_note ? `
-                        <div class="shift-mobile-variance-note">
-                            <strong>Note:</strong> ${sh.variance_note}
-                        </div>
-                    ` : ''}
-                    
-                    <div class="shift-mobile-actions">
-                        <a href="sales_reports.html?date=${shiftDate}" class="shift-mobile-action-btn sales-action">
-                            <i class="fas fa-chart-line"></i> Sales Report
-                        </a>
-                        <a href="moneyinout.html" class="shift-mobile-action-btn money-action">
-                            <i class="fas fa-money-bill-wave"></i> Money Log
-                        </a>
-                    </div>
-                </div>
-            `;
-        });
-
-        mobileContainer.innerHTML = mobileHtml || '<div class="no-results"><i class="fas fa-search"></i><p>No shift records found</p></div>';
-    }
-
-    function filterData(searchTerm) {
-        const filtered = allShifts.filter(sh => {
-            const dateStr = new Date(sh.start_time).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric'}).toLowerCase();
-            const status = (sh.status || '').toLowerCase();
-            const note = (sh.variance_note || '').toLowerCase();
-            
-            return dateStr.includes(searchTerm) || 
-                   status.includes(searchTerm) ||
-                   note.includes(searchTerm);
-        });
-        
-        render(filtered);
-    }
-
-    document.getElementById('auditSearch').addEventListener('input', (e) => {
-        const term = e.target.value.toLowerCase().trim();
-        if (term === '') {
-            render(allShifts);
-        } else {
-            filterData(term);
-        }
-    });
-
-    async function refreshData() {
-        const btn = document.getElementById('refreshBtn');
-        const originalHtml = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-        btn.disabled = true;
-        
-        await fetchData();
-        
-        btn.innerHTML = originalHtml;
-        btn.disabled = false;
-        
-        btn.style.background = '#10b981';
-        setTimeout(() => {
-            btn.style.background = '';
-        }, 1000);
-    }
-
-    // Handle window resize
-    window.addEventListener('resize', function() {
-        const newIsMobile = window.innerWidth <= 768;
-        if (newIsMobile !== isMobile) {
-            isMobile = newIsMobile;
-            render();
-        }
-    });
-
-    // Initialize on load
-    document.addEventListener('DOMContentLoaded', async function() {
-        const profile = await loadUserProfile();
-        if (profile) {
-            await fetchData();
-        }
-        
-        // Check if we're on mobile initially
-        isMobile = window.innerWidth <= 768;
-    });
-</script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -787,7 +230,7 @@
             width: 100%;
             border-collapse: collapse;
             font-size: 0.8rem;
-            min-width: 800px;
+            min-width: 900px;
         }
 
         .spreadsheet-table th,
@@ -805,17 +248,21 @@
 
         .spreadsheet-table td input {
             width: 100%;
-            padding: 6px 8px;
-            border: 1px solid transparent;
-            border-radius: 6px;
+            padding: 8px 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
             font-size: 0.8rem;
-            background: transparent;
+            background: white;
         }
 
         .spreadsheet-table td input:focus {
             outline: none;
             border-color: var(--primary);
-            background: #fff;
+            box-shadow: 0 0 0 2px rgba(44,122,77,0.1);
+        }
+
+        .spreadsheet-table td input:hover {
+            background: #f8fafc;
         }
 
         .member-name-cell {
@@ -963,7 +410,6 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Toast notification */
         .toast-notification {
             position: fixed;
             bottom: 20px;
@@ -1018,6 +464,10 @@
             .spreadsheet-table th,
             .spreadsheet-table td {
                 padding: 6px 4px;
+                font-size: 0.7rem;
+            }
+            .spreadsheet-table td input {
+                padding: 4px 6px;
                 font-size: 0.7rem;
             }
         }
@@ -1076,7 +526,7 @@
 <script>
 // ============================================
 // MONTHLY RECORDS - SPREADSHEET STYLE
-// With auto-save, month/year persistence, copy feature
+// With proper column alignment for all 6 fields
 // ============================================
 
 let allMembers = [];
@@ -1097,7 +547,6 @@ function getFooterMessage() {
     return "🌙 Good evening! Wishing you a peaceful rest after a productive day.";
 }
 
-// Update footer with dynamic message
 function updateFooter() {
     const footer = document.getElementById("footerMessage");
     if (footer) {
@@ -1105,13 +554,11 @@ function updateFooter() {
     }
 }
 
-// Save selected period to localStorage
 function saveSelectedPeriod() {
     localStorage.setItem("chama_selected_month", currentMonth);
     localStorage.setItem("chama_selected_year", currentYear);
 }
 
-// Load saved period from localStorage
 function loadSavedPeriod() {
     const savedMonth = localStorage.getItem("chama_selected_month");
     const savedYear = localStorage.getItem("chama_selected_year");
@@ -1193,12 +640,11 @@ async function loadData() {
         if (recordsError) throw recordsError;
         allRecords = recordsData || [];
         
-        // Extract available years from records
+        // Extract available years
         var yearsSet = new Set();
         for (var i = 0; i < allRecords.length; i++) {
             yearsSet.add(allRecords[i].year);
         }
-        // Add surrounding years
         var currentYearNum = new Date().getFullYear();
         yearsSet.add(currentYearNum - 2);
         yearsSet.add(currentYearNum - 1);
@@ -1359,7 +805,6 @@ async function saveAllChanges() {
     }
 }
 
-// Copy table data to clipboard
 async function copyToClipboard() {
     var table = document.getElementById("data-table");
     if (!table) {
@@ -1516,14 +961,12 @@ function shareToWhatsApp() {
         var monthlyContribution = safeValue(getRecordValue(member.id, "monthly_contribution"));
         var penalties = safeValue(getRecordValue(member.id, "penalties"));
         
-        if (loan > 0 || loanDeductions > 0 || loanBalance > 0 || monthlyContribution > 0 || penalties > 0) {
-            message += "👤 *" + member.name + "*\n";
-            message += "├─ 💰 Loan: KES " + formatNumber(loan) + "\n";
-            message += "├─ 📉 Loan Deductions: KES " + formatNumber(loanDeductions) + "\n";
-            message += "├─ ⚖️ Loan Balance: KES " + formatNumber(loanBalance) + "\n";
-            message += "├─ 📋 Contribution: KES " + formatNumber(monthlyContribution) + "\n";
-            message += "└─ ⚠️ Penalties: KES " + formatNumber(penalties) + "\n\n";
-        }
+        message += "👤 *" + member.name + "*\n";
+        message += "├─ 💰 Loan: KES " + formatNumber(loan) + "\n";
+        message += "├─ 📉 Loan Deductions: KES " + formatNumber(loanDeductions) + "\n";
+        message += "├─ ⚖️ Loan Balance: KES " + formatNumber(loanBalance) + "\n";
+        message += "├─ 📋 Contribution: KES " + formatNumber(monthlyContribution) + "\n";
+        message += "└─ ⚠️ Penalties: KES " + formatNumber(penalties) + "\n\n";
     }
     
     var totalLoan = 0, totalLoanDeductions = 0, totalLoanBalance = 0, totalMonthlyContribution = 0, totalPenalties = 0;
@@ -1588,7 +1031,7 @@ function renderSpreadsheet() {
         var penalties = safeValue(getRecordValue(member.id, "penalties"));
         
         tableRows += '<tr>';
-        tableRows += '<td class="member-name-cell"><strong>' + escapeHtml(member.name) + '</strong></tr>';
+        tableRows += '<td class="member-name-cell"><strong>' + escapeHtml(member.name) + '</strong></td>';
         tableRows += '<td><input type="number" value="' + loan + '" step="any" onchange="handleCellChange(\'' + member.id + '\', \'loan\', event)" placeholder="0"></td>';
         tableRows += '<td><input type="number" value="' + loanDeductions + '" step="any" onchange="handleCellChange(\'' + member.id + '\', \'loan_deductions\', event)" placeholder="0"></td>';
         tableRows += '<td><input type="number" value="' + loanBalance + '" step="any" onchange="handleCellChange(\'' + member.id + '\', \'loan_balance\', event)" placeholder="0"></td>';
@@ -1683,7 +1126,7 @@ function renderSpreadsheet() {
     
     container.innerHTML = html;
     
-    // Auto-update when month or year changes (no apply button needed)
+    // Auto-update when month or year changes
     document.getElementById("monthSelect").addEventListener("change", function() {
         if (pendingSaves.size > 0 && confirm("You have unsaved changes. Change period anyway?")) {
             saveAllChanges();
@@ -1712,7 +1155,7 @@ function renderSpreadsheet() {
 }
 
 // Initialize
-loadSavedPeriod(); // Load saved month/year from localStorage (October 2025 default)
+loadSavedPeriod();
 updateFooter();
 
 (async function() {
