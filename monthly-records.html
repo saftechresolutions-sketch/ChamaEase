@@ -246,6 +246,12 @@
             font-weight: 600;
         }
 
+        .currency-display {
+            font-weight: 500;
+            font-family: monospace;
+            text-align: right;
+        }
+
         .spreadsheet-table td input {
             width: 100%;
             padding: 8px 10px;
@@ -253,6 +259,7 @@
             border-radius: 8px;
             font-size: 0.8rem;
             background: white;
+            text-align: right;
         }
 
         .spreadsheet-table td input:focus {
@@ -525,8 +532,8 @@
 <script src="supabase-config.js"></script>
 <script>
 // ============================================
-// MONTHLY RECORDS - UPDATED with 2DP & COMMAS for all currency displays
-// All numeric values now show 2 decimal places and thousands separators
+// MONTHLY RECORDS - SPREADSHEET STYLE
+// All currency values display with 2 decimal places and commas
 // ============================================
 
 let allMembers = [];
@@ -607,18 +614,13 @@ function safeValue(value) {
     return parseFloat(value);
 }
 
-// NEW: Format currency with 2 decimal places and thousands commas
+// Format currency with 2 decimal places and thousands commas
 function formatCurrency(num) {
     if (num === null || num === undefined) return "0.00";
     const numeric = parseFloat(num);
     if (isNaN(numeric)) return "0.00";
-    // Format with 2 decimal places and thousands separators (Kenyan format)
+    // Format with 2 decimal places and thousands separators
     return numeric.toLocaleString('en-KE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
-
-// Legacy formatNumber remains but we upgrade to formatCurrency for all monetary displays
-function formatNumber(num) {
-    return formatCurrency(num);
 }
 
 function escapeHtml(str) {
@@ -889,9 +891,9 @@ async function copyTableToClipboard() {
             }
         } else {
             for (var j = 0; j < cells.length; j++) {
-                var input = cells[j].querySelector("input");
-                if (input) {
-                    rowText.push(input.value);
+                var displaySpan = cells[j].querySelector(".currency-display");
+                if (displaySpan) {
+                    rowText.push(displaySpan.textContent.trim());
                 } else {
                     rowText.push(cells[j].innerText.trim());
                 }
@@ -1046,20 +1048,46 @@ function renderSpreadsheet() {
     
     for (var i = 0; i < allMembers.length; i++) {
         var member = allMembers[i];
-        // Raw numeric values for input fields (no formatting in input value)
+        // Get raw numeric values for editing
         var loanRaw = safeValue(getRecordValue(member.id, "loan"));
         var loanDeductionsRaw = safeValue(getRecordValue(member.id, "loan_deductions"));
         var loanBalanceRaw = safeValue(getRecordValue(member.id, "loan_balance"));
         var monthlyContributionRaw = safeValue(getRecordValue(member.id, "monthly_contribution"));
         var penaltiesRaw = safeValue(getRecordValue(member.id, "penalties"));
         
+        // Format for display
+        var loanFormatted = formatCurrency(loanRaw);
+        var loanDeductionsFormatted = formatCurrency(loanDeductionsRaw);
+        var loanBalanceFormatted = formatCurrency(loanBalanceRaw);
+        var monthlyContributionFormatted = formatCurrency(monthlyContributionRaw);
+        var penaltiesFormatted = formatCurrency(penaltiesRaw);
+        
         tableRows += '<tr>';
         tableRows += '<td class="member-name-cell"><strong>' + escapeHtml(member.name) + '</strong></td>';
-        tableRows += '<td><input type="number" step="any" value="' + loanRaw + '" onchange="handleCellChange(\'' + member.id + '\', \'loan\', event)" placeholder="0.00"></td>';
-        tableRows += '<td><input type="number" step="any" value="' + loanDeductionsRaw + '" onchange="handleCellChange(\'' + member.id + '\', \'loan_deductions\', event)" placeholder="0.00"></td>';
-        tableRows += '<td><input type="number" step="any" value="' + loanBalanceRaw + '" onchange="handleCellChange(\'' + member.id + '\', \'loan_balance\', event)" placeholder="0.00"></td>';
-        tableRows += '<td><input type="number" step="any" value="' + monthlyContributionRaw + '" onchange="handleCellChange(\'' + member.id + '\', \'monthly_contribution\', event)" placeholder="0.00"></td>';
-        tableRows += '<td><input type="number" step="any" value="' + penaltiesRaw + '" onchange="handleCellChange(\'' + member.id + '\', \'penalties\', event)" placeholder="0.00"></td>';
+        tableRows += '<td style="text-align: right; font-weight: 500;">';
+        tableRows += '<div class="currency-display" style="cursor: pointer; padding: 4px;" onclick="this.style.display=\'none\'; this.nextElementSibling.style.display=\'block\'; this.nextElementSibling.focus();">KES ' + loanFormatted + '</div>';
+        tableRows += '<input type="number" step="any" value="' + loanRaw + '" style="display: none; text-align: right;" onblur="handleCellChange(\'' + member.id + '\', \'loan\', event); this.style.display=\'none\'; this.previousElementSibling.style.display=\'block\'; this.previousElementSibling.innerHTML=\'KES \' + formatCurrency(this.value);" onkeypress="if(event.key===\'Enter\') this.blur();">';
+        tableRows += '</td>';
+        
+        tableRows += '<td style="text-align: right; font-weight: 500;">';
+        tableRows += '<div class="currency-display" style="cursor: pointer; padding: 4px;" onclick="this.style.display=\'none\'; this.nextElementSibling.style.display=\'block\'; this.nextElementSibling.focus();">KES ' + loanDeductionsFormatted + '</div>';
+        tableRows += '<input type="number" step="any" value="' + loanDeductionsRaw + '" style="display: none; text-align: right;" onblur="handleCellChange(\'' + member.id + '\', \'loan_deductions\', event); this.style.display=\'none\'; this.previousElementSibling.style.display=\'block\'; this.previousElementSibling.innerHTML=\'KES \' + formatCurrency(this.value);" onkeypress="if(event.key===\'Enter\') this.blur();">';
+        tableRows += '</td>';
+        
+        tableRows += '<td style="text-align: right; font-weight: 500;">';
+        tableRows += '<div class="currency-display" style="cursor: pointer; padding: 4px;" onclick="this.style.display=\'none\'; this.nextElementSibling.style.display=\'block\'; this.nextElementSibling.focus();">KES ' + loanBalanceFormatted + '</div>';
+        tableRows += '<input type="number" step="any" value="' + loanBalanceRaw + '" style="display: none; text-align: right;" onblur="handleCellChange(\'' + member.id + '\', \'loan_balance\', event); this.style.display=\'none\'; this.previousElementSibling.style.display=\'block\'; this.previousElementSibling.innerHTML=\'KES \' + formatCurrency(this.value);" onkeypress="if(event.key===\'Enter\') this.blur();">';
+        tableRows += '</td>';
+        
+        tableRows += '<td style="text-align: right; font-weight: 500;">';
+        tableRows += '<div class="currency-display" style="cursor: pointer; padding: 4px;" onclick="this.style.display=\'none\'; this.nextElementSibling.style.display=\'block\'; this.nextElementSibling.focus();">KES ' + monthlyContributionFormatted + '</div>';
+        tableRows += '<input type="number" step="any" value="' + monthlyContributionRaw + '" style="display: none; text-align: right;" onblur="handleCellChange(\'' + member.id + '\', \'monthly_contribution\', event); this.style.display=\'none\'; this.previousElementSibling.style.display=\'block\'; this.previousElementSibling.innerHTML=\'KES \' + formatCurrency(this.value);" onkeypress="if(event.key===\'Enter\') this.blur();">';
+        tableRows += '</td>';
+        
+        tableRows += '<td style="text-align: right; font-weight: 500;">';
+        tableRows += '<div class="currency-display" style="cursor: pointer; padding: 4px;" onclick="this.style.display=\'none\'; this.nextElementSibling.style.display=\'block\'; this.nextElementSibling.focus();">KES ' + penaltiesFormatted + '</div>';
+        tableRows += '<input type="number" step="any" value="' + penaltiesRaw + '" style="display: none; text-align: right;" onblur="handleCellChange(\'' + member.id + '\', \'penalties\', event); this.style.display=\'none\'; this.previousElementSibling.style.display=\'block\'; this.previousElementSibling.innerHTML=\'KES \' + formatCurrency(this.value);" onkeypress="if(event.key===\'Enter\') this.blur();">';
+        tableRows += '</td>';
         tableRows += '</tr>';
     }
     
@@ -1097,17 +1125,17 @@ function renderSpreadsheet() {
             
             <div class="action-buttons-row">
                 <span id="savingStatus" class="saving-status"></span>
-                  <button class="action-btn btn-save" id="saveAllBtn">
+                <button class="action-btn btn-save" id="saveAllBtn">
                     💾 Save All <span id="pendingCount" class="pending-badge" style="display:none;">0</span>
                 </button>
-                 <button class="action-btn btn-share" id="shareWABtn">
+                <button class="action-btn btn-share" id="shareWABtn">
                     📱 Share to WhatsApp
                 </button>
                 <button class="action-btn btn-copy" id="copyFormattedBtn">
                     📋 Copy & share
                 </button>
                 <button class="action-btn btn-copy" id="copyTableBtn">
-                    📊 Copy as word
+                    📊 Copy as table
                 </button>
                 <button class="action-btn btn-excel" id="exportExcelBtn">
                     📊 Export Excel
@@ -1123,33 +1151,36 @@ function renderSpreadsheet() {
                 <thead>
                     <tr>
                         <th style="min-width:140px;">👤 MEMBER</th>
-                        <th style="min-width:120px;">💰 LOAN (KES)</th>
-                        <th style="min-width:150px;">📉 LOAN DEDUCTIONS (KES)</th>
-                        <th style="min-width:140px;">⚖️ LOAN BALANCE (KES)</th>
-                        <th style="min-width:170px;">📋 MONTHLY CONTRIBUTION (KES)</th>
-                        <th style="min-width:120px;">⚠️ PENALTIES (KES)</th>
+                        <th style="min-width:140px; text-align: right;">💰 LOAN (KES)</th>
+                        <th style="min-width:160px; text-align: right;">📉 LOAN DEDUCTIONS (KES)</th>
+                        <th style="min-width:150px; text-align: right;">⚖️ LOAN BALANCE (KES)</th>
+                        <th style="min-width:180px; text-align: right;">📋 MONTHLY CONTRIBUTION (KES)</th>
+                        <th style="min-width:140px; text-align: right;">⚠️ PENALTIES (KES)</th>
                     </tr>
                 </thead>
                 <tbody>
                     ${tableRows}
                     <tr id="totals-row" class="totals-row">
-                        <td><strong>📊 TOTAL</strong></td>
-                        <td><strong>KES ${formatCurrency(totalLoan)}</strong></td>
-                        <td><strong>KES ${formatCurrency(totalLoanDeductions)}</strong></td>
-                        <td><strong>KES ${formatCurrency(totalLoanBalance)}</strong></td>
-                        <td><strong>KES ${formatCurrency(totalMonthlyContribution)}</strong></td>
-                        <td><strong>KES ${formatCurrency(totalPenalties)}</strong></td>
+                        <td><strong>📊 TOTAL</strong></strong></td>
+                        <td style="text-align: right;"><strong>KES ${formatCurrency(totalLoan)}</strong></td>
+                        <td style="text-align: right;"><strong>KES ${formatCurrency(totalLoanDeductions)}</strong></td>
+                        <td style="text-align: right;"><strong>KES ${formatCurrency(totalLoanBalance)}</strong></td>
+                        <td style="text-align: right;"><strong>KES ${formatCurrency(totalMonthlyContribution)}</strong></td>
+                        <td style="text-align: right;"><strong>KES ${formatCurrency(totalPenalties)}</strong></td>
                     </tr>
                 </tbody>
             </table>
         </div>
         
         <div style="margin-top: 1rem; padding: 0.8rem; background: var(--primary-light); border-radius: 12px; text-align: center; font-size: 0.75rem; color: var(--primary);">
-            💡 <strong>Tip:</strong> All amounts show 2 decimal places & thousands commas. Click any cell to edit.
+            💡 <strong>Tip:</strong> All amounts show 2 decimal places & thousands commas. Click any value to edit.
         </div>
     `;
     
     container.innerHTML = html;
+    
+    // Make formatCurrency available globally for inline handlers
+    window.formatCurrency = formatCurrency;
     
     document.getElementById("monthSelect").addEventListener("change", function() {
         if (pendingSaves.size > 0 && confirm("You have unsaved changes. Change period anyway?")) {
@@ -1182,6 +1213,9 @@ function renderSpreadsheet() {
 // Initialize
 loadSavedPeriod();
 updateFooter();
+
+// Expose formatCurrency globally
+window.formatCurrency = formatCurrency;
 
 (async function() {
     const isAuth = await protectPage();
