@@ -1,14 +1,837 @@
-<!DOCTYPE html>
+<script type="module">
+    import { supabase } from './auth.js';
+    
+    let allShifts = [], allTransactions = [];
+    let isMobile = window.innerWidth <= 768;
+    let currentUser = null;
+    let currentBranchId = null;
+    let currentBranch = null;
+
+    // ==================== SIDEBAR FUNCTIONS ====================
+    window.toggleMenu = () => {
+        document.getElementById('sidebar').classList.toggle('mobile-active');
+        document.getElementById('overlay').classList.toggle('active');
+    };
+
+    // ==================== BRANCH FUNCTIONS ====================
+
+    // Get current user's branch ID from session
+    function getCurrentBranchId() {
+        const session = JSON.parse(localStorage.getItem('pos_session') || '{}');
+        return session.branch?.id || currentBranchId;
+    }
+
+    // Load user profile with branch info
+    async function loadUserProfile() {
+        try {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) {
+                window.location.href = 'index.html';
+                return null;
+            }
+            
+            currentUser = user;
+            
+            // Get profile with branch info
+            const { data: profile, error } = await supabase
+                .from('profiles')
+                .select(`
+                    *,
+                    branches (
+                        id,
+                        name,
+                        code,
+                        location
+                    )
+                `)
+                .eq('id', user.id)
+                .maybeSingle();
+            
+            if (error) throw error;
+            if (!profile) {
+                console.error("No profile found");
+                return null;
+            }
+            
+            currentBranchId = profile.branch_id;
+            currentBranch = profile.branches;
+            
+            const session = {
+                user: user,
+                profile: profile,
+                branch: profile.branches,
+                role: profile.role
+            };
+            localStorage.setItem('pos_session', JSON.stringify(session));
+            
+            // Update sidebar with user's assigned branch
+            const sidebarBranchName = document.querySelector('#sidebarBranchName span');
+            if (profile.branches && sidebarBranchName) {
+                sidebarBranchName.textContent = profile.branches.name;
+            }
+            
+            // Update branch display
+            const branchNameSpan = document.getElementById('branchName');
+            if (branchNameSpan && profile.branches) {
+                branchNameSpan.textContent = profile.branches.name;
+            }
+            
+            return profile;
+        } catch (error) {
+            console.error("Error loading profile:", error);
+            return null;
+        }
+    }
+
+    window.logoutUser = async () => { 
+        localStorage.removeItem('pos_session');
+        await supabase.auth.signOut(); 
+        location.href = 'index.html'; 
+    };
+
+    async function fetchData() {
+        showLoading(true);
+        
+        try {
+            const branchId = getCurrentBranchId();
+            if (!branchId) {
+                console.error("No branch ID found");
+                return;
+            }
+
+            // Fetch shifts with pre-calculated totals
+            const [shiftsRes, transRes] = await Promise.all([
+                supabase.from('daily_shifts')
+                    .select('*')
+                    .eq('branch_id', branchId)
+                    .order('start_time', { ascending: false }),
+                supabase.from('cash_transactions')
+                    .select('shift_id, amount, type')
+                    .eq('branch_id', branchId)
+            ]);
+
+            allShifts = shiftsRes.data || [];
+            allTransactions = transRes.data || [];
+            
+            console.log(`Loaded ${allShifts.length} shifts`);
+            
+            render();
+        } catch (error) {
+            console.error("Error fetching data:", error);
+            alert("Error loading shift data. Please try again.");
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    function showLoading(show) {
+        const loadingEl = document.getElementById('loadingSpinner');
+        const refreshBtn = document.getElementById('refreshBtn');
+        
+        if (loadingEl) loadingEl.style.display = show ? 'flex' : 'none';
+        if (refreshBtn) refreshBtn.disabled = show;
+    }
+
+    function render(data = allShifts) {
+        if (isMobile) {
+            renderMobile(data);
+        } else {
+            renderDesktop(data);
+        }
+        
+        // Show/hide no results message
+        const noResultsEl = document.getElementById('noResults');
+        if (noResultsEl) {
+            noResultsEl.style.display = data.length === 0 ? 'block' : 'none';
+        }
+    }
+
+    function renderDesktop(data = allShifts) {
+        const tbody = document.getElementById('audit-body-desktop');
+        if (!tbody) return;
+        
+        let tableHtml = '';
+
+        data.forEach(sh => {
+            const shiftLogs = allTransactions.filter(t => t.shift_id === sh.id);
+            
+            // Use pre-calculated totals from the shift table
+            const cashSales = sh.total_cash_sales || 0;
+            const kcbPaybillSales = sh.total_kcb_paybill_sales || 0;
+            const totalRevenue = sh.total_sales_amount || 0;
+            
+            // Format the date for the URL (YYYY-MM-DD)
+            const shiftDate = new Date(sh.start_time).toISOString().split('T')[0];
+
+            const moneyIn = shiftLogs.filter(t => t.type === 'Money In').reduce((s, t) => s + (t.amount || 0), 0);
+            const moneyOut = shiftLogs.filter(t => t.type === 'Money Out').reduce((s, t) => s + (t.amount || 0), 0);
+
+            const openTotal = (sh.open_cash||0) + (sh.open_mpesa||0) + (sh.open_kcb||0) + (sh.open_kcb_bank||0) + (sh.open_equity||0);
+            const closeTotal = (sh.close_cash||0) + (sh.close_mpesa||0) + (sh.close_kcb||0) + (sh.close_kcb_bank||0) + (sh.close_equity||0);
+
+            // Fix: Check status correctly (case insensitive)
+            const isClosed = sh.status && sh.status.toLowerCase() === 'closed';
+            
+            const expected = sh.system_expected_total || (openTotal + totalRevenue + moneyIn - moneyOut);
+            
+            // LOGIC FOR VARIANCE DISPLAY
+            let varianceVal = isClosed ? (closeTotal - expected) : 0;
+            let varianceDisplay = '';
+            let varianceClass = '';
+
+            if (!isClosed) {
+                varianceDisplay = 'OPEN';
+                varianceClass = 'status-open';
+            } else {
+                // If closed, check the amount for sign and color
+                if (varianceVal > 0) {
+                    varianceDisplay = '+ ' + varianceVal.toLocaleString();
+                    varianceClass = 'var-positive';
+                } else if (varianceVal < 0) {
+                    varianceDisplay = varianceVal.toLocaleString();
+                    varianceClass = 'var-negative';
+                } else {
+                    varianceDisplay = 'BALANCED';
+                    varianceClass = 'var-balanced';
+                }
+            }
+
+            const startD = new Date(sh.start_time);
+            const endD = sh.end_time ? new Date(sh.end_time) : null;
+            
+            // Build payment methods HTML using pre-calculated totals, wrapped in a link
+            let paymentMethodsHtml = '';
+            
+            // Only show if there are sales
+            if (cashSales > 0 || kcbPaybillSales > 0 || totalRevenue > 0) {
+                if (cashSales > 0) {
+                    paymentMethodsHtml += `
+                        <div class="payment-method-item">
+                            <span class="payment-label">Cash</span>
+                            <span class="payment-amount positive">+${cashSales.toLocaleString()}</span>
+                        </div>
+                    `;
+                }
+                if (kcbPaybillSales > 0) {
+                    paymentMethodsHtml += `
+                        <div class="payment-method-item">
+                            <span class="payment-label">KCB Paybill</span>
+                            <span class="payment-amount positive">+${kcbPaybillSales.toLocaleString()}</span>
+                        </div>
+                    `;
+                }
+            } else {
+                paymentMethodsHtml = '<div class="payment-method-item"><span class="payment-label">No sales recorded</span><span class="payment-amount">0</span></div>';
+            }
+            
+            // Add total revenue at the bottom, wrapped in a link
+            paymentMethodsHtml += `
+                <a href="sales_reports.html?date=${shiftDate}" class="revenue-card" style="display: block; text-decoration: none; margin-top: 8px;">
+                    <div class="payment-method-item" style="margin-top:8px; padding-top:8px; border-top:2px solid var(--border);">
+                        <span class="payment-label" style="font-weight:800;">📊 TOTAL SALES</span>
+                        <span class="payment-amount" style="font-weight:800; color:var(--primary);">+${totalRevenue.toLocaleString()}</span>
+                    </div>
+                    <div style="font-size:0.6rem; color:var(--primary); font-weight:800; margin-top:4px; text-align:right">CLICK TO VIEW ➔</div>
+                </a>
+            `;
+            
+            tableHtml += `
+                <tr>
+                    <td class="date-cell">
+                        <b>${startD.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric'})}</b>
+                        <span class="time-pill">IN: ${startD.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span><br>
+                        <span class="time-pill">${endD ? 'OUT: '+endD.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : 'ACTIVE'}</span>
+                      </td>
+                      <td>
+                        <div class="account-line"><span class="account-label">Cash</span><span class="account-val">${(sh.open_cash||0).toLocaleString()}</span></div>
+                        <div class="account-line"><span class="account-label">Mpesa</span><span class="account-val">${(sh.open_mpesa||0).toLocaleString()}</span></div>
+                        <div class="account-line"><span class="account-label">KCB Float</span><span class="account-val">${(sh.open_kcb||0).toLocaleString()}</span></div>
+                        <div class="account-line"><span class="account-label">Equity</span><span class="account-val">${(sh.open_equity||0).toLocaleString()}</span></div>
+                        <div class="account-line"><span class="account-label">KCB Bank</span><span class="account-val">${(sh.open_kcb_bank||0).toLocaleString()}</span></div>
+                        <div class="total-row">Total: ${openTotal.toLocaleString()}</div>
+                      </td>
+                    <td style="vertical-align: middle;">
+                        <div style="background: #f8fafc; padding: 10px; border-radius: 8px;">
+                            ${paymentMethodsHtml}
+                        </div>
+                    </td>
+                    <td>
+                        <a href="moneyinout.html" class="revenue-card">
+                            <div class="account-line"><span class="account-label">In</span><span class="account-val" style="color:var(--success)">+${moneyIn.toLocaleString()}</span></div>
+                            <div class="account-line"><span class="account-label">Out</span><span class="account-val" style="color:var(--danger)">-${moneyOut.toLocaleString()}</span></div>
+                            <div style="font-size:0.6rem; color:var(--primary); font-weight:800; margin-top:8px; text-align:right">CLICK TO VIEW ➔</div>
+                        </a>
+                    </td>
+                    <td>
+                        <div class="account-line"><span class="account-label">Cash</span><span class="account-val">${(sh.close_cash||0).toLocaleString()}</span></div>
+                        <div class="account-line"><span class="account-label">Mpesa</span><span class="account-val">${(sh.close_mpesa||0).toLocaleString()}</span></div>
+                        <div class="account-line"><span class="account-label">KCB Float</span><span class="account-val">${(sh.close_kcb||0).toLocaleString()}</span></div>
+                        <div class="account-line"><span class="account-label">Equity</span><span class="account-val">${(sh.close_equity||0).toLocaleString()}</span></div>
+                        <div class="account-line"><span class="account-label">KCB Bank</span><span class="account-val">${(sh.close_kcb_bank||0).toLocaleString()}</span></div>
+                        <div class="total-row" style="background:#f0f9ff">Total: ${closeTotal.toLocaleString()}</div>
+                    </td>
+                    <td>
+                        <span class="status-badge ${varianceClass}">
+                            ${varianceDisplay}
+                        </span>
+                        <div style="font-size: 0.65rem; color: var(--text-dim); margin-top: 8px; text-align: center;">
+                            Expected: ${expected.toLocaleString()}
+                        </div>
+                    </td>
+                    <td><div style="max-height: 120px; overflow-y: auto; font-size: 0.8rem; color: var(--text-dim); font-style: italic;">${sh.variance_note || 'No notes added.'}</div></td>
+                </tr>`;
+        });
+
+        tbody.innerHTML = tableHtml || '<tr><td colspan="7" style="text-align:center; padding:50px;">No records found.</td></td>';
+    }
+
+    function renderMobile(data = allShifts) {
+        const mobileContainer = document.getElementById('mobile-shifts-container');
+        if (!mobileContainer) return;
+        
+        let mobileHtml = '';
+
+        data.forEach(sh => {
+            const shiftLogs = allTransactions.filter(t => t.shift_id === sh.id);
+            
+            // Use pre-calculated totals from the shift table
+            const cashSales = sh.total_cash_sales || 0;
+            const kcbPaybillSales = sh.total_kcb_paybill_sales || 0;
+            const totalRevenue = sh.total_sales_amount || 0;
+            
+            // Format the date for the URL (YYYY-MM-DD)
+            const shiftDate = new Date(sh.start_time).toISOString().split('T')[0];
+
+            const moneyIn = shiftLogs.filter(t => t.type === 'Money In').reduce((s, t) => s + (t.amount || 0), 0);
+            const moneyOut = shiftLogs.filter(t => t.type === 'Money Out').reduce((s, t) => s + (t.amount || 0), 0);
+
+            const openTotal = (sh.open_cash||0) + (sh.open_mpesa||0) + (sh.open_kcb||0) + (sh.open_kcb_bank||0) + (sh.open_equity||0);
+            const closeTotal = (sh.close_cash||0) + (sh.close_mpesa||0) + (sh.close_kcb||0) + (sh.close_kcb_bank||0) + (sh.close_equity||0);
+
+            const isClosed = sh.status && sh.status.toLowerCase() === 'closed';
+            
+            const expected = sh.system_expected_total || (openTotal + totalRevenue + moneyIn - moneyOut);
+            const varianceVal = isClosed ? (closeTotal - expected) : 0;
+            
+            const startD = new Date(sh.start_time);
+            const endD = sh.end_time ? new Date(sh.end_time) : null;
+            
+            let statusClass = '';
+            let statusText = '';
+            
+            if (!isClosed) {
+                statusClass = 'status-open';
+                statusText = 'OPEN';
+            } else if (varianceVal > 0) {
+                statusClass = 'var-positive';
+                statusText = `+${varianceVal.toLocaleString()}`;
+            } else if (varianceVal < 0) {
+                statusClass = 'var-negative';
+                statusText = varianceVal.toLocaleString();
+            } else {
+                statusClass = 'var-balanced';
+                statusText = 'BALANCED';
+            }
+            
+            // Build payment methods HTML for mobile using pre-calculated totals, wrapped in a link
+            let paymentMethodsHtml = '';
+            
+            if (cashSales > 0) {
+                paymentMethodsHtml += `
+                    <div class="shift-mobile-detail-line">
+                        <span class="shift-mobile-detail-label">Cash</span>
+                        <span class="shift-mobile-detail-value" style="color:var(--success)">+${cashSales.toLocaleString()}</span>
+                    </div>
+                `;
+            }
+            if (kcbPaybillSales > 0) {
+                paymentMethodsHtml += `
+                    <div class="shift-mobile-detail-line">
+                        <span class="shift-mobile-detail-label">KCB Paybill</span>
+                        <span class="shift-mobile-detail-value" style="color:var(--success)">+${kcbPaybillSales.toLocaleString()}</span>
+                    </div>
+                `;
+            }
+            
+            if (paymentMethodsHtml === '') {
+                paymentMethodsHtml = '<div class="shift-mobile-detail-line"><span class="shift-mobile-detail-label">No sales recorded</span><span class="shift-mobile-detail-value">0</span></div>';
+            }
+            
+            // Add total, wrapped in a link
+            paymentMethodsHtml += `
+                <a href="sales_reports.html?date=${shiftDate}" style="text-decoration: none; display: block;">
+                    <div class="shift-mobile-total" style="margin-top:8px;">
+                        Total Sales: +${totalRevenue.toLocaleString()}
+                        <div style="font-size:0.6rem; color:var(--primary); font-weight:800; margin-top:4px;">➔ CLICK TO VIEW</div>
+                    </div>
+                </a>
+            `;
+            
+            mobileHtml += `
+                <div class="shift-mobile-card">
+                    <div class="shift-mobile-header">
+                        <div class="shift-mobile-date">
+                            ${startD.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric'})}
+                            <small>
+                                ${startD.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}
+                                ${endD ? ` - ${endD.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}` : ''}
+                            </small>
+                        </div>
+                        <div class="shift-mobile-status ${statusClass}">
+                            ${statusText}
+                        </div>
+                    </div>
+                    
+                    <div class="shift-mobile-grid">
+                        <div class="shift-mobile-section">
+                            <div class="shift-mobile-section-title">
+                                <i class="fas fa-wallet"></i> OPENING FLOATS
+                            </div>
+                            <div class="shift-mobile-details">
+                                <div class="shift-mobile-detail-line">
+                                    <span class="shift-mobile-detail-label">Cash</span>
+                                    <span class="shift-mobile-detail-value">${(sh.open_cash||0).toLocaleString()}</span>
+                                </div>
+                                <div class="shift-mobile-detail-line">
+                                    <span class="shift-mobile-detail-label">Mpesa</span>
+                                    <span class="shift-mobile-detail-value">${(sh.open_mpesa||0).toLocaleString()}</span>
+                                </div>
+                                <div class="shift-mobile-detail-line">
+                                    <span class="shift-mobile-detail-label">KCB Float</span>
+                                    <span class="shift-mobile-detail-value">${(sh.open_kcb||0).toLocaleString()}</span>
+                                </div>
+                                <div class="shift-mobile-detail-line">
+                                    <span class="shift-mobile-detail-label">Equity</span>
+                                    <span class="shift-mobile-detail-value">${(sh.open_equity||0).toLocaleString()}</span>
+                                </div>
+                                <div class="shift-mobile-detail-line">
+                                    <span class="shift-mobile-detail-label">KCB Bank</span>
+                                    <span class="shift-mobile-detail-value">${(sh.open_kcb_bank||0).toLocaleString()}</span>
+                                </div>
+                                <div class="shift-mobile-total">
+                                    Total: ${openTotal.toLocaleString()}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="shift-mobile-section">
+                            <div class="shift-mobile-section-title">
+                                <i class="fas fa-cash-register"></i> PAYMENT METHOD
+                            </div>
+                            <div class="shift-mobile-details">
+                                ${paymentMethodsHtml}
+                            </div>
+                        </div>
+                        
+                        <div class="shift-mobile-section">
+                            <div class="shift-mobile-section-title">
+                                <i class="fas fa-exchange-alt"></i> MONEY IN/OUT
+                            </div>
+                            <div class="shift-mobile-details">
+                                <div class="shift-mobile-detail-line">
+                                    <span class="shift-mobile-detail-label">Money In</span>
+                                    <span class="shift-mobile-detail-value" style="color:var(--success)">+${moneyIn.toLocaleString()}</span>
+                                </div>
+                                <div class="shift-mobile-detail-line">
+                                    <span class="shift-mobile-detail-label">Money Out</span>
+                                    <span class="shift-mobile-detail-value" style="color:var(--danger)">-${moneyOut.toLocaleString()}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="shift-mobile-section">
+                            <div class="shift-mobile-section-title">
+                                <i class="fas fa-safe"></i> CLOSING FLOATS
+                            </div>
+                            <div class="shift-mobile-details">
+                                <div class="shift-mobile-detail-line">
+                                    <span class="shift-mobile-detail-label">Cash</span>
+                                    <span class="shift-mobile-detail-value">${(sh.close_cash||0).toLocaleString()}</span>
+                                </div>
+                                <div class="shift-mobile-detail-line">
+                                    <span class="shift-mobile-detail-label">Mpesa</span>
+                                    <span class="shift-mobile-detail-value">${(sh.close_mpesa||0).toLocaleString()}</span>
+                                </div>
+                                <div class="shift-mobile-detail-line">
+                                    <span class="shift-mobile-detail-label">KCB Float</span>
+                                    <span class="shift-mobile-detail-value">${(sh.close_kcb||0).toLocaleString()}</span>
+                                </div>
+                                <div class="shift-mobile-detail-line">
+                                    <span class="shift-mobile-detail-label">Equity</span>
+                                    <span class="shift-mobile-detail-value">${(sh.close_equity||0).toLocaleString()}</span>
+                                </div>
+                                <div class="shift-mobile-detail-line">
+                                    <span class="shift-mobile-detail-label">KCB Bank</span>
+                                    <span class="shift-mobile-detail-value">${(sh.close_kcb_bank||0).toLocaleString()}</span>
+                                </div>
+                                <div class="shift-mobile-total" style="background:#f0f9ff">
+                                    Total: ${closeTotal.toLocaleString()}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="shift-mobile-expected">
+                        Expected: ${expected.toLocaleString()}
+                    </div>
+                    
+                    ${sh.variance_note ? `
+                        <div class="shift-mobile-variance-note">
+                            <strong>Note:</strong> ${sh.variance_note}
+                        </div>
+                    ` : ''}
+                    
+                    <div class="shift-mobile-actions">
+                        <a href="sales_reports.html?date=${shiftDate}" class="shift-mobile-action-btn sales-action">
+                            <i class="fas fa-chart-line"></i> Sales Report
+                        </a>
+                        <a href="moneyinout.html" class="shift-mobile-action-btn money-action">
+                            <i class="fas fa-money-bill-wave"></i> Money Log
+                        </a>
+                    </div>
+                </div>
+            `;
+        });
+
+        mobileContainer.innerHTML = mobileHtml || '<div class="no-results"><i class="fas fa-search"></i><p>No shift records found</p></div>';
+    }
+
+    function filterData(searchTerm) {
+        const filtered = allShifts.filter(sh => {
+            const dateStr = new Date(sh.start_time).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric'}).toLowerCase();
+            const status = (sh.status || '').toLowerCase();
+            const note = (sh.variance_note || '').toLowerCase();
+            
+            return dateStr.includes(searchTerm) || 
+                   status.includes(searchTerm) ||
+                   note.includes(searchTerm);
+        });
+        
+        render(filtered);
+    }
+
+    document.getElementById('auditSearch').addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase().trim();
+        if (term === '') {
+            render(allShifts);
+        } else {
+            filterData(term);
+        }
+    });
+
+    async function refreshData() {
+        const btn = document.getElementById('refreshBtn');
+        const originalHtml = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        btn.disabled = true;
+        
+        await fetchData();
+        
+        btn.innerHTML = originalHtml;
+        btn.disabled = false;
+        
+        btn.style.background = '#10b981';
+        setTimeout(() => {
+            btn.style.background = '';
+        }, 1000);
+    }
+
+    // Handle window resize
+    window.addEventListener('resize', function() {
+        const newIsMobile = window.innerWidth <= 768;
+        if (newIsMobile !== isMobile) {
+            isMobile = newIsMobile;
+            render();
+        }
+    });
+
+    // Initialize on load
+    document.addEventListener('DOMContentLoaded', async function() {
+        const profile = await loadUserProfile();
+        if (profile) {
+            await fetchData();
+        }
+        
+        // Check if we're on mobile initially
+        isMobile = window.innerWidth <= 768;
+    });
+</script><!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
     <title>ChamaEase | Monthly Records</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="supabase-config.js"></script>
     <style>
-        /* Additional styles for monthly records */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+        }
+
+        body {
+            background: #f4f7fb;
+            color: #1e2a3e;
+        }
+
+        :root {
+            --primary: #2c7a4d;
+            --primary-light: #eaf5ef;
+            --primary-dark: #1f5a3a;
+            --danger: #dc4c4c;
+            --gray-border: #e2e8f0;
+            --shadow-sm: 0 4px 12px rgba(0,0,0,0.04);
+            --radius-card: 16px;
+            --radius-btn: 32px;
+            --sidebar-width: 280px;
+        }
+
+        .app-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            background: white;
+            border-right: 1px solid var(--gray-border);
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            box-shadow: var(--shadow-sm);
+            transform: translateX(0);
+        }
+
+        .sidebar-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--gray-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-logo {
+            font-weight: 800;
+            font-size: 1.2rem;
+            background: linear-gradient(135deg, var(--primary), #3b9b62);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .sidebar-close {
+            background: none;
+            border: none;
+            font-size: 1.3rem;
+            cursor: pointer;
+            color: #94a3b8;
+            display: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar-close:hover {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+
+        .sidebar-nav {
+            padding: 0.8rem 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0.7rem 1rem;
+            margin: 0.2rem 0.8rem;
+            border-radius: 12px;
+            text-decoration: none;
+            color: #4a5568;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .nav-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .nav-item .icon {
+            font-size: 1.1rem;
+            width: 26px;
+            text-align: center;
+        }
+
+        .nav-item .label {
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            transition: margin-left 0.3s ease;
+            width: calc(100% - var(--sidebar-width));
+        }
+
+        .top-bar {
+            background: white;
+            padding: 0.7rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--gray-border);
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 99;
+        }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            font-size: 1.3rem;
+            cursor: pointer;
+            color: var(--primary);
+            padding: 6px;
+            border-radius: 50%;
+        }
+
+        .page-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1e2a3e;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .user-email {
+            font-size: 0.7rem;
+            color: #5b6e8c;
+            display: none;
+        }
+
+        @media (min-width: 480px) {
+            .user-email {
+                display: inline;
+            }
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: 1px solid #dc2626;
+            color: #dc2626;
+            padding: 0.35rem 0.7rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            font-size: 0.7rem;
+        }
+
+        .logout-btn:hover {
+            background: #dc2626;
+            color: white;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem;
+            width: 100%;
+            min-height: 70vh;
+        }
+
+        .btn {
+            border: none;
+            background: var(--primary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-btn);
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.75rem;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .spreadsheet-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--gray-border);
+            background: white;
+        }
+
+        .spreadsheet-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+            min-width: 800px;
+        }
+
+        .spreadsheet-table th,
+        .spreadsheet-table td {
+            border: 1px solid var(--gray-border);
+            padding: 10px 8px;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        .spreadsheet-table th {
+            background: #f8fafc;
+            font-weight: 600;
+        }
+
+        .spreadsheet-table td input {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            background: transparent;
+        }
+
+        .spreadsheet-table td input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: #fff;
+        }
+
+        .member-name-cell {
+            font-weight: 600;
+            background: #f8fafc;
+        }
+
+        .totals-row {
+            background: #f1f5f9;
+            font-weight: 600;
+        }
+
+        .totals-row td {
+            border-top: 2px solid var(--primary);
+        }
+
         .records-header-section {
             background: white;
             border-radius: 20px;
@@ -16,7 +839,7 @@
             margin-bottom: 1.5rem;
             border: 1px solid var(--gray-border);
         }
-        
+
         .filter-row {
             display: flex;
             flex-wrap: wrap;
@@ -24,12 +847,12 @@
             align-items: flex-end;
             margin-bottom: 1rem;
         }
-        
+
         .filter-item {
             flex: 1;
             min-width: 140px;
         }
-        
+
         .filter-label {
             font-size: 0.7rem;
             font-weight: 600;
@@ -37,7 +860,7 @@
             color: #1e2a3e;
             display: block;
         }
-        
+
         .filter-select {
             width: 100%;
             padding: 10px 12px;
@@ -47,12 +870,7 @@
             background: white;
             cursor: pointer;
         }
-        
-        .filter-select:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-        
+
         .active-period-badge {
             display: inline-flex;
             align-items: center;
@@ -64,7 +882,7 @@
             font-size: 0.8rem;
             font-weight: 600;
         }
-        
+
         .action-buttons-row {
             display: flex;
             gap: 0.8rem;
@@ -74,7 +892,7 @@
             padding-top: 1rem;
             border-top: 1px solid var(--gray-border);
         }
-        
+
         .action-btn {
             padding: 8px 18px;
             border-radius: 40px;
@@ -87,47 +905,18 @@
             gap: 6px;
             transition: all 0.2s;
         }
-        
-        .btn-save {
-            background: #3b82f6;
-            color: white;
-        }
-        
-        .btn-save:hover {
-            background: #2563eb;
-            transform: translateY(-1px);
-        }
-        
-        .btn-excel {
-            background: #10b981;
-            color: white;
-        }
-        
-        .btn-excel:hover {
-            background: #059669;
-            transform: translateY(-1px);
-        }
-        
-        .btn-pdf {
-            background: #dc2626;
-            color: white;
-        }
-        
-        .btn-pdf:hover {
-            background: #b91c1c;
-            transform: translateY(-1px);
-        }
-        
-        .btn-share {
-            background: #25D366;
-            color: white;
-        }
-        
-        .btn-share:hover {
-            background: #128C7E;
-            transform: translateY(-1px);
-        }
-        
+
+        .btn-save { background: #3b82f6; color: white; }
+        .btn-save:hover { background: #2563eb; transform: translateY(-1px); }
+        .btn-excel { background: #10b981; color: white; }
+        .btn-excel:hover { background: #059669; transform: translateY(-1px); }
+        .btn-pdf { background: #dc2626; color: white; }
+        .btn-pdf:hover { background: #b91c1c; transform: translateY(-1px); }
+        .btn-share { background: #25D366; color: white; }
+        .btn-share:hover { background: #128C7E; transform: translateY(-1px); }
+        .btn-copy { background: #6366f1; color: white; }
+        .btn-copy:hover { background: #4f46e5; transform: translateY(-1px); }
+
         .saving-status {
             font-size: 0.7rem;
             color: #94a3b8;
@@ -135,11 +924,7 @@
             align-items: center;
             gap: 6px;
         }
-        
-        .saving-status.saving {
-            color: var(--primary);
-        }
-        
+
         .pending-badge {
             background: #f59e0b;
             color: white;
@@ -148,8 +933,75 @@
             font-size: 10px;
             margin-left: 5px;
         }
-        
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 3px solid #e2e8f0;
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Toast notification */
+        .toast-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #2c7a4d;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            z-index: 1002;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: slideIn 0.3s ease;
+        }
+        .toast-notification.toast-error {
+            background: #dc2626;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
         @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+            .sidebar-close {
+                display: flex;
+            }
+            .container {
+                padding: 0.8rem;
+            }
             .filter-row {
                 flex-direction: column;
             }
@@ -163,8 +1015,13 @@
                 flex: 1;
                 justify-content: center;
             }
+            .spreadsheet-table th,
+            .spreadsheet-table td {
+                padding: 6px 4px;
+                font-size: 0.7rem;
+            }
         }
-        
+
         @media print {
             .records-header-section,
             .action-buttons-row,
@@ -175,6 +1032,7 @@
             }
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 <div class="app-wrapper">
@@ -210,22 +1068,60 @@
                 <p>Loading spreadsheet...</p>
             </div>
         </div>
-        <footer>Smart Chama Management · Click any cell to edit · Auto-saves</footer>
+        <footer id="footerMessage">✨ Smart Chama Management</footer>
     </main>
 </div>
 
+<script src="supabase-config.js"></script>
 <script>
-// Using supabaseClient from supabase-config.js
+// ============================================
+// MONTHLY RECORDS - SPREADSHEET STYLE
+// With auto-save, month/year persistence, copy feature
+// ============================================
+
 let allMembers = [];
 let allRecords = [];
-let currentMonth = new Date().getMonth() + 1;
-let currentYear = new Date().getFullYear();
+let currentMonth = 10; // October (default)
+let currentYear = 2025; // 2025 (default)
 let saveTimeout = null;
 let pendingSaves = new Map();
 
-// Available years
 let availableYears = [];
 let monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
+
+// Get time-based footer message
+function getFooterMessage() {
+    const hour = new Date().getHours();
+    if (hour < 12) return "🌅 Good morning! Have a productive day managing your Chama.";
+    if (hour < 17) return "☀️ Good afternoon! Keep up the great work with your records.";
+    return "🌙 Good evening! Wishing you a peaceful rest after a productive day.";
+}
+
+// Update footer with dynamic message
+function updateFooter() {
+    const footer = document.getElementById("footerMessage");
+    if (footer) {
+        footer.innerHTML = `✨ ${getFooterMessage()} ✨`;
+    }
+}
+
+// Save selected period to localStorage
+function saveSelectedPeriod() {
+    localStorage.setItem("chama_selected_month", currentMonth);
+    localStorage.setItem("chama_selected_year", currentYear);
+}
+
+// Load saved period from localStorage
+function loadSavedPeriod() {
+    const savedMonth = localStorage.getItem("chama_selected_month");
+    const savedYear = localStorage.getItem("chama_selected_year");
+    if (savedMonth && savedMonth >= 1 && savedMonth <= 12) {
+        currentMonth = parseInt(savedMonth);
+    }
+    if (savedYear && savedYear >= 2020 && savedYear <= 2030) {
+        currentYear = parseInt(savedYear);
+    }
+}
 
 // Sidebar functions
 function openSidebar() {
@@ -280,6 +1176,7 @@ function escapeHtml(str) {
 }
 
 async function loadData() {
+    updateFooter();
     try {
         const { data: membersData, error: membersError } = await supabaseClient
             .from("members")
@@ -301,11 +1198,13 @@ async function loadData() {
         for (var i = 0; i < allRecords.length; i++) {
             yearsSet.add(allRecords[i].year);
         }
-        // Add current year and next year
+        // Add surrounding years
         var currentYearNum = new Date().getFullYear();
+        yearsSet.add(currentYearNum - 2);
         yearsSet.add(currentYearNum - 1);
         yearsSet.add(currentYearNum);
         yearsSet.add(currentYearNum + 1);
+        yearsSet.add(currentYearNum + 2);
         
         availableYears = Array.from(yearsSet).sort((a, b) => b - a);
         
@@ -375,7 +1274,7 @@ async function updateRecordValue(memberId, field, value, isBulkSave = false) {
         }
         updateTotalsRow();
         if (!isBulkSave) {
-            showToast("Saved successfully");
+            showToast("Saved");
         }
         return true;
     } catch (error) {
@@ -418,7 +1317,7 @@ function updateTotalsRow() {
 
 async function saveAllChanges() {
     if (pendingSaves.size === 0) {
-        showToast("No pending changes to save", true);
+        showToast("No pending changes", true);
         return;
     }
     
@@ -457,6 +1356,47 @@ async function saveAllChanges() {
     }
     if (errorCount > 0) {
         showToast("Failed to save " + errorCount + " item(s)", true);
+    }
+}
+
+// Copy table data to clipboard
+async function copyToClipboard() {
+    var table = document.getElementById("data-table");
+    if (!table) {
+        showToast("No data to copy", true);
+        return;
+    }
+    
+    var rows = table.getElementsByTagName("tr");
+    var copyText = "";
+    
+    for (var i = 0; i < rows.length; i++) {
+        var cells = rows[i].getElementsByTagName("td");
+        var headers = rows[i].getElementsByTagName("th");
+        var rowText = [];
+        
+        if (headers.length > 0) {
+            for (var j = 0; j < headers.length; j++) {
+                rowText.push(headers[j].innerText.trim());
+            }
+        } else {
+            for (var j = 0; j < cells.length; j++) {
+                var input = cells[j].querySelector("input");
+                if (input) {
+                    rowText.push(input.value);
+                } else {
+                    rowText.push(cells[j].innerText.trim());
+                }
+            }
+        }
+        copyText += rowText.join("\t") + "\n";
+    }
+    
+    try {
+        await navigator.clipboard.writeText(copyText);
+        showToast("Table copied to clipboard!");
+    } catch (err) {
+        showToast("Failed to copy", true);
     }
 }
 
@@ -551,7 +1491,6 @@ function exportToPDF() {
     printWindow.document.write("table { border-collapse: collapse; width: 100%; margin-top: 20px; }");
     printWindow.document.write("th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }");
     printWindow.document.write("th { background: #2c7a4d; color: white; }");
-    printWindow.document.write("h2 { color: #2c7a4d; }");
     printWindow.document.write("</style>");
     printWindow.document.write("</head><body>");
     printWindow.document.write("<h2>🏦 CHAMA RECORDS - " + monthName + " " + currentYear + "</h2>");
@@ -563,7 +1502,6 @@ function exportToPDF() {
     showToast("PDF ready for printing");
 }
 
-// WhatsApp Share - Opens WhatsApp App Directly with ALL columns
 function shareToWhatsApp() {
     var monthName = monthNames[currentMonth - 1];
     
@@ -578,7 +1516,6 @@ function shareToWhatsApp() {
         var monthlyContribution = safeValue(getRecordValue(member.id, "monthly_contribution"));
         var penalties = safeValue(getRecordValue(member.id, "penalties"));
         
-        // Only show members with any activity
         if (loan > 0 || loanDeductions > 0 || loanBalance > 0 || monthlyContribution > 0 || penalties > 0) {
             message += "👤 *" + member.name + "*\n";
             message += "├─ 💰 Loan: KES " + formatNumber(loan) + "\n";
@@ -589,7 +1526,6 @@ function shareToWhatsApp() {
         }
     }
     
-    // Add totals
     var totalLoan = 0, totalLoanDeductions = 0, totalLoanBalance = 0, totalMonthlyContribution = 0, totalPenalties = 0;
     for (var i = 0; i < allMembers.length; i++) {
         var member = allMembers[i];
@@ -652,7 +1588,7 @@ function renderSpreadsheet() {
         var penalties = safeValue(getRecordValue(member.id, "penalties"));
         
         tableRows += '<tr>';
-        tableRows += '<td class="member-name-cell"><strong>' + escapeHtml(member.name) + '</strong></td>';
+        tableRows += '<td class="member-name-cell"><strong>' + escapeHtml(member.name) + '</strong></tr>';
         tableRows += '<td><input type="number" value="' + loan + '" step="any" onchange="handleCellChange(\'' + member.id + '\', \'loan\', event)" placeholder="0"></td>';
         tableRows += '<td><input type="number" value="' + loanDeductions + '" step="any" onchange="handleCellChange(\'' + member.id + '\', \'loan_deductions\', event)" placeholder="0"></td>';
         tableRows += '<td><input type="number" value="' + loanBalance + '" step="any" onchange="handleCellChange(\'' + member.id + '\', \'loan_balance\', event)" placeholder="0"></td>';
@@ -678,7 +1614,6 @@ function renderSpreadsheet() {
     
     var html = `
         <div class="records-header-section">
-            <!-- Filter Row - Auto-updates when changed -->
             <div class="filter-row">
                 <div class="filter-item">
                     <label class="filter-label">📅 Select Month</label>
@@ -695,11 +1630,13 @@ function renderSpreadsheet() {
                 </div>
             </div>
             
-            <!-- Action Buttons Row -->
             <div class="action-buttons-row">
                 <span id="savingStatus" class="saving-status"></span>
+                <button class="action-btn btn-copy" id="copyTableBtn">
+                    📋 Copy Table
+                </button>
                 <button class="action-btn btn-save" id="saveAllBtn">
-                    💾 Save All Changes <span id="pendingCount" class="pending-badge" style="display:none;">0</span>
+                    💾 Save All <span id="pendingCount" class="pending-badge" style="display:none;">0</span>
                 </button>
                 <button class="action-btn btn-excel" id="exportExcelBtn">
                     📊 Export Excel
@@ -713,7 +1650,6 @@ function renderSpreadsheet() {
             </div>
         </div>
         
-        <!-- Records Table -->
         <div class="spreadsheet-container">
             <table class="spreadsheet-table" id="data-table">
                 <thead>
@@ -754,6 +1690,7 @@ function renderSpreadsheet() {
         }
         currentMonth = parseInt(document.getElementById("monthSelect").value);
         currentYear = parseInt(document.getElementById("yearSelect").value);
+        saveSelectedPeriod();
         renderSpreadsheet();
     });
     
@@ -763,16 +1700,21 @@ function renderSpreadsheet() {
         }
         currentMonth = parseInt(document.getElementById("monthSelect").value);
         currentYear = parseInt(document.getElementById("yearSelect").value);
+        saveSelectedPeriod();
         renderSpreadsheet();
     });
     
     document.getElementById("saveAllBtn").addEventListener("click", saveAllChanges);
+    document.getElementById("copyTableBtn").addEventListener("click", copyToClipboard);
     document.getElementById("exportExcelBtn").addEventListener("click", exportToExcel);
     document.getElementById("exportPDFBtn").addEventListener("click", exportToPDF);
     document.getElementById("shareWABtn").addEventListener("click", shareToWhatsApp);
 }
 
 // Initialize
+loadSavedPeriod(); // Load saved month/year from localStorage (October 2025 default)
+updateFooter();
+
 (async function() {
     const isAuth = await protectPage();
     if (isAuth) {
