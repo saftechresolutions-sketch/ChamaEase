@@ -401,9 +401,16 @@
         <div class="top-bar">
             <button class="menu-toggle" id="menuToggle">☰</button>
             <div class="page-title">📜 MEMBER HISTORY</div>
-            <div class="user-info">
-                <span class="user-email" id="userEmail"></span>
-                <button id="logoutBtn" class="logout-btn">LOGOUT</button>
+            <div class="header-right">
+                <div class="header-quicklinks">
+                    <a href="members.html" class="quicklink-btn" title="Members">👥</a>
+                    <a href="monthly-records.html" class="quicklink-btn" title="Monthly Records">📅</a>
+                    <a href="reports.html" class="quicklink-btn" title="Reports">📈</a>
+                </div>
+                <div class="user-info">
+                    <span class="user-email" id="userEmail"></span>
+                    <button id="logoutBtn" class="logout-btn">LOGOUT</button>
+                </div>
             </div>
         </div>
         <div id="app-root" class="container">
@@ -449,7 +456,7 @@ document.getElementById("logoutBtn").addEventListener("click", async function() 
 
 function showToast(message, isError = false) {
     const toast = document.createElement('div');
-    toast.className = `toast-success ${isError ? 'toast-error' : ''}`;
+    toast.className = `toast-notification ${isError ? 'error' : ''}`;
     toast.textContent = isError ? '⚠️ ' + message : '✓ ' + message;
     document.body.appendChild(toast);
     setTimeout(() => {
@@ -460,10 +467,12 @@ function showToast(message, isError = false) {
 
 function escapeHtml(str) {
     if (!str) return "";
-    return str.replace(/[&<>]/g, function(m) {
+    return String(str).replace(/[&<>"']/g, function(m) {
         if (m === "&") return "&amp;";
         if (m === "<") return "&lt;";
         if (m === ">") return "&gt;";
+        if (m === '"') return "&quot;";
+        if (m === "'") return "&#39;";
         return m;
     });
 }

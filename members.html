@@ -40,59 +40,6 @@
             opacity: 0.9;
         }
         
-        .stats-grid-modern {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0.8rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        @media (min-width: 768px) {
-            .stats-grid-modern {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        }
-        
-        .stat-card-modern {
-            background: white;
-            border-radius: 20px;
-            padding: 1rem;
-            text-align: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-            border: 1px solid var(--gray-border);
-            transition: all 0.2s;
-        }
-        
-        .stat-card-modern:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-        }
-        
-        .stat-icon {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        .stat-value {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: var(--primary);
-            line-height: 1.2;
-        }
-        
-        .stat-label {
-            font-size: 0.7rem;
-            color: #6c757d;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .stat-small {
-            font-size: 0.65rem;
-            color: #6c757d;
-            margin-top: 0.25rem;
-        }
-        
         /* Search and Action Bar */
         .action-bar {
             display: flex;
@@ -143,7 +90,7 @@
         .search-input:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(44, 122, 77, 0.1);
+            box-shadow: 0 0 0 3px rgba(182, 85, 42, 0.1);
         }
         
         .btn-group {
@@ -337,144 +284,6 @@
             color: white;
         }
         
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 3rem 1.5rem;
-            background: white;
-            border-radius: 20px;
-            border: 1px solid var(--gray-border);
-        }
-        
-        .empty-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            opacity: 0.5;
-        }
-        
-        .empty-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-        
-        .empty-text {
-            font-size: 0.8rem;
-            color: #6c757d;
-            margin-bottom: 1.5rem;
-        }
-        
-        /* Modal Improvements */
-        .modal-modern {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1001;
-            backdrop-filter: blur(4px);
-        }
-        
-        .modal-content-modern {
-            background: white;
-            border-radius: 28px;
-            width: 90%;
-            max-width: 500px;
-            max-height: 85vh;
-            overflow-y: auto;
-            animation: slideUp 0.3s ease;
-        }
-        
-        @keyframes slideUp {
-            from {
-                transform: translateY(30px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-        
-        .modal-header-modern {
-            padding: 1.2rem;
-            border-bottom: 1px solid var(--gray-border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            background: white;
-            z-index: 10;
-        }
-        
-        .modal-title {
-            font-size: 1.2rem;
-            font-weight: 700;
-        }
-        
-        .modal-close-btn {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #94a3b8;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .modal-close-btn:hover {
-            background: #fee2e2;
-            color: var(--danger);
-        }
-        
-        .modal-body {
-            padding: 1.2rem;
-        }
-        
-        .form-group-modern {
-            margin-bottom: 1rem;
-        }
-        
-        .form-label {
-            display: block;
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-bottom: 0.4rem;
-            color: #1e2a3e;
-        }
-        
-        .form-input {
-            width: 100%;
-            padding: 12px 14px;
-            border: 1px solid var(--gray-border);
-            border-radius: 16px;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-        }
-        
-        .form-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(44, 122, 77, 0.1);
-        }
-        
-        .modal-footer {
-            padding: 1rem 1.2rem;
-            border-top: 1px solid var(--gray-border);
-            display: flex;
-            gap: 0.8rem;
-            justify-content: flex-end;
-        }
-        
         /* Tablet and Desktop Adjustments */
         @media (min-width: 768px) {
             .hero-title {
@@ -545,26 +354,6 @@
             0% { background-position: 200% 0; }
             100% { background-position: -200% 0; }
         }
-        
-        /* Toast Notifications */
-        .toast-success {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--primary);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 40px;
-            font-size: 0.85rem;
-            z-index: 1002;
-            animation: slideUp 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-        
-        .toast-error {
-            background: var(--danger);
-        }
     </style>
 </head>
 <body>
@@ -579,6 +368,7 @@
         <nav class="sidebar-nav">
             <a href="dashboard.html" class="nav-item"><span class="icon">📊</span><span class="label">DASHBOARD</span></a>
             <a href="members.html" class="nav-item active"><span class="icon">👥</span><span class="label">MEMBERS</span></a>
+            <a href="member-history.html" class="nav-item"><span class="icon">📜</span><span class="label">MEMBER HISTORY</span></a>
             <a href="monthly-records.html" class="nav-item"><span class="icon">📅</span><span class="label">MONTHLY RECORDS</span></a>
             <a href="reports.html" class="nav-item"><span class="icon">📈</span><span class="label">REPORTS</span></a>
             <a href="settings.html" class="nav-item"><span class="icon">⚙️</span><span class="label">SETTINGS</span></a>
@@ -589,9 +379,16 @@
         <div class="top-bar">
             <button class="menu-toggle" id="menuToggle">☰</button>
             <div class="page-title">MEMBERS</div>
-            <div class="user-info">
-                <span class="user-email" id="userEmail"></span>
-                <button id="logoutBtn" class="logout-btn">LOGOUT</button>
+            <div class="header-right">
+                <div class="header-quicklinks">
+                    <a href="members.html" class="quicklink-btn active" title="Members">👥</a>
+                    <a href="monthly-records.html" class="quicklink-btn" title="Monthly Records">📅</a>
+                    <a href="reports.html" class="quicklink-btn" title="Reports">📈</a>
+                </div>
+                <div class="user-info">
+                    <span class="user-email" id="userEmail"></span>
+                    <button id="logoutBtn" class="logout-btn">LOGOUT</button>
+                </div>
             </div>
         </div>
         <div id="app-root" class="container">
@@ -631,7 +428,7 @@ document.getElementById("logoutBtn").addEventListener("click", async function() 
 
 function showToast(message, isError = false) {
     const toast = document.createElement('div');
-    toast.className = `toast-success ${isError ? 'toast-error' : ''}`;
+    toast.className = `toast-notification ${isError ? 'error' : ''}`;
     toast.textContent = isError ? '⚠️ ' + message : '✓ ' + message;
     document.body.appendChild(toast);
     setTimeout(() => {
@@ -642,10 +439,12 @@ function showToast(message, isError = false) {
 
 function escapeHtml(str) {
     if (!str) return "";
-    return str.replace(/[&<>]/g, function(m) {
+    return String(str).replace(/[&<>"']/g, function(m) {
         if (m === "&") return "&amp;";
         if (m === "<") return "&lt;";
         if (m === ">") return "&gt;";
+        if (m === '"') return "&quot;";
+        if (m === "'") return "&#39;";
         return m;
     });
 }
@@ -781,9 +580,9 @@ function renderMembersList() {
                         </div>
                     </div>
                     <div class="member-card-actions">
-                        <button class="action-btn action-edit" onclick="editMember('${m.id}', '${escapeHtml(m.name)}', '${escapeHtml(m.phone || '')}', '${escapeHtml(m.email || '')}')">✏️ Edit</button>
-                        <button class="action-btn action-history" onclick="viewHistory('${m.id}', '${escapeHtml(m.name)}')">📜 History</button>
-                        <button class="action-btn action-delete" onclick="deleteMember('${m.id}', '${escapeHtml(m.name)}')">🗑️ Delete</button>
+                        <button class="action-btn action-edit" data-action="edit" data-member-id="${escapeHtml(m.id)}">✏️ Edit</button>
+                        <button class="action-btn action-history" data-action="history" data-member-id="${escapeHtml(m.id)}">📜 History</button>
+                        <button class="action-btn action-delete" data-action="delete" data-member-id="${escapeHtml(m.id)}">🗑️ Delete</button>
                     </div>
                 </div>
             `;
@@ -796,27 +595,26 @@ function renderMembersList() {
             <div class="hero-subtitle">Manage your chama members and track their contributions</div>
         </div>
         
-        <div class="stats-grid-modern">
-            <div class="stat-card-modern">
+        <div class="stats-grid">
+            <div class="stat-card">
                 <div class="stat-icon">👥</div>
                 <div class="stat-value">${allMembers.length}</div>
                 <div class="stat-label">Total Members</div>
             </div>
-            <div class="stat-card-modern">
+            <div class="stat-card">
                 <div class="stat-icon">⭐</div>
                 <div class="stat-value">${activeMembers}</div>
                 <div class="stat-label">Active Members</div>
                 <div class="stat-small">have records</div>
             </div>
-            <div class="stat-card-modern">
+            <div class="stat-card">
                 <div class="stat-icon">💰</div>
-                <div class="stat-value">KES ${(totalContributions/1000).toFixed(0)}k</div>
+                <div class="stat-value">KES ${formatNumber(totalContributions)}</div>
                 <div class="stat-label">Total Contributions</div>
-                <div class="stat-small">KES ${formatNumber(totalContributions)}</div>
             </div>
-            <div class="stat-card-modern">
+            <div class="stat-card">
                 <div class="stat-icon">📊</div>
-                <div class="stat-value">KES ${(totalBalance/1000).toFixed(0)}k</div>
+                <div class="stat-value">KES ${formatNumber(totalBalance)}</div>
                 <div class="stat-label">Outstanding Balance</div>
                 <div class="stat-small">loan balance</div>
             </div>
@@ -854,6 +652,20 @@ function renderMembersList() {
     }
     if (document.getElementById("exportMembersBtn")) {
         document.getElementById("exportMembersBtn").addEventListener("click", exportMembersToCSV);
+    }
+
+    var membersGrid = document.getElementById("membersGrid");
+    if (membersGrid) {
+        membersGrid.addEventListener("click", function(e) {
+            var btn = e.target.closest("[data-action]");
+            if (!btn) return;
+            var member = allMembers.find(function(mm) { return mm.id === btn.getAttribute("data-member-id"); });
+            if (!member) return;
+            var action = btn.getAttribute("data-action");
+            if (action === "edit") editMember(member);
+            else if (action === "history") viewHistory(member);
+            else if (action === "delete") deleteMember(member);
+        });
     }
 }
 
@@ -915,7 +727,7 @@ function showAddMemberModal() {
     };
 }
 
-window.editMember = function(id, name, phone, email) {
+window.editMember = function(member) {
     const modalHtml = `
         <div class="modal-modern" id="memberModal">
             <div class="modal-content-modern">
@@ -926,15 +738,15 @@ window.editMember = function(id, name, phone, email) {
                 <div class="modal-body">
                     <div class="form-group-modern">
                         <label class="form-label">Full Name *</label>
-                        <input type="text" id="memberName" class="form-input" value="${escapeHtml(name)}">
+                        <input type="text" id="memberName" class="form-input" value="${escapeHtml(member.name)}">
                     </div>
                     <div class="form-group-modern">
                         <label class="form-label">Email Address</label>
-                        <input type="email" id="memberEmail" class="form-input" value="${escapeHtml(email)}">
+                        <input type="email" id="memberEmail" class="form-input" value="${escapeHtml(member.email || '')}">
                     </div>
                     <div class="form-group-modern">
                         <label class="form-label">Phone Number</label>
-                        <input type="tel" id="memberPhone" class="form-input" value="${escapeHtml(phone)}">
+                        <input type="tel" id="memberPhone" class="form-input" value="${escapeHtml(member.phone || '')}">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -944,40 +756,40 @@ window.editMember = function(id, name, phone, email) {
             </div>
         </div>
     `;
-    
+
     document.body.insertAdjacentHTML('beforeend', modalHtml);
-    
+
     document.getElementById("confirmEditBtn").onclick = async function() {
         const newName = document.getElementById("memberName").value.trim();
         const newEmail = document.getElementById("memberEmail").value.trim();
         const newPhone = document.getElementById("memberPhone").value.trim();
-        
+
         if (!newName) {
             showToast("Please enter member name", true);
             return;
         }
-        
+
         const updateData = { name: newName };
         updateData.email = newEmail || null;
         updateData.phone = newPhone || null;
-        
-        const response = await supabaseClient.from("members").update(updateData).eq("id", id);
+
+        const response = await supabaseClient.from("members").update(updateData).eq("id", member.id);
         if (response.error) {
             showToast(response.error.message, true);
             return;
         }
-        
+
         closeModal();
         await loadMembers();
         showToast("Member updated successfully!");
     };
 };
 
-window.deleteMember = function(id, name) {
-    if (!confirm(`⚠️ Delete "${name}"?\n\nThis will also delete ALL records (contributions, loans, penalties) for this member. This action cannot be undone!`)) return;
-    
+window.deleteMember = function(member) {
+    if (!confirm(`⚠️ Delete "${member.name}"?\n\nThis will also delete ALL records (contributions, loans, penalties) for this member. This action cannot be undone!`)) return;
+
     (async function() {
-        const response = await supabaseClient.from("members").delete().eq("id", id);
+        const response = await supabaseClient.from("members").delete().eq("id", member.id);
         if (response.error) {
             showToast(response.error.message, true);
             return;
@@ -987,8 +799,8 @@ window.deleteMember = function(id, name) {
     })();
 };
 
-window.viewHistory = function(id, name) {
-    window.location.href = `member-history.html?id=${id}&name=${encodeURIComponent(name)}`;
+window.viewHistory = function(member) {
+    window.location.href = `member-history.html?id=${encodeURIComponent(member.id)}&name=${encodeURIComponent(member.name)}`;
 };
 
 window.closeModal = function() {

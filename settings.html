@@ -4,468 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
     <title>ChamaEase | Settings</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: system-ui, 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
-        }
-
-        body {
-            background: #f4f7fb;
-            color: #1e2a3e;
-        }
-
-        :root {
-            --primary: #2c7a4d;
-            --primary-light: #eaf5ef;
-            --primary-dark: #1f5a3a;
-            --danger: #dc4c4c;
-            --warning: #f59e0b;
-            --gray-border: #e2e8f0;
-            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.04);
-            --radius-card: 16px;
-            --radius-btn: 32px;
-            --sidebar-width: 280px;
-        }
-
-        .dark-theme {
-            background: #1a1a2e;
-            color: #e2e8f0;
-        }
-
-        .dark-theme .sidebar,
-        .dark-theme .card,
-        .dark-theme .top-bar,
-        .dark-theme .stat-card {
-            background: #16213e;
-            border-color: #2d3748;
-        }
-
-        .dark-theme input,
-        .dark-theme select {
-            background: #0f3460;
-            border-color: #2d3748;
-            color: #e2e8f0;
-        }
-
-        .app-wrapper {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        .sidebar {
-            width: var(--sidebar-width);
-            background: white;
-            border-right: 1px solid var(--gray-border);
-            position: fixed;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            overflow-y: auto;
-            transition: transform 0.3s ease;
-            z-index: 1000;
-            box-shadow: var(--shadow-sm);
-            transform: translateX(0);
-        }
-
-        .sidebar-header {
-            padding: 1rem;
-            border-bottom: 1px solid var(--gray-border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .sidebar-logo {
-            font-weight: 800;
-            font-size: 1.2rem;
-            background: linear-gradient(135deg, var(--primary), #3b9b62);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        .sidebar-close {
-            background: none;
-            border: none;
-            font-size: 1.3rem;
-            cursor: pointer;
-            color: #94a3b8;
-            transition: all 0.2s;
-            display: none;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .sidebar-close:hover {
-            background: #fee2e2;
-            color: var(--danger);
-        }
-
-        .sidebar-nav {
-            padding: 0.8rem 0;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 0.7rem 1rem;
-            margin: 0.2rem 0.8rem;
-            border-radius: 12px;
-            text-decoration: none;
-            color: #4a5568;
-            transition: all 0.2s;
-            cursor: pointer;
-        }
-
-        .nav-item:hover {
-            background: var(--primary-light);
-            color: var(--primary);
-        }
-
-        .nav-item.active {
-            background: var(--primary);
-            color: white;
-        }
-
-        .nav-item .icon {
-            font-size: 1.1rem;
-            width: 26px;
-            text-align: center;
-        }
-
-        .nav-item .label {
-            font-weight: 500;
-            font-size: 0.85rem;
-        }
-
-        .main-content {
-            flex: 1;
-            margin-left: var(--sidebar-width);
-            transition: margin-left 0.3s ease;
-            width: calc(100% - var(--sidebar-width));
-        }
-
-        .top-bar {
-            background: white;
-            padding: 0.7rem 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--gray-border);
-            box-shadow: var(--shadow-sm);
-            position: sticky;
-            top: 0;
-            z-index: 99;
-        }
-
-        .menu-toggle {
-            background: none;
-            border: none;
-            font-size: 1.3rem;
-            cursor: pointer;
-            color: var(--primary);
-            padding: 6px;
-            border-radius: 50%;
-            transition: all 0.2s;
-        }
-
-        .page-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #1e2a3e;
-        }
-
-        .dark-theme .page-title {
-            color: #e2e8f0;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-        }
-
-        .user-email {
-            font-size: 0.7rem;
-            color: #5b6e8c;
-            display: none;
-        }
-
-        @media (min-width: 480px) {
-            .user-email {
-                display: inline;
-            }
-        }
-
-        .logout-btn {
-            background: transparent;
-            border: 1px solid #dc2626;
-            color: #dc2626;
-            padding: 0.35rem 0.7rem;
-            border-radius: 2rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.7rem;
-        }
-
-        .logout-btn:hover {
-            background: #dc2626;
-            color: white;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 1rem;
-            width: 100%;
-            min-height: 70vh;
-        }
-
-        .card {
-            background: white;
-            border-radius: var(--radius-card);
-            box-shadow: var(--shadow-sm);
-            padding: 1rem;
-            margin-bottom: 1rem;
-            border: 1px solid var(--gray-border);
-        }
-
-        .btn {
-            border: none;
-            background: var(--primary);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: var(--radius-btn);
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 0.75rem;
-            transition: 0.2s;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .btn:hover {
-            background: var(--primary-dark);
-            transform: translateY(-1px);
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--primary);
-            color: var(--primary);
-        }
-
-        .btn-outline:hover {
-            background: var(--primary-light);
-        }
-
-        .btn-sm {
-            padding: 0.25rem 0.6rem;
-            font-size: 0.65rem;
-        }
-
-        .btn-danger {
-            background: var(--danger);
-        }
-
-        .btn-danger:hover {
-            background: #b91c1c;
-        }
-
-        .flex-between {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 0.6rem;
-            margin-bottom: 1rem;
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.3rem;
-            font-weight: 600;
-            font-size: 0.75rem;
-            color: #1e2a3e;
-        }
-
-        .dark-theme .form-group label {
-            color: #e2e8f0;
-        }
-
-        input, select {
-            width: 100%;
-            padding: 0.5rem 0.8rem;
-            border-radius: 1rem;
-            border: 1px solid var(--gray-border);
-            font-size: 0.75rem;
-            transition: all 0.2s;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(44, 122, 77, 0.1);
-        }
-
-        input:disabled {
-            background: #f8fafc;
-            cursor: not-allowed;
-        }
-
-        .setting-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.8rem 0;
-            border-bottom: 1px solid var(--gray-border);
-        }
-
-        .setting-item:last-child {
-            border-bottom: none;
-        }
-
-        .setting-info h4 {
-            font-size: 0.85rem;
-            margin-bottom: 0.2rem;
-        }
-
-        .setting-info p {
-            font-size: 0.7rem;
-            color: #6c757d;
-        }
-
-        .toggle-switch {
-            width: 45px;
-            height: 24px;
-            background: #cbd5e1;
-            border-radius: 30px;
-            position: relative;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .toggle-switch.active {
-            background: var(--primary);
-        }
-
-        .toggle-switch::after {
-            content: '';
-            width: 20px;
-            height: 20px;
-            background: white;
-            border-radius: 50%;
-            position: absolute;
-            top: 2px;
-            left: 3px;
-            transition: all 0.3s;
-        }
-
-        .toggle-switch.active::after {
-            left: 22px;
-        }
-
-        .success-message {
-            background: #dff0e4;
-            color: #2c7a4d;
-            padding: 0.6rem;
-            border-radius: 1rem;
-            margin-bottom: 0.8rem;
-            font-size: 0.7rem;
-        }
-
-        .error-message {
-            background: #fee2e2;
-            color: #dc2626;
-            padding: 0.6rem;
-            border-radius: 1rem;
-            margin-bottom: 0.8rem;
-            font-size: 0.7rem;
-        }
-
-        footer {
-            text-align: center;
-            padding: 0.8rem;
-            font-size: 0.65rem;
-            color: #6c757d;
-            border-top: 1px solid var(--gray-border);
-            margin-top: 1rem;
-        }
-
-        .loading-spinner {
-            display: inline-block;
-            width: 30px;
-            height: 30px;
-            border: 3px solid #e2e8f0;
-            border-radius: 50%;
-            border-top-color: var(--primary);
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .sidebar-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 999;
-        }
-
-        .sidebar-overlay.active {
-            display: block;
-        }
-
-        .stat-badge {
-            display: inline-block;
-            background: var(--primary-light);
-            color: var(--primary);
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 600;
-        }
-
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-            .sidebar.open {
-                transform: translateX(0);
-            }
-            .main-content {
-                margin-left: 0;
-                width: 100%;
-            }
-            .sidebar-close {
-                display: flex;
-            }
-            .container {
-                padding: 0.8rem;
-            }
-            .setting-item {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.5rem;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
 </head>
@@ -487,6 +26,10 @@
                 <span class="icon">👥</span>
                 <span class="label">MEMBERS</span>
             </a>
+            <a href="member-history.html" class="nav-item">
+                <span class="icon">📜</span>
+                <span class="label">MEMBER HISTORY</span>
+            </a>
             <a href="monthly-records.html" class="nav-item">
                 <span class="icon">📅</span>
                 <span class="label">MONTHLY RECORDS</span>
@@ -506,9 +49,16 @@
         <div class="top-bar">
             <button class="menu-toggle" id="menuToggle">☰</button>
             <div class="page-title">⚙️ SETTINGS</div>
-            <div class="user-info">
-                <span class="user-email" id="userEmail"></span>
-                <button id="logoutBtn" class="logout-btn">LOGOUT</button>
+            <div class="header-right">
+                <div class="header-quicklinks">
+                    <a href="members.html" class="quicklink-btn" title="Members">👥</a>
+                    <a href="monthly-records.html" class="quicklink-btn" title="Monthly Records">📅</a>
+                    <a href="reports.html" class="quicklink-btn" title="Reports">📈</a>
+                </div>
+                <div class="user-info">
+                    <span class="user-email" id="userEmail"></span>
+                    <button id="logoutBtn" class="logout-btn">LOGOUT</button>
+                </div>
             </div>
         </div>
         <div id="app-root" class="container">
@@ -554,10 +104,12 @@ window.addEventListener('resize', function() {
 
 function escapeHtml(str) {
     if (!str) return "";
-    return str.replace(/[&<>]/g, function(m) {
+    return String(str).replace(/[&<>"']/g, function(m) {
         if (m === "&") return "&amp;";
         if (m === "<") return "&lt;";
         if (m === ">") return "&gt;";
+        if (m === '"') return "&quot;";
+        if (m === "'") return "&#39;";
         return m;
     });
 }
@@ -574,12 +126,12 @@ function showMessage(message, type) {
 
 async function loadSystemStats() {
     try {
-        const membersRes = await supabaseClient.from('members').select('*', { count: 'exact' });
-        const recordsRes = await supabaseClient.from('monthly_records').select('*', { count: 'exact' });
-        
+        const membersRes = await supabaseClient.from('members').select('*', { count: 'exact', head: true });
+        const recordsRes = await supabaseClient.from('monthly_records').select('*', { count: 'exact', head: true });
+
         systemStats = {
-            totalMembers: membersRes.data ? membersRes.data.length : 0,
-            totalRecords: recordsRes.data ? recordsRes.data.length : 0,
+            totalMembers: membersRes.count || 0,
+            totalRecords: recordsRes.count || 0,
             lastUpdated: new Date().toLocaleString()
         };
         
@@ -673,32 +225,73 @@ async function exportAllData() {
     }
 }
 
+function showClearDataModal() {
+    const modalHtml = `
+        <div class="modal-overlay" id="clearDataModal">
+            <div class="modal-box">
+                <div class="modal-box-icon">⚠️</div>
+                <h3>Delete All Data?</h3>
+                <p>This permanently deletes <strong>every member</strong> and <strong>every monthly record</strong> for this chama. This cannot be undone.</p>
+                <p class="modal-box-instruction">Type DELETE below to confirm:</p>
+                <input type="text" id="clearDataConfirmInput" class="modal-box-input" placeholder="DELETE" autocomplete="off" autocapitalize="off" spellcheck="false">
+                <div class="modal-box-actions">
+                    <button class="btn-outline btn" id="clearDataCancelBtn" type="button">Cancel</button>
+                    <button class="btn-danger btn" id="clearDataConfirmBtn" type="button" disabled>🗑️ Delete Everything</button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+    const overlay = document.getElementById('clearDataModal');
+    const input = document.getElementById('clearDataConfirmInput');
+    const confirmBtn = document.getElementById('clearDataConfirmBtn');
+    const cancelBtn = document.getElementById('clearDataCancelBtn');
+
+    function closeClearDataModal() {
+        overlay.remove();
+    }
+
+    input.addEventListener('input', function() {
+        confirmBtn.disabled = input.value.trim() !== 'DELETE';
+    });
+
+    cancelBtn.addEventListener('click', closeClearDataModal);
+    overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) closeClearDataModal();
+    });
+
+    confirmBtn.addEventListener('click', async function() {
+        if (input.value.trim() !== 'DELETE') return;
+        confirmBtn.disabled = true;
+        cancelBtn.disabled = true;
+        confirmBtn.innerHTML = '<span style="display:inline-block;width:12px;height:12px;border:2px solid white;border-radius:50%;border-top-color:transparent;animation:spin 0.6s linear infinite;margin-right:6px;"></span>Deleting...';
+        await clearAllData();
+        closeClearDataModal();
+    });
+
+    input.focus();
+}
+
 async function clearAllData() {
-    if (!confirm('⚠️ WARNING: This will delete ALL members and records. This action cannot be undone!\n\nAre you absolutely sure?')) {
-        return;
-    }
-    
-    if (!confirm('Type "DELETE" to confirm:')) {
-        return;
-    }
-    
     try {
         // Delete all records first (due to foreign key constraints)
         const { error: recordsError } = await supabaseClient
             .from('monthly_records')
             .delete()
             .neq('id', '00000000-0000-0000-0000-000000000000');
-        
+
         if (recordsError) throw recordsError;
-        
+
         // Delete all members
         const { error: membersError } = await supabaseClient
             .from('members')
             .delete()
             .neq('id', '00000000-0000-0000-0000-000000000000');
-        
+
         if (membersError) throw membersError;
-        
+
         showMessage('✅ All data cleared successfully!', 'success');
         loadSystemStats();
     } catch (error) {
@@ -755,35 +348,35 @@ async function renderSettings() {
         
         <div class="card">
             <h3 style="font-size:1rem;">👤 Profile Settings</h3>
-            <div class="form-group">
-                <label>Email Address</label>
-                <input type="email" value="${escapeHtml(currentUser?.email || '')}" disabled style="background:#f8fafc;">
+            <div class="form-group-modern">
+                <label class="form-label">Email Address</label>
+                <input type="email" class="form-input" value="${escapeHtml(currentUser?.email || '')}" disabled>
                 <small style="color:#6c757d; font-size:0.65rem;">Email cannot be changed</small>
             </div>
-            <div class="form-group">
-                <label>Full Name</label>
-                <input type="text" id="fullName" placeholder="Enter your full name" value="${escapeHtml(currentUser?.user_metadata?.full_name || '')}">
+            <div class="form-group-modern">
+                <label class="form-label">Full Name</label>
+                <input type="text" id="fullName" class="form-input" placeholder="Enter your full name" value="${escapeHtml(currentUser?.user_metadata?.full_name || '')}">
             </div>
-            <div class="form-group">
-                <label>Phone Number</label>
-                <input type="tel" id="phone" placeholder="Enter phone number" value="${escapeHtml(currentUser?.user_metadata?.phone || '')}">
+            <div class="form-group-modern">
+                <label class="form-label">Phone Number</label>
+                <input type="tel" id="phone" class="form-input" placeholder="Enter phone number" value="${escapeHtml(currentUser?.user_metadata?.phone || '')}">
             </div>
             <button class="btn" onclick="updateProfile()">💾 Update Profile</button>
         </div>
-        
+
         <div class="card">
             <h3 style="font-size:1rem;">🔒 Security & Password</h3>
-            <div class="form-group">
-                <label>Current Password</label>
-                <input type="password" id="currentPassword" placeholder="Enter current password">
+            <div class="form-group-modern">
+                <label class="form-label">Current Password</label>
+                <input type="password" id="currentPassword" class="form-input" placeholder="Enter current password">
             </div>
-            <div class="form-group">
-                <label>New Password</label>
-                <input type="password" id="newPassword" placeholder="Enter new password (min 6 characters)">
+            <div class="form-group-modern">
+                <label class="form-label">New Password</label>
+                <input type="password" id="newPassword" class="form-input" placeholder="Enter new password (min 6 characters)">
             </div>
-            <div class="form-group">
-                <label>Confirm New Password</label>
-                <input type="password" id="confirmPassword" placeholder="Confirm new password">
+            <div class="form-group-modern">
+                <label class="form-label">Confirm New Password</label>
+                <input type="password" id="confirmPassword" class="form-input" placeholder="Confirm new password">
             </div>
             <button class="btn" onclick="updatePassword()">🔑 Change Password</button>
         </div>
@@ -820,7 +413,7 @@ async function renderSettings() {
                     <h4>Clear All Data</h4>
                     <p>⚠️ Delete ALL members and records (irreversible)</p>
                 </div>
-                <button class="btn-danger btn-sm" onclick="clearAllData()">🗑️ Clear All</button>
+                <button class="btn-danger btn-sm" onclick="showClearDataModal()">🗑️ Clear All</button>
             </div>
         </div>
         

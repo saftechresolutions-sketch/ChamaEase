@@ -4,246 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
     <title>ChamaEase | Monthly Records</title>
+    <link rel="stylesheet" href="style.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: system-ui, 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
-        }
-
-        body {
-            background: #f4f7fb;
-            color: #1e2a3e;
-        }
-
-        :root {
-            --primary: #2c7a4d;
-            --primary-light: #eaf5ef;
-            --primary-dark: #1f5a3a;
-            --danger: #dc4c4c;
-            --gray-border: #e2e8f0;
-            --shadow-sm: 0 4px 12px rgba(0,0,0,0.04);
-            --radius-card: 16px;
-            --radius-btn: 32px;
-            --sidebar-width: 280px;
-        }
-
-        .app-wrapper {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        .sidebar {
-            width: var(--sidebar-width);
-            background: white;
-            border-right: 1px solid var(--gray-border);
-            position: fixed;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            overflow-y: auto;
-            transition: transform 0.3s ease;
-            z-index: 1000;
-            box-shadow: var(--shadow-sm);
-            transform: translateX(0);
-        }
-
-        .sidebar-header {
-            padding: 1rem;
-            border-bottom: 1px solid var(--gray-border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .sidebar-logo {
-            font-weight: 800;
-            font-size: 1.2rem;
-            background: linear-gradient(135deg, var(--primary), #3b9b62);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        .sidebar-close {
-            background: none;
-            border: none;
-            font-size: 1.3rem;
-            cursor: pointer;
-            color: #94a3b8;
-            display: none;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .sidebar-close:hover {
-            background: #fee2e2;
-            color: var(--danger);
-        }
-
-        .sidebar-nav {
-            padding: 0.8rem 0;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 0.7rem 1rem;
-            margin: 0.2rem 0.8rem;
-            border-radius: 12px;
-            text-decoration: none;
-            color: #4a5568;
-            transition: all 0.2s;
-            cursor: pointer;
-        }
-
-        .nav-item:hover {
-            background: var(--primary-light);
-            color: var(--primary);
-        }
-
-        .nav-item.active {
-            background: var(--primary);
-            color: white;
-        }
-
-        .nav-item .icon {
-            font-size: 1.1rem;
-            width: 26px;
-            text-align: center;
-        }
-
-        .nav-item .label {
-            font-weight: 500;
-            font-size: 0.85rem;
-        }
-
-        .main-content {
-            flex: 1;
-            margin-left: var(--sidebar-width);
-            transition: margin-left 0.3s ease;
-            width: calc(100% - var(--sidebar-width));
-        }
-
-        .top-bar {
-            background: white;
-            padding: 0.7rem 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--gray-border);
-            box-shadow: var(--shadow-sm);
-            position: sticky;
-            top: 0;
-            z-index: 99;
-        }
-
-        .menu-toggle {
-            background: none;
-            border: none;
-            font-size: 1.3rem;
-            cursor: pointer;
-            color: var(--primary);
-            padding: 6px;
-            border-radius: 50%;
-        }
-
-        .page-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #1e2a3e;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-        }
-
-        .user-email {
-            font-size: 0.7rem;
-            color: #5b6e8c;
-            display: none;
-        }
-
-        @media (min-width: 480px) {
-            .user-email {
-                display: inline;
-            }
-        }
-
-        .logout-btn {
-            background: transparent;
-            border: 1px solid #dc2626;
-            color: #dc2626;
-            padding: 0.35rem 0.7rem;
-            border-radius: 2rem;
-            cursor: pointer;
-            font-size: 0.7rem;
-        }
-
-        .logout-btn:hover {
-            background: #dc2626;
-            color: white;
-        }
-
         .container {
             max-width: 1400px;
-            margin: 0 auto;
-            padding: 1rem;
-            width: 100%;
-            min-height: 70vh;
         }
 
-        .btn {
-            border: none;
-            background: var(--primary);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: var(--radius-btn);
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 0.75rem;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--primary);
-            color: var(--primary);
-        }
-
-        .spreadsheet-container {
-            overflow-x: auto;
-            border-radius: 12px;
-            border: 1px solid var(--gray-border);
-            background: white;
-        }
-
+        /* This page's table is wider (6 columns of currency data) than the
+           shared spreadsheet default, so it needs a taller min-width to
+           avoid clipping before the horizontal scroll kicks in. */
         .spreadsheet-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.8rem;
             min-width: 900px;
-        }
-
-        .spreadsheet-table th,
-        .spreadsheet-table td {
-            border: 1px solid var(--gray-border);
-            padding: 10px 8px;
-            text-align: left;
-            vertical-align: middle;
-        }
-
-        .spreadsheet-table th {
-            background: #f8fafc;
-            font-weight: 600;
         }
 
         .currency-display {
@@ -257,7 +28,7 @@
         }
 
         .currency-display:hover {
-            background: #eaf5ef;
+            background: var(--primary-light);
             border-radius: 6px;
         }
 
@@ -274,25 +45,11 @@
         .spreadsheet-table td input:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(44,122,77,0.1);
+            box-shadow: 0 0 0 2px rgba(182,85,42,0.1);
         }
 
         .spreadsheet-table td input:hover {
             background: #f8fafc;
-        }
-
-        .member-name-cell {
-            font-weight: 600;
-            background: #f8fafc;
-        }
-
-        .totals-row {
-            background: #f1f5f9;
-            font-weight: 600;
-        }
-
-        .totals-row td {
-            border-top: 2px solid var(--primary);
         }
 
         .records-header-section {
@@ -397,73 +154,7 @@
             margin-left: 5px;
         }
 
-        .sidebar-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 999;
-        }
-
-        .sidebar-overlay.active {
-            display: block;
-        }
-
-        .loading-spinner {
-            display: inline-block;
-            width: 30px;
-            height: 30px;
-            border: 3px solid #e2e8f0;
-            border-radius: 50%;
-            border-top-color: var(--primary);
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .toast-notification {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #2c7a4d;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 40px;
-            font-size: 0.8rem;
-            z-index: 1002;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            animation: slideIn 0.3s ease;
-        }
-        .toast-notification.toast-error {
-            background: #dc2626;
-        }
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
         @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-            .sidebar.open {
-                transform: translateX(0);
-            }
-            .main-content {
-                margin-left: 0;
-                width: 100%;
-            }
-            .sidebar-close {
-                display: flex;
-            }
-            .container {
-                padding: 0.8rem;
-            }
             .filter-row {
                 flex-direction: column;
             }
@@ -476,15 +167,6 @@
             .action-btn {
                 flex: 1;
                 justify-content: center;
-            }
-            .spreadsheet-table th,
-            .spreadsheet-table td {
-                padding: 6px 4px;
-                font-size: 0.7rem;
-            }
-            .spreadsheet-table td input {
-                padding: 4px 6px;
-                font-size: 0.7rem;
             }
         }
 
@@ -503,7 +185,7 @@
 <body>
 <div class="app-wrapper">
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
-    
+
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">ChamaEase</div>
@@ -523,9 +205,16 @@
         <div class="top-bar">
             <button class="menu-toggle" id="menuToggle">☰</button>
             <div class="page-title">📅 MONTHLY RECORDS</div>
-            <div class="user-info">
-                <span class="user-email" id="userEmail"></span>
-                <button id="logoutBtn" class="logout-btn">LOGOUT</button>
+            <div class="header-right">
+                <div class="header-quicklinks">
+                    <a href="members.html" class="quicklink-btn" title="Members">👥</a>
+                    <a href="monthly-records.html" class="quicklink-btn active" title="Monthly Records">📅</a>
+                    <a href="reports.html" class="quicklink-btn" title="Reports">📈</a>
+                </div>
+                <div class="user-info">
+                    <span class="user-email" id="userEmail"></span>
+                    <button id="logoutBtn" class="logout-btn">LOGOUT</button>
+                </div>
             </div>
         </div>
         <div id="app-root" class="container">
@@ -606,7 +295,7 @@ document.getElementById("logoutBtn").addEventListener("click", async function() 
 
 function showToast(message, isError = false) {
     const toast = document.createElement('div');
-    toast.className = `toast-notification ${isError ? 'toast-error' : ''}`;
+    toast.className = `toast-notification ${isError ? 'error' : ''}`;
     toast.textContent = isError ? '⚠️ ' + message : '✓ ' + message;
     document.body.appendChild(toast);
     setTimeout(() => {
@@ -633,12 +322,26 @@ function formatCurrency(num) {
 
 function escapeHtml(str) {
     if (!str) return "";
-    return str.replace(/[&<>]/g, function(m) {
+    return String(str).replace(/[&<>"']/g, function(m) {
         if (m === "&") return "&amp;";
         if (m === "<") return "&lt;";
         if (m === ">") return "&gt;";
+        if (m === '"') return "&quot;";
+        if (m === "'") return "&#39;";
         return m;
     });
+}
+
+// Fetch only the records for one year (instead of the whole table's
+// history every time) — much smaller payload, much faster page loads.
+async function loadRecordsForYear(year) {
+    const { data, error } = await supabaseClient
+        .from("monthly_records")
+        .select("*")
+        .eq("year", year);
+
+    if (error) throw error;
+    allRecords = data || [];
 }
 
 async function loadData() {
@@ -648,21 +351,21 @@ async function loadData() {
             .from("members")
             .select("*")
             .order("name");
-        
+
         if (membersError) throw membersError;
         allMembers = membersData || [];
-        
-        const { data: recordsData, error: recordsError } = await supabaseClient
+
+        // Lightweight query (one column only) just to know which years have
+        // data, for the year dropdown — far cheaper than fetching every row.
+        const { data: yearsData, error: yearsError } = await supabaseClient
             .from("monthly_records")
-            .select("*");
-        
-        if (recordsError) throw recordsError;
-        allRecords = recordsData || [];
-        
-        // Extract available years
+            .select("year");
+
+        if (yearsError) throw yearsError;
+
         var yearsSet = new Set();
-        for (var i = 0; i < allRecords.length; i++) {
-            yearsSet.add(allRecords[i].year);
+        for (var i = 0; i < (yearsData || []).length; i++) {
+            yearsSet.add(yearsData[i].year);
         }
         var currentYearNum = new Date().getFullYear();
         yearsSet.add(currentYearNum - 2);
@@ -670,9 +373,11 @@ async function loadData() {
         yearsSet.add(currentYearNum);
         yearsSet.add(currentYearNum + 1);
         yearsSet.add(currentYearNum + 2);
-        
+
         availableYears = Array.from(yearsSet).sort((a, b) => b - a);
-        
+
+        await loadRecordsForYear(currentYear);
+
         renderSpreadsheet();
     } catch (error) {
         document.getElementById("app-root").innerHTML = '<div style="padding:2rem;text-align:center"><h3>⚠️ Error</h3><p>' + error.message + '</p><button class="btn" onclick="location.reload()">Retry</button></div>';
@@ -1027,7 +732,7 @@ function exportToPDF() {
     printWindow.document.write("body { font-family: Arial, sans-serif; padding: 20px; }");
     printWindow.document.write("table { border-collapse: collapse; width: 100%; margin-top: 20px; }");
     printWindow.document.write("th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }");
-    printWindow.document.write("th { background: #2c7a4d; color: white; }");
+    printWindow.document.write("th { background: #b6552a; color: white; }");
     printWindow.document.write("td { text-align: right; }");
     printWindow.document.write("td:first-child { text-align: left; }");
     printWindow.document.write("</style>");
@@ -1182,6 +887,7 @@ function renderSpreadsheet() {
             </div>
         </div>
         
+        <div class="scroll-hint">← Swipe to see all columns →</div>
         <div class="spreadsheet-container">
             <table class="spreadsheet-table" id="data-table">
                 <thead>
@@ -1225,13 +931,14 @@ function renderSpreadsheet() {
         renderSpreadsheet();
     });
     
-    document.getElementById("yearSelect").addEventListener("change", function() {
+    document.getElementById("yearSelect").addEventListener("change", async function() {
         if (pendingSaves.size > 0 && confirm("You have unsaved changes. Change period anyway?")) {
             saveAllChanges();
         }
         currentMonth = parseInt(document.getElementById("monthSelect").value);
         currentYear = parseInt(document.getElementById("yearSelect").value);
         saveSelectedPeriod();
+        await loadRecordsForYear(currentYear);
         renderSpreadsheet();
     });
     

@@ -1,0 +1,32 @@
+name: Keep Supabase Project Awake
+
+# Supabase pauses free-tier projects after 7 days with no API activity.
+# This pings a real table through the REST API on a schedule well inside
+# that window, so the project never goes to sleep even if nobody opens
+# the app for a while. It's a plain SELECT with limit=1 — RLS means it
+# returns an empty result (not an error), which is all we need: any
+# response confirms the request reached the database.
+
+"on":
+  schedule:
+    - cron: '0 8 * * *' # every day at 08:00 UTC
+  workflow_dispatch: {} # lets you trigger it manually from the Actions tab
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase REST API
+        run: |
+          KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFmaWhlYnFvbWx1bGV5d3BndWZ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxOTM5NDEsImV4cCI6MjA5Mzc2OTk0MX0.yKFXsCDYReshZKL9oosvm5ZwHh4GUZy1SYwFyqhDv9I"
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            "https://qfihebqomluleywpgufv.supabase.co/rest/v1/members?select=id&limit=1" \
+            -H "apikey: $KEY" \
+            -H "Authorization: Bearer $KEY")
+          echo "Supabase REST API responded with status $STATUS"
+          if [ "$STATUS" -ge 200 ] && [ "$STATUS" -lt 500 ]; then
+            echo "Ping successful (project is awake)."
+          else
+            echo "::warning::Unexpected status code from Supabase: $STATUS"
+            exit 1
+          fi

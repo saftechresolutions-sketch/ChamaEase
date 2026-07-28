@@ -4,261 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>ChamaEase | Login</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: system-ui, 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, #eaf5ef 0%, #d4e8dc 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1.5rem;
-        }
-
-        .login-container {
-            max-width: 450px;
-            width: 100%;
-        }
-
-        .login-card {
-            background: white;
-            border-radius: 2rem;
-            padding: 2rem;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e2e8f0;
-        }
-
-        .logo {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .logo h1 {
-            font-size: 2rem;
-            background: linear-gradient(135deg, #2c7a4d, #3b9b62);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        .logo p {
-            color: #5b6e8c;
-            margin-top: 0.5rem;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: #1e2a3e;
-        }
-
-        input {
-            width: 100%;
-            padding: 0.8rem 1rem;
-            border-radius: 1rem;
-            border: 1px solid #cbd5e1;
-            font-size: 1rem;
-            transition: all 0.2s;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: #2c7a4d;
-            box-shadow: 0 0 0 3px rgba(44, 122, 77, 0.1);
-        }
-
-        .btn {
-            width: 100%;
-            background: #2c7a4d;
-            color: white;
-            padding: 0.8rem;
-            border: none;
-            border-radius: 2rem;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .btn:hover {
-            background: #1f5a3a;
-            transform: translateY(-1px);
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .btn-secondary {
-            background: transparent;
-            color: #2c7a4d;
-            border: 1px solid #2c7a4d;
-            margin-top: 0.5rem;
-        }
-
-        .btn-secondary:hover {
-            background: #eaf5ef;
-            transform: translateY(-1px);
-        }
-
-        .error-message {
-            background: #fee2e2;
-            color: #dc2626;
-            padding: 0.8rem;
-            border-radius: 1rem;
-            margin-bottom: 1rem;
-            font-size: 0.85rem;
-            text-align: center;
-        }
-
-        .success-message {
-            background: #dff0e4;
-            color: #2c7a4d;
-            padding: 0.8rem;
-            border-radius: 1rem;
-            margin-bottom: 1rem;
-            font-size: 0.85rem;
-            text-align: center;
-        }
-
-        .info-message {
-            background: #e0f2fe;
-            color: #0284c7;
-            padding: 0.8rem;
-            border-radius: 1rem;
-            margin-bottom: 1rem;
-            font-size: 0.85rem;
-            text-align: center;
-        }
-
-        .register-link {
-            text-align: center;
-            margin-top: 1rem;
-            color: #5b6e8c;
-        }
-
-        .register-link a {
-            color: #2c7a4d;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .register-link a:hover {
-            text-decoration: underline;
-        }
-
-        .reset-link {
-            text-align: center;
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid #e2e8f0;
-        }
-
-        .reset-link a {
-            color: #6c757d;
-            text-decoration: none;
-            font-size: 0.85rem;
-        }
-
-        .reset-link a:hover {
-            color: #2c7a4d;
-            text-decoration: underline;
-        }
-
-        .loading {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid white;
-            border-radius: 50%;
-            border-top-color: transparent;
-            animation: spin 0.6s linear infinite;
-            margin-right: 8px;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 2rem;
-            padding: 2rem;
-            max-width: 450px;
-            width: 90%;
-            position: relative;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .modal-header h2 {
-            font-size: 1.5rem;
-            color: #1e2a3e;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.8rem;
-            cursor: pointer;
-            color: #94a3b8;
-            transition: all 0.2s;
-        }
-
-        .modal-close:hover {
-            color: #dc2626;
-        }
-
-        @media (max-width: 640px) {
-            .login-card {
-                padding: 1.5rem;
-            }
-            .modal-content {
-                padding: 1.5rem;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <div class="login-container">
-        <div class="login-card">
-            <div class="logo">
+    <div class="auth-container">
+    <div class="auth-card-wrapper">
+        <div class="auth-card">
+            <div class="auth-logo">
                 <h1>🌿 ChamaEase</h1>
                 <p>Community Contribution Hub</p>
             </div>
@@ -266,44 +19,41 @@
             <div id="messageArea"></div>
 
             <form id="loginForm">
-                <div class="form-group">
+                <div class="auth-form-group">
                     <label>📧 Email Address</label>
                     <input type="email" id="email" placeholder="admin@chama.com" required autocomplete="email">
                 </div>
 
-                <div class="form-group">
+                <div class="auth-form-group">
                     <label>🔒 Password</label>
                     <input type="password" id="password" placeholder="Enter your password" required autocomplete="current-password">
                 </div>
 
-                <button type="submit" id="loginBtn" class="btn">Login to Dashboard</button>
+                <button type="submit" id="loginBtn" class="auth-btn">Login to Dashboard</button>
             </form>
 
-            <div class="register-link">
-                Don't have an account? <a href="#" id="showRegisterLink">Create now</a>
-            </div>
-
-            <div class="reset-link">
+            <div class="auth-reset-link">
                 <a href="#" id="showResetLink">Forgot Password?</a>
             </div>
         </div>
     </div>
+    </div>
 
-    <div id="resetModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
+    <div id="resetModal" class="auth-modal">
+        <div class="auth-modal-content">
+            <div class="auth-modal-header">
                 <h2>Reset Password</h2>
-                <button class="modal-close" id="closeModalBtn">&times;</button>
+                <button class="auth-modal-close" id="closeModalBtn">&times;</button>
             </div>
             <div id="resetModalMessage"></div>
-            <div class="form-group">
+            <div class="auth-form-group">
                 <label>📧 Email Address</label>
                 <input type="email" id="resetEmail" placeholder="Enter your registered email" required autocomplete="email">
             </div>
             <p style="font-size: 0.75rem; color: #5b6e8c; margin-bottom: 1rem;">
                 We'll send you a password reset link to your email.
             </p>
-            <button id="sendResetBtn" class="btn">Send Reset Link</button>
+            <button id="sendResetBtn" class="auth-btn">Send Reset Link</button>
         </div>
     </div>
 
@@ -315,15 +65,12 @@
         const emailInput = document.getElementById('email');
         const passwordInput = document.getElementById('password');
         const messageArea = document.getElementById('messageArea');
-        const showRegisterLink = document.getElementById('showRegisterLink');
         const showResetLink = document.getElementById('showResetLink');
         const resetModal = document.getElementById('resetModal');
         const closeModalBtn = document.getElementById('closeModalBtn');
         const sendResetBtn = document.getElementById('sendResetBtn');
         const resetEmail = document.getElementById('resetEmail');
         const resetModalMessage = document.getElementById('resetModalMessage');
-
-        let isRegisterMode = false;
 
         function showMessage(message, type = 'error') {
             messageArea.innerHTML = `<div class="${type === 'error' ? 'error-message' : (type === 'info' ? 'info-message' : 'success-message')}">${message}</div>`;
@@ -342,17 +89,17 @@
         function setLoading(loading) {
             if (loading) {
                 loginBtn.disabled = true;
-                loginBtn.innerHTML = '<span class="loading"></span> Please wait...';
+                loginBtn.innerHTML = '<span class="auth-loading"></span> Please wait...';
             } else {
                 loginBtn.disabled = false;
-                loginBtn.innerHTML = isRegisterMode ? 'Create Account' : 'Login to Dashboard';
+                loginBtn.innerHTML = 'Login to Dashboard';
             }
         }
 
         function setResetLoading(loading) {
             if (loading) {
                 sendResetBtn.disabled = true;
-                sendResetBtn.innerHTML = '<span class="loading"></span> Sending...';
+                sendResetBtn.innerHTML = '<span class="auth-loading"></span> Sending...';
             } else {
                 sendResetBtn.disabled = false;
                 sendResetBtn.innerHTML = 'Send Reset Link';
@@ -430,46 +177,9 @@
             }
         }
 
-        async function handleRegister(email, password) {
-            try {
-                const { data, error } = await supabaseClient.auth.signUp({
-                    email: email,
-                    password: password,
-                    options: {
-                        data: {
-                            full_name: 'Administrator'
-                        }
-                    }
-                });
-
-                if (error) {
-                    showMessage(error.message, 'error');
-                    return false;
-                }
-
-                if (data.user) {
-                    if (data.user.identities && data.user.identities.length === 0) {
-                        showMessage('This email is already registered. Please login instead.', 'info');
-                    } else {
-                        showMessage('✅ Registration successful! Please check your email to confirm your account.', 'success');
-                    }
-                    isRegisterMode = false;
-                    loginBtn.textContent = 'Login to Dashboard';
-                    showRegisterLink.textContent = 'Create now';
-                    emailInput.value = '';
-                    passwordInput.value = '';
-                }
-                return true;
-            } catch (error) {
-                console.error("Registration error:", error);
-                showMessage('Network error. Please try again.', 'error');
-                return false;
-            }
-        }
-
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const email = emailInput.value.trim();
             const password = passwordInput.value;
 
@@ -484,29 +194,8 @@
             }
 
             setLoading(true);
-
-            if (isRegisterMode) {
-                await handleRegister(email, password);
-            } else {
-                await handleLogin(email, password);
-            }
-
+            await handleLogin(email, password);
             setLoading(false);
-        });
-
-        showRegisterLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            isRegisterMode = !isRegisterMode;
-            
-            if (isRegisterMode) {
-                loginBtn.textContent = 'Create Account';
-                showRegisterLink.textContent = 'Back to Login';
-                showMessage('Create a new admin account. You will receive a confirmation email.', 'info');
-            } else {
-                loginBtn.textContent = 'Login to Dashboard';
-                showRegisterLink.textContent = 'Create now';
-                messageArea.innerHTML = '';
-            }
         });
 
         showResetLink.addEventListener('click', (e) => {
